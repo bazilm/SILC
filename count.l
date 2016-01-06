@@ -1,0 +1,40 @@
+%{
+#include<stdio.h>
+int wordcnt,linecnt,charcnt,intcnt,floatcnt;
+%}
+
+char [a-zA-Z]
+digit [0-9]
+
+%%
+{char}+		{wordcnt++;
+		charcnt += yyleng;
+		}
+
+{digit}+	{intcnt++;
+		 charcnt +=yyleng;
+		}
+{digit}+(\.{digit}+)?	{floatcnt++;
+			 charcnt += yyleng;
+			}
+
+\n	{
+	linecnt++;
+	charcnt++;
+	}
+.	charcnt++;
+
+%%
+
+int main()
+{
+yylex();
+return 0;
+}
+
+int yywrap()
+{
+printf("No. of lines = %d \nNo. of words = %d \nNo. of characters = %d\nNo. of integers = %d\nNo. of floats = %d\n",
+			linecnt,wordcnt,charcnt,intcnt,floatcnt);
+return 1;
+}

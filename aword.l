@@ -1,0 +1,29 @@
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+%}
+
+char [a-zA-Z]
+
+%%
+
+[aA]{char}+	{
+		if(yyleng==3)
+			printf("Found 3 letter string %s\n",yytext);
+		}
+
+.		{}		
+\n
+%%
+
+int main()
+{
+yylex();
+return 0;
+}
+
+int yywrap()
+{
+return 1;
+}
