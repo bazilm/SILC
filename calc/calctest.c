@@ -2,23 +2,24 @@
 #include<stdarg.h>
 #include "calc.h"
 
+int sym[26];
 
 int main()
 {
 Node * node1, * node2, * node3;
+
 int i,j;
 char oper;
 scanf("%d\n%d\n%c",&i,&j,&oper);
 
 node1 = makeConNode(i);
 node2 = makeConNode(j);
-node3 = makeOperNode(&oper,2,node1,node2);
+node3 = makeOperNode(oper,2,node1,node2);
 printf("%d\n",node3->oper.nops);
 
-for(i =0;i<node3->oper.nops;i++)
-{
-printf("%d\t",node3->oper.operands[i].con.value);
-}
+
+printf("%d\t",interpret(node3));
+
 return 0;
 }
 
@@ -43,7 +44,7 @@ p->var.id = id;
 return p;
 }
 
-Node * makeOperNode(char * oper,int nops,...)
+Node * makeOperNode(int oper,int nops,...)
 {
 va_list temp_args;
 va_start(temp_args,nops);
@@ -64,6 +65,60 @@ p->oper.operands[i] = *va_arg(temp_args,Node*);
 
 return p;
 }
+
+int interpret(Node * root)
+{
+switch(root->nodeType)
+{
+case CONSTANT:
+	{
+	
+	return root->con.value;
+	break;
+	}
+
+case VARIABLE:
+	{
+	return sym[root->var.id];
+	break;
+	}
+
+case OPERATOR:
+	{
+	
+	switch(root->oper.op)
+	{
+		case '+':
+			{
+			return interpret(&root->oper.operands[0]) + interpret(&root->oper.operands[1]);
+			break;
+			}
+
+		case '-':
+			{
+			return interpret(&root->oper.operands[0]) - interpret(&root->oper.operands[1]);
+			break;
+			}
+	
+		case '*':
+			{
+			return interpret(&root->oper.operands[0]) * interpret(&root->oper.operands[1]);
+			break;
+			}
+	
+		case '/':
+			{
+			return interpret(&root->oper.operands[0]) / interpret(&root->oper.operands[1]);
+			break;
+			}
+	}
+	}
+}
+}
+
+	
+
+
 
 
 

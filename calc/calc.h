@@ -12,7 +12,7 @@ int id;
 
 typedef struct 
 {
-char * op;
+int op;
 int nops;
 struct NodeTag *operands;
 }OperNode;
@@ -32,10 +32,11 @@ VarNode var;
 
 Node * makeConNode(int);
 Node * makeVarNode(int);
-Node * makeOperNode(char *,int,...);
+Node * makeOperNode(int,int,...);
+int interpret(Node *);
 Node * freeNode(Node *);
 
-
+extern int sym[26];
 
 
 
