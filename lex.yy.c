@@ -378,20 +378,19 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[18] =
+static yyconst flex_int16_t yy_accept[11] =
     {   0,
-        3,    3,    6,    3,    3,    3,    5,    3,    3,    4,
-        4,    1,    0,    0,    1,    2,    0
+        0,    0,    6,    4,    3,    2,    2,    1,    1,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
     {   0,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    2,
+        1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    3,
-        4,    5,    1,    1,    1,    1,    6,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    4,    4,    1,    4,    1,    4,    5,    5,    5,
+        5,    5,    5,    5,    5,    5,    5,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -416,39 +415,33 @@ static yyconst flex_int32_t yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static yyconst flex_int32_t yy_meta[7] =
+static yyconst flex_int32_t yy_meta[6] =
     {   0,
-        1,    2,    3,    3,    4,    5
+        1,    1,    1,    1,    2
     } ;
 
-static yyconst flex_int16_t yy_base[23] =
+static yyconst flex_int16_t yy_base[12] =
     {   0,
-        0,    0,   24,    0,    4,    0,    4,    0,    0,   25,
-       18,    0,   17,    0,    0,   25,   25,   10,   13,   12,
-       16,   10
+        0,    0,    7,    8,    8,    8,    8,    0,    0,    8,
+        4
     } ;
 
-static yyconst flex_int16_t yy_def[23] =
+static yyconst flex_int16_t yy_def[12] =
     {   0,
-       17,    1,   17,   18,   17,   19,   17,   18,    5,   17,
-       20,   21,   20,   22,   21,   17,    0,   17,   17,   17,
-       17,   17
+       10,    1,   10,   10,   10,   10,   10,   11,   11,    0,
+       10
     } ;
 
-static yyconst flex_int16_t yy_nxt[32] =
+static yyconst flex_int16_t yy_nxt[14] =
     {   0,
-        4,    4,    5,    5,    6,    7,    9,    9,   11,   12,
-        8,    8,   13,   13,   16,   13,   15,   10,   15,   15,
-       15,   14,   14,   17,    3,   17,   17,   17,   17,   17,
-       17
+        4,    5,    6,    7,    8,    9,   10,    3,   10,   10,
+       10,   10,   10
     } ;
 
-static yyconst flex_int16_t yy_chk[32] =
+static yyconst flex_int16_t yy_chk[14] =
     {   0,
-        1,    1,    1,    1,    1,    1,    5,    5,    7,    7,
-       18,   18,   20,   20,   22,   20,   21,   19,   21,   21,
-       21,   13,   11,    3,   17,   17,   17,   17,   17,   17,
-       17
+        1,    1,    1,    1,    1,   11,    3,   10,   10,   10,
+       10,   10,   10
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -465,10 +458,11 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "comments.l"
-#line 2 "comments.l"
-#include<stdio.h>
-#line 472 "lex.yy.c"
+#line 1 "infix_postfix.l"
+#line 2 "infix_postfix.l"
+#include<stdlib.h>
+#include "y.tab.h"
+#line 466 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -682,10 +676,10 @@ YY_DECL
 		}
 
 	{
-#line 9 "comments.l"
+#line 8 "infix_postfix.l"
 
 
-#line 689 "lex.yy.c"
+#line 683 "lex.yy.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -712,13 +706,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 18 )
+				if ( yy_current_state >= 11 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 25 );
+		while ( yy_base[yy_current_state] != 8 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -744,32 +738,33 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 11 "comments.l"
-{printf("%s\n",yytext);}
+#line 10 "infix_postfix.l"
+{yylval = atoi(yytext);
+		return NUM;
+		}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 13 "comments.l"
-{printf("%s\n",yytext);}
+#line 14 "infix_postfix.l"
+{return *yytext;}
 	YY_BREAK
 case 3:
-/* rule 3 can match eol */
 YY_RULE_SETUP
-#line 15 "comments.l"
-{}
+#line 16 "infix_postfix.l"
+
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 16 "comments.l"
-{}
+#line 17 "infix_postfix.l"
+{yyerror("Invalid expression");}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 19 "comments.l"
+#line 19 "infix_postfix.l"
 ECHO;
 	YY_BREAK
-#line 773 "lex.yy.c"
+#line 768 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1062,7 +1057,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 18 )
+			if ( yy_current_state >= 11 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1090,11 +1085,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 18 )
+		if ( yy_current_state >= 11 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 17);
+	yy_is_jam = (yy_current_state == 10);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1764,20 +1759,19 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 18 "comments.l"
+#line 18 "infix_postfix.l"
 
 
-
-int main()
-{
-FILE * file = fopen("lex.yy.c","r");
-yyin = file;
-yylex();
-return 0;
-}
 
 int yywrap()
 {
 return 1;
 }
+
+void yyerror(char * s)
+{
+printf("%s\n",s);
+}
+
+
 
