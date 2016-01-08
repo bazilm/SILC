@@ -45,11 +45,15 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INTEGER = 258
+    EXIT = 258,
+    INTEGER = 259,
+    VAR = 260
   };
 #endif
 /* Tokens.  */
-#define INTEGER 258
+#define EXIT 258
+#define INTEGER 259
+#define VAR 260
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -60,9 +64,10 @@ union YYSTYPE
 
 int ival;
 float fval;
+
 struct NodeTag* nval;
 
-#line 66 "y.tab.h" /* yacc.c:1909  */
+#line 71 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

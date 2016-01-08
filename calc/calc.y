@@ -14,10 +14,13 @@ void findEnd();
 {
 int ival;
 float fval;
+
 struct NodeTag* nval;
 }
 
+%token EXIT
 %token <ival> INTEGER 
+%token <ival> VAR
 %type <nval> expr 
 
 
@@ -29,6 +32,7 @@ struct NodeTag* nval;
 program: program expr '\n'	{printf("= %d\n",interpret($2));//freeNode($2);
 					}
 	|error '\n'
+	|EXIT '\n'		{return 0;}
 	|
 	;
 
@@ -40,12 +44,15 @@ expr :
 					$$ = makeOperNode('/',2,$1,$3);	
 				else
 					{
-					yyerror("Division By Zero Error\n");
-					findEnd();
+					yyerror("Division By Zero Error");
+					
 					}
 				}
-	|INTEGER		{$$ = makeConNode($1);	
-				}
+	|VAR '=' expr		{$$ = makeVarNode($1);
+				sym[$1]=interpret($3);}
+	|INTEGER		{$$ = makeConNode($1);}
+	|VAR			{$$ = makeVarNode($1);}
+					
 	;
 %%
 
@@ -64,7 +71,7 @@ printf("%s\n",s);
 void findEnd()
 {
 int i;
-while ((i=yylex())!=';'||(i=yylex())!='\n');
+while ((i=yylex())!='\n');
 }
 	
 Node * makeConNode(int value)
@@ -126,8 +133,13 @@ p->oper.operands[i] = *va_arg(temp_args,Node*);
 return p;
 }
 
+
 int interpret(Node * root)
 {
+
+if(!root)
+	return 0;
+
 switch(root->nodeType)
 {
 case CONSTANT:

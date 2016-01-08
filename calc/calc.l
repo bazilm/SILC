@@ -4,6 +4,7 @@
 %}
 
 digits	[0-9]
+
 %%
 
 {digits}+	{yylval.ival = atoi(yytext);
@@ -11,7 +12,9 @@ digits	[0-9]
 		}
 
 [-+*/;\n]		{return *yytext;}
-
+[a-z]		{yylval.ival = *yytext - 'a';
+		return VAR;}
+exit		{return EXIT;}
 [ \t]		
 
 .		{return *yytext;}	
