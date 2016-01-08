@@ -32,7 +32,7 @@ VarNode var;
 
 Node * makeConNode(int);
 Node * makeVarNode(int);
-Node * makeOperNode(char *,int,...);
+Node * makeOperNode(int,int,...);
 int interpret(Node *);
 Node * freeNode(Node *);
 

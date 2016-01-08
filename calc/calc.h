@@ -34,7 +34,7 @@ Node * makeConNode(int);
 Node * makeVarNode(int);
 Node * makeOperNode(int,int,...);
 int interpret(Node *);
-Node * freeNode(Node *);
+void freeNode(Node *);
 
 extern int sym[26];
 
