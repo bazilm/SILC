@@ -45,39 +45,49 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    EXIT = 258,
-    READ = 259,
-    WRITE = 260,
-    EQUALS = 261,
-    LE = 262,
-    GE = 263,
-    INTEGER = 264,
-    VAR = 265
+    BEG = 258,
+    END = 259,
+    READ = 260,
+    WRITE = 261,
+    EQUALS = 262,
+    LE = 263,
+    GE = 264,
+    IF = 265,
+    THEN = 266,
+    ELSE = 267,
+    ENDIF = 268,
+    INTEGER = 269,
+    VAR = 270
   };
 #endif
 /* Tokens.  */
-#define EXIT 258
-#define READ 259
-#define WRITE 260
-#define EQUALS 261
-#define LE 262
-#define GE 263
-#define INTEGER 264
-#define VAR 265
+#define BEG 258
+#define END 259
+#define READ 260
+#define WRITE 261
+#define EQUALS 262
+#define LE 263
+#define GE 264
+#define IF 265
+#define THEN 266
+#define ELSE 267
+#define ENDIF 268
+#define INTEGER 269
+#define VAR 270
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 15 "expl.y" /* yacc.c:1909  */
+#line 12 "expl.y" /* yacc.c:1909  */
 
 int ival;
 float fval;
 char cval;
 struct NodeTag* nval;
 
-#line 81 "y.tab.h" /* yacc.c:1909  */
+#line 91 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

@@ -3,11 +3,6 @@
 
 typedef enum  {CONSTANT,OPERATOR,VARIABLE} NodeType ;
 
-struct returnType
-{
-int value;
-bool printable;
-};
 
 typedef struct 
 {
@@ -42,7 +37,7 @@ VarNode var;
 Node * makeConNode(int);
 Node * makeVarNode(char);
 Node * makeOperNode(int,int,...);
-struct returnType interpret(Node *);
+int interpret(Node *);
 void freeNode(Node *);
 
 extern int *sym[26];

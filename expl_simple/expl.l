@@ -1,6 +1,7 @@
 %{
 #include<stdlib.h>
 #include "y.tab.h"
+extern int lineNo;
 %}
 
 digits	[0-9]
@@ -11,7 +12,7 @@ digits	[0-9]
 		return INTEGER;
 		}
 
-[-+*/;\n]	{return *yytext;}
+[-+*/;]	{return *yytext;}
 [a-z]		{yylval.cval = *yytext;
 		return VAR;}
 \=\=		return EQUALS;
@@ -19,8 +20,15 @@ digits	[0-9]
 \>\=		return GE;
 read		return READ;
 write		return WRITE;
-exit		return EXIT;
-[ \t]		
+BEGIN		return BEG;
+END		return END;
+if		return IF;
+then		return THEN;
+else		return ELSE;
+ENDIF		return ENDIF;
+
+[ \t]
+\n		lineNo++;		
 
 .		return *yytext;	
 
