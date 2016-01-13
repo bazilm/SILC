@@ -2,7 +2,7 @@
 #include<stdarg.h>
 
 typedef enum  {CONSTANT,OPERATOR,VARIABLE} NodeType ;
-
+typedef enum  {INT,BOOLEAN} Type;
 
 typedef struct 
 {
@@ -24,7 +24,7 @@ struct NodeTag *operands;
 typedef struct NodeTag
 {
 NodeType nodeType;
-
+Type type;
 union
 {
 ConNode con;
@@ -37,7 +37,7 @@ VarNode var;
 Node * makeConNode(int);
 Node * makeVarNode(char);
 Node * makeOperNode(int,int,...);
-void interpret(Node *);
+int interpret(Node *);
 void freeNode(Node *);
 
 extern int *sym[26];

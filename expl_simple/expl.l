@@ -15,17 +15,24 @@ digits	[0-9]
 [-+*/;]	{return *yytext;}
 [a-z]		{yylval.cval = *yytext;
 		return VAR;}
-\=\=		return EQUALS;
+\=\=		return EQ;
 \<\=		return LE;
 \>\=		return GE;
+!=		return NE;
+and		return AND;
+or		return OR;
+not		return NOT;
 read		return READ;
 write		return WRITE;
-BEGIN		return BEG;
-END		return END;
+begin		return BEG;
+end		return END;
 if		return IF;
 then		return THEN;
 else		return ELSE;
-ENDIF		return ENDIF;
+endif		return ENDIF;
+while		return WHILE;
+do		return DO;
+endwhile 	return ENDWHILE;
 
 [ \t]
 \n		lineNo++;		

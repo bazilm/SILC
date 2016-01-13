@@ -49,15 +49,22 @@ extern int yydebug;
     END = 259,
     READ = 260,
     WRITE = 261,
-    EQUALS = 262,
-    LE = 263,
-    GE = 264,
-    IF = 265,
-    THEN = 266,
-    ELSE = 267,
-    ENDIF = 268,
-    INTEGER = 269,
-    VAR = 270
+    EQ = 262,
+    NE = 263,
+    LE = 264,
+    GE = 265,
+    AND = 266,
+    OR = 267,
+    NOT = 268,
+    IF = 269,
+    THEN = 270,
+    ELSE = 271,
+    ENDIF = 272,
+    WHILE = 273,
+    DO = 274,
+    ENDWHILE = 275,
+    INTEGER = 276,
+    VAR = 277
   };
 #endif
 /* Tokens.  */
@@ -65,15 +72,22 @@ extern int yydebug;
 #define END 259
 #define READ 260
 #define WRITE 261
-#define EQUALS 262
-#define LE 263
-#define GE 264
-#define IF 265
-#define THEN 266
-#define ELSE 267
-#define ENDIF 268
-#define INTEGER 269
-#define VAR 270
+#define EQ 262
+#define NE 263
+#define LE 264
+#define GE 265
+#define AND 266
+#define OR 267
+#define NOT 268
+#define IF 269
+#define THEN 270
+#define ELSE 271
+#define ENDIF 272
+#define WHILE 273
+#define DO 274
+#define ENDWHILE 275
+#define INTEGER 276
+#define VAR 277
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -87,7 +101,7 @@ float fval;
 char cval;
 struct NodeTag* nval;
 
-#line 91 "y.tab.h" /* yacc.c:1909  */
+#line 105 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
