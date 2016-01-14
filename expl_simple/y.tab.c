@@ -66,13 +66,14 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<math.h>
 #include "parse.h"
 
-int *sym[26];
+STable *sTableBeg,*sTableEnd;
 int lineNo;
 
-#line 76 "y.tab.c" /* yacc.c:339  */
+#line 77 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -156,14 +157,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 12 "expl.y" /* yacc.c:355  */
+#line 13 "expl.y" /* yacc.c:355  */
 
 int ival;
-float fval;
-char cval;
 struct NodeTag* nval;
 
-#line 167 "y.tab.c" /* yacc.c:355  */
+#line 166 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -178,7 +177,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 182 "y.tab.c" /* yacc.c:358  */
+#line 181 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -477,10 +476,10 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    33,    33,    34,    37,    38,    41,    42,    43,    44,
-      45,    46,    50,    51,    52,    53,    54,    55,    56,    57,
-      58,    59,    60,    61,    62,    63,    64,    65,    66,    67,
-      68,    69,    70,    71,    72,    73,    74,    75,    76
+       0,    32,    32,    33,    36,    37,    40,    41,    42,    43,
+      44,    45,    49,    50,    51,    52,    53,    54,    55,    56,
+      57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
+      67,    68,    69,    70,    71,    72,    73,    74,    75
 };
 #endif
 
@@ -1356,229 +1355,229 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 33 "expl.y" /* yacc.c:1646  */
+#line 32 "expl.y" /* yacc.c:1646  */
     {interpret((yyvsp[-1].nval));	return 0;			}
-#line 1362 "y.tab.c" /* yacc.c:1646  */
+#line 1361 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 34 "expl.y" /* yacc.c:1646  */
+#line 33 "expl.y" /* yacc.c:1646  */
     { return 0;					}
-#line 1368 "y.tab.c" /* yacc.c:1646  */
+#line 1367 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 37 "expl.y" /* yacc.c:1646  */
+#line 36 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('$',2,(yyvsp[-1].nval),(yyvsp[0].nval));	}
-#line 1374 "y.tab.c" /* yacc.c:1646  */
+#line 1373 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 38 "expl.y" /* yacc.c:1646  */
+#line 37 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = (yyvsp[0].nval);				}
-#line 1380 "y.tab.c" /* yacc.c:1646  */
+#line 1379 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 41 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(READ,1,makeVarNode((yyvsp[-2].cval)));	}
-#line 1386 "y.tab.c" /* yacc.c:1646  */
+#line 40 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval) = makeOperNode(READ,1,(yyvsp[-2].nval));	}
+#line 1385 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 42 "expl.y" /* yacc.c:1646  */
+#line 41 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(WRITE,1,(yyvsp[-2].nval));			}
-#line 1392 "y.tab.c" /* yacc.c:1646  */
+#line 1391 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 43 "expl.y" /* yacc.c:1646  */
+#line 42 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(IF,3,(yyvsp[-7].nval),(yyvsp[-4].nval),(yyvsp[-2].nval));		}
-#line 1398 "y.tab.c" /* yacc.c:1646  */
+#line 1397 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 44 "expl.y" /* yacc.c:1646  */
+#line 43 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(IF,2,(yyvsp[-5].nval),(yyvsp[-2].nval));			}
-#line 1404 "y.tab.c" /* yacc.c:1646  */
+#line 1403 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 45 "expl.y" /* yacc.c:1646  */
+#line 44 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(WHILE,2,(yyvsp[-5].nval),(yyvsp[-2].nval));		}
-#line 1410 "y.tab.c" /* yacc.c:1646  */
+#line 1409 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 46 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode('=',2,makeVarNode((yyvsp[-3].cval)),(yyvsp[-1].nval));	}
-#line 1416 "y.tab.c" /* yacc.c:1646  */
+#line 45 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval) = makeOperNode('=',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
+#line 1415 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 50 "expl.y" /* yacc.c:1646  */
+#line 49 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('+',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1422 "y.tab.c" /* yacc.c:1646  */
+#line 1421 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 51 "expl.y" /* yacc.c:1646  */
+#line 50 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('-',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1428 "y.tab.c" /* yacc.c:1646  */
+#line 1427 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 52 "expl.y" /* yacc.c:1646  */
+#line 51 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('*',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1434 "y.tab.c" /* yacc.c:1646  */
+#line 1433 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 53 "expl.y" /* yacc.c:1646  */
+#line 52 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('/',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1440 "y.tab.c" /* yacc.c:1646  */
+#line 1439 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 54 "expl.y" /* yacc.c:1646  */
+#line 53 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('%',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1446 "y.tab.c" /* yacc.c:1646  */
+#line 1445 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 55 "expl.y" /* yacc.c:1646  */
+#line 54 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('+',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1452 "y.tab.c" /* yacc.c:1646  */
+#line 1451 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 56 "expl.y" /* yacc.c:1646  */
+#line 55 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('-',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1458 "y.tab.c" /* yacc.c:1646  */
+#line 1457 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 57 "expl.y" /* yacc.c:1646  */
+#line 56 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('*',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1464 "y.tab.c" /* yacc.c:1646  */
+#line 1463 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 58 "expl.y" /* yacc.c:1646  */
+#line 57 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('/',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1470 "y.tab.c" /* yacc.c:1646  */
+#line 1469 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 59 "expl.y" /* yacc.c:1646  */
+#line 58 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('%',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1476 "y.tab.c" /* yacc.c:1646  */
+#line 1475 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 60 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(EQUALS,2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1482 "y.tab.c" /* yacc.c:1646  */
+#line 59 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval) = makeOperNode(EQ,2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
+#line 1481 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 61 "expl.y" /* yacc.c:1646  */
+#line 60 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('<',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1488 "y.tab.c" /* yacc.c:1646  */
+#line 1487 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 62 "expl.y" /* yacc.c:1646  */
+#line 61 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('>',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1494 "y.tab.c" /* yacc.c:1646  */
+#line 1493 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 63 "expl.y" /* yacc.c:1646  */
+#line 62 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(LE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1500 "y.tab.c" /* yacc.c:1646  */
+#line 1499 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 64 "expl.y" /* yacc.c:1646  */
+#line 63 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(GE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1506 "y.tab.c" /* yacc.c:1646  */
+#line 1505 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 65 "expl.y" /* yacc.c:1646  */
+#line 64 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1512 "y.tab.c" /* yacc.c:1646  */
+#line 1511 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 66 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(EQUALS,2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1518 "y.tab.c" /* yacc.c:1646  */
+#line 65 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval) = makeOperNode(EQ,2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
+#line 1517 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 67 "expl.y" /* yacc.c:1646  */
+#line 66 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('<',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1524 "y.tab.c" /* yacc.c:1646  */
+#line 1523 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 68 "expl.y" /* yacc.c:1646  */
+#line 67 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('>',2,(yyvsp[-3].nval),(yyvsp[-1].nval));	}
-#line 1530 "y.tab.c" /* yacc.c:1646  */
+#line 1529 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 69 "expl.y" /* yacc.c:1646  */
+#line 68 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(LE,2,(yyvsp[-3].nval),(yyvsp[-1].nval));		}
-#line 1536 "y.tab.c" /* yacc.c:1646  */
+#line 1535 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 70 "expl.y" /* yacc.c:1646  */
+#line 69 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(GE,2,(yyvsp[-3].nval),(yyvsp[-1].nval));		}
-#line 1542 "y.tab.c" /* yacc.c:1646  */
+#line 1541 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 71 "expl.y" /* yacc.c:1646  */
+#line 70 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NE,2,(yyvsp[-3].nval),(yyvsp[-1].nval));		}
-#line 1548 "y.tab.c" /* yacc.c:1646  */
+#line 1547 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 72 "expl.y" /* yacc.c:1646  */
+#line 71 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(AND,2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1554 "y.tab.c" /* yacc.c:1646  */
+#line 1553 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 73 "expl.y" /* yacc.c:1646  */
+#line 72 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(OR,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1560 "y.tab.c" /* yacc.c:1646  */
+#line 1559 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 74 "expl.y" /* yacc.c:1646  */
+#line 73 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NOT,1,(yyvsp[0].nval));		}
-#line 1566 "y.tab.c" /* yacc.c:1646  */
+#line 1565 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 75 "expl.y" /* yacc.c:1646  */
+#line 74 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeConNode((yyvsp[0].ival));			}
-#line 1572 "y.tab.c" /* yacc.c:1646  */
+#line 1571 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 76 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeVarNode((yyvsp[0].cval));			}
-#line 1578 "y.tab.c" /* yacc.c:1646  */
+#line 75 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval) = (yyvsp[0].nval);			}
+#line 1577 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1582 "y.tab.c" /* yacc.c:1646  */
+#line 1581 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1806,7 +1805,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 78 "expl.y" /* yacc.c:1906  */
+#line 77 "expl.y" /* yacc.c:1906  */
 
 
 int main(int argc, char *argv[])
@@ -1816,6 +1815,7 @@ if(argc>1)
 extern FILE * yyin;
 yyin = fopen(argv[1],"r");
 }
+
 lineNo=1;
 yyparse();
 return 0;
@@ -1828,6 +1828,57 @@ printf("%s:%d\n",s,lineNo);
 }
 
 
+STable *GInstall(char *name,Type type,int size)
+{
+STable *sTable = malloc(sizeof(STable));
+sTable->name = name;
+sTable->type = type;
+
+switch(type)
+{
+	case INT:
+		{
+		sTable->size = 1;
+		sTable->binding = malloc(sizeof(int));
+		break;
+		}
+
+	case BOOLEAN:
+		{
+		sTable->size=1;
+		sTable->binding = malloc(sizeof(bool));
+		break;
+		}
+}
+
+sTable->next = NULL;
+
+if(sTableBeg==NULL)
+	{
+	sTableBeg=sTable;
+	sTableEnd=sTable;
+	}
+else
+	{
+	sTableEnd->next = sTable;
+	sTableEnd = sTable;
+	}
+return sTableEnd;
+}
+
+STable *LookUp(char * name)
+{
+STable * sTable = sTableBeg;
+while(sTable!=NULL)
+	{
+	if(strcmp(sTable->name,name)==0)
+		return sTable;
+
+	sTable=sTable->next;
+	}
+return NULL;
+}
+
 	
 Node * makeConNode(int value)
 {
@@ -1839,12 +1890,14 @@ if((p =malloc(sizeof(Node))) == NULL)
 	exit(0);
 	}
 p->nodeType = CONSTANT;
+p->type = INT;
 p->con.value = value;
 return p;
 }
 
-Node * makeVarNode(char id)
+Node * makeVarNode(char *name)
 {
+
 Node *p;
 if((p =malloc(sizeof(Node))) == NULL)
 	{
@@ -1852,7 +1905,9 @@ if((p =malloc(sizeof(Node))) == NULL)
 	exit(0);
 	}
 p->nodeType = VARIABLE;
-p->var.id = id - 'a';
+p->type = INT;
+p->var.name = malloc(sizeof(name));
+strcpy(p->var.name,name);
 return p;
 }
 
@@ -1892,6 +1947,8 @@ return p;
 int interpret(Node * root)
 {
 
+STable * sTableEntry;
+
 if(!root)
 	{
 	printf("Error: Parse Tree root NULL\n");
@@ -1909,154 +1966,357 @@ case CONSTANT:
 
 case VARIABLE:
 	{
-	if(sym[root->var.id]==NULL)
+	sTableEntry = LookUp(root->var.name);
+	if(sTableEntry==NULL)
 		{
-		printf("Error: Variable %c not initialized\n",root->var.id+'a');
+		printf("Error: Variable %s not declared\n",root->var.name);
 		return 0;
 		}
-	return *sym[root->var.id];
+
+	else if(sTableEntry->size==0)
+		{
+		printf("Error: Variable %s not initialized\n",root->var.name);
+		return 0;
+		}
+	root->type = sTableEntry->type;
+	return *(int *)(sTableEntry->binding);
 	break;
 	}
 
 case OPERATOR:
 	{
-	
+	int oper1,oper2,oper3;
 	switch(root->oper.op)
 	{
 		case '+':
 			{
-			return interpret(&root->oper.operands[0]) + interpret(&root->oper.operands[1]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
+				{
+				root->type = INT;
+				return oper1 + oper2;
+				}
+			else
+				{
+				printf("Type Mismatch in %c in line %d\n",root->oper.op,lineNo);
+				exit(1);
+				}
 			break;
 			}
 
 		case '-':
 			{
-			return interpret(&root->oper.operands[0]) - interpret(&root->oper.operands[1]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
+				{
+				root->type = INT;
+				return oper1 - oper2;
+				}
+			else
+				{
+				printf("Type Mismatch in %c in line %d\n",root->oper.op,lineNo);
+				exit(1);
+				}
 			break;
 			}
 	
 		case '*':
 			{
-			return interpret(&root->oper.operands[0]) * interpret(&root->oper.operands[1]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
+				{
+				root->type = INT;
+				return oper1 * oper2;	
+				}
+			else
+				{
+				printf("Type Mismatch in %c in line %d\n",root->oper.op,lineNo);
+				exit(1);
+				}
 			break;
 			}
 	
 		case '/':
 			{
-			return interpret(&root->oper.operands[0]) / interpret(&root->oper.operands[1]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
+				{
+				root->type = INT;
+				return oper1 / oper2;
+				}
+			else
+				{
+				printf("Type Mismatch in %c in line %d\n",root->oper.op,lineNo);
+				exit(1);
+				}
 			break;
 			}
 	
 		case '%':
 			{
-			return interpret(&root->oper.operands[0]) % interpret(&root->oper.operands[1]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
+				{
+				root->type = INT;
+				return oper1 % oper2;
+				}
+			else
+				{
+				printf("Type Mismatch in %c in line %d\n",root->oper.op,lineNo);
+				exit(1);
+				}
 			break;
 			}
 
 		case '=':
 			{
-			if (sym[root->oper.operands[0].var.id]==NULL)
-				sym[root->oper.operands[0].var.id] = malloc(sizeof(int));
+			//printf("in =\n");
+			oper1 = interpret(&root->oper.operands[1]);
+			sTableEntry = LookUp(root->oper.operands[0].var.name);
 
-			*sym[root->oper.operands[0].var.id] = interpret(&root->oper.operands[1]);
+			//printf("%s\n",root->oper.operands[0].var.name);
+			if(!sTableEntry)
+				sTableEntry = GInstall(root->oper.operands[0].var.name,root->oper.operands[1].type,1);
+
+			*(int *)(sTableEntry->binding) = oper1;
+			
+			
 			return 1;
 			break;
 			}	
 			
 		case EQ:
 			{
-			
-			
-			if (interpret(&root->oper.operands[0])==interpret(&root->oper.operands[1]))
-				return 1;
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				if (oper1==oper2)
+					return 1;
 				
-			else
-				return 0;
-							
+				else
+					return 0;
 			}
-
+			else
+			{
+				
+				printf("Type Mismatch in ==\n");
+				exit(1);
+				
+			}
+			break;
+			}
 		case '<':
 			{
 			
-			if (interpret(&root->oper.operands[0])<interpret(&root->oper.operands[1]))
-				return 1;
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				if (oper1<oper2)
+					return 1;
+				
+				else
+					return 0;
+			}
 			else
-				return 0;
+			{
+				
+				printf("Type Mismatch in <\n");
+				exit(1);
+				
+			}
+			break;
 			}
 
 		case '>':
 			{
 			
-			if (interpret(&root->oper.operands[0])>interpret(&root->oper.operands[1]))
-				return 1;
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				if (oper1>oper2)
+					return 1;
+				
+				else
+					return 0;
+			}
 			else
-				return 0;
+			{
+				
+				printf("Type Mismatch in >\n");
+				exit(1);
+				
+			}
+			break;
 							
 			}
 
 		case LE:
 			{
-			
-			if (interpret(&root->oper.operands[0])<=interpret(&root->oper.operands[1]))
-				return 1;
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				if (oper1<=oper2)
+					return 1;
+				
+				else
+					return 0;
+			}
 			else
-				return 0;
+			{
+				
+				printf("Type Mismatch in <=\n");
+				exit(1);
+				
+			}
+			break;
 			}
 
 		case GE:
 			{
 			
-			if (interpret(&root->oper.operands[0])>=interpret(&root->oper.operands[1]))
-				return 1;
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				if (oper1>=oper2)
+					return 1;
+				
+				else
+					return 0;
+			}
 			else
-				return 0;
-							
+			{
+				
+				printf("Type Mismatch in >=\n");
+				exit(1);
+				
+			}
+			break;		
 			}
 
 		case NE:
 			{
-			if (interpret(&root->oper.operands[0])!=interpret(&root->oper.operands[1]))
-				return 1;
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				if (oper1!=oper2)
+					return 1;
+				
+				else
+					return 0;
+			}
 			else
-				return 0;
+			{
+				
+				printf("Type Mismatch in !=\n");
+				exit(1);
+				
+			}
+			break;
 			}
 	
 		case AND:
 			{
-			return interpret(&root->oper.operands[0])&&interpret(&root->oper.operands[1]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				return interpret(&root->oper.operands[0])&&interpret(&root->oper.operands[1]);
 			}
+			else
+			{
+				
+				printf("Type Mismatch in ==\n");
+				exit(1);
+				
+			}
+			break;}
 
 		case OR:
 			{
-			return interpret(&root->oper.operands[0])||interpret(&root->oper.operands[1]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if(root->oper.operands[0].type == root->oper.operands[1].type)
+			{
+				root->type = BOOLEAN;
+				return interpret(&root->oper.operands[0])||interpret(&root->oper.operands[1]);
+
 			}
+			else
+			{
+				
+				printf("Type Mismatch in ==\n");
+				exit(1);
+				
+			}
+			break;}
 
 		case NOT:
 			{
-			return !interpret(&root->oper.operands[0]);
+			oper1 = interpret(&root->oper.operands[0]);
+			oper2 = interpret(&root->oper.operands[1]);
+			if((root->oper.operands[0].type == root->oper.operands[1].type))
+			{
+				root->type = BOOLEAN;
+				return !interpret(&root->oper.operands[0]);
 			}
+			else
+			{
+				
+				printf("Type Mismatch in ==\n");
+				exit(1);
+				
+			}
+			break;}
 		case READ:
 			{
+			sTableEntry =  LookUp(root->oper.operands[0].var.name);
 			
-			if (sym[root->oper.operands[0].var.id]==NULL)
-				sym[root->oper.operands[0].var.id] = malloc(sizeof(int));
-
-			scanf("%d",sym[root->oper.operands[0].var.id]);
-			
-			
+			if(!sTableEntry)
+				sTableEntry = GInstall(root->oper.operands[0].var.name,INT,1);
+			scanf("%d",(int *)(sTableEntry->binding));
+						
 			return 1;
 			break;
 			}
 
 		case WRITE:
 			{
+			//printf("in write\n");
 			if(root->oper.operands[0].nodeType == VARIABLE)
 			{
-			 if (sym[root->oper.operands[0].var.id]==NULL)
-				printf("Error: Variable %c Not initialized\n",root->oper.operands[0].var.id+'a');
+			sTableEntry = LookUp(root->oper.operands[0].var.name);
+
+			 if (!sTableEntry)
+				{
+				printf("Error: Variable %s Not declared\n",root->oper.operands[0].var.name);
+				return 0;
+				}
+			 else if (sTableEntry->size==0)
+				{
+				printf("Error: Variable %s Not initialized\n",sTableEntry->name);
+				return 0;
+				}
 
 			 else
-				printf("%d\n",*sym[root->oper.operands[0].var.id]);
+				printf("%d\n",*(int *)(sTableEntry->binding));
 			}
 
 			else
@@ -2106,7 +2366,7 @@ case CONSTANT:
 
 case VARIABLE:
 	{
-	sym[node->var.id] = 0;
+	
 	free(node);
 	break;
 	}

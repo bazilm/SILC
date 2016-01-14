@@ -5,6 +5,8 @@ extern int lineNo;
 %}
 
 digits	[0-9]
+alphabets [a-zA-Z]
+identifiers {alphabets}({alphabets}|{digits})*
 
 %%
 
@@ -12,9 +14,7 @@ digits	[0-9]
 		return INTEGER;
 		}
 
-[-+*/;]	{return *yytext;}
-[a-z]		{yylval.cval = *yytext;
-		return VAR;}
+[-+*/;]		{return *yytext;}
 \=\=		return EQ;
 \<\=		return LE;
 \>\=		return GE;
@@ -30,7 +30,13 @@ if		return IF;
 then		return THEN;
 else		return ELSE;
 endif		return ENDIF;
-
+while		return WHILE;
+do		return DO;
+endwhile 	return ENDWHILE;
+{identifiers}	{yylval.id = LookUp(yytext);
+		if(!yylval.id)
+			yylval.id = GInstall(yytext,INT,1);
+		return VAR;}
 
 [ \t]
 \n		lineNo++;		

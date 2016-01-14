@@ -94,14 +94,12 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 12 "expl.y" /* yacc.c:1909  */
+#line 13 "expl.y" /* yacc.c:1909  */
 
 int ival;
-float fval;
-char cval;
 struct NodeTag* nval;
 
-#line 105 "y.tab.h" /* yacc.c:1909  */
+#line 103 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

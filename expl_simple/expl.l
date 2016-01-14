@@ -5,6 +5,8 @@ extern int lineNo;
 %}
 
 digits	[0-9]
+alphabets [a-zA-Z]
+identifiers {alphabets}({alphabets}|{digits})*
 
 %%
 
@@ -12,9 +14,7 @@ digits	[0-9]
 		return INTEGER;
 		}
 
-[-+*/;]	{return *yytext;}
-[a-z]		{yylval.cval = *yytext;
-		return VAR;}
+[-+*/;]		{return *yytext;}
 \=\=		return EQ;
 \<\=		return LE;
 \>\=		return GE;
@@ -33,6 +33,9 @@ endif		return ENDIF;
 while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
+{identifiers}	{
+		yylval.nval = makeVarNode(yytext);
+		return VAR;}
 
 [ \t]
 \n		lineNo++;		
