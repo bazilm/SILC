@@ -22,6 +22,7 @@ int value;
 typedef struct 
 {
 char * name;
+int index;
 }VarNode;
 
 typedef struct 
@@ -50,7 +51,7 @@ Node * makeOperNode(int,int,...);
 int interpret(Node *);
 void freeNode(Node *);
 
-STable * makeSTable();
+void makeSTable(Node *,Type);
 STable * GInstall(char *,Type,int);
 STable * LookUp(char *);
 

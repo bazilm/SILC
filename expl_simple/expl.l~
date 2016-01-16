@@ -10,6 +10,11 @@ identifiers {alphabets}({alphabets}|{digits})*
 
 %%
 
+decl		return DECL;
+enddecl		return ENDDECL;
+int		return INTEGER;
+boolean		return BOOLEAN;
+
 {digits}+	{yylval.ival = atoi(yytext);
 		return INTEGER;
 		}
@@ -33,9 +38,8 @@ endif		return ENDIF;
 while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
-{identifiers}	{yylval.id = LookUp(yytext);
-		if(!yylval.id)
-			yylval.id = GInstall(yytext,INT,1);
+{identifiers}	{
+		yylval.nval = makeVarNode(yytext);
 		return VAR;}
 
 [ \t]

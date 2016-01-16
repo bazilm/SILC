@@ -46,48 +46,56 @@ extern int yydebug;
   enum yytokentype
   {
     BEG = 258,
-    END = 259,
-    READ = 260,
-    WRITE = 261,
-    EQ = 262,
-    NE = 263,
-    LE = 264,
-    GE = 265,
-    AND = 266,
-    OR = 267,
-    NOT = 268,
-    IF = 269,
-    THEN = 270,
-    ELSE = 271,
-    ENDIF = 272,
-    WHILE = 273,
-    DO = 274,
-    ENDWHILE = 275,
-    INTEGER = 276,
-    VAR = 277
+    DECL = 259,
+    ENDDECL = 260,
+    INTEGER = 261,
+    BOOLEAN = 262,
+    END = 263,
+    READ = 264,
+    WRITE = 265,
+    EQ = 266,
+    NE = 267,
+    LE = 268,
+    GE = 269,
+    AND = 270,
+    OR = 271,
+    NOT = 272,
+    IF = 273,
+    THEN = 274,
+    ELSE = 275,
+    ENDIF = 276,
+    WHILE = 277,
+    DO = 278,
+    ENDWHILE = 279,
+    CONST = 280,
+    VAR = 281
   };
 #endif
 /* Tokens.  */
 #define BEG 258
-#define END 259
-#define READ 260
-#define WRITE 261
-#define EQ 262
-#define NE 263
-#define LE 264
-#define GE 265
-#define AND 266
-#define OR 267
-#define NOT 268
-#define IF 269
-#define THEN 270
-#define ELSE 271
-#define ENDIF 272
-#define WHILE 273
-#define DO 274
-#define ENDWHILE 275
-#define INTEGER 276
-#define VAR 277
+#define DECL 259
+#define ENDDECL 260
+#define INTEGER 261
+#define BOOLEAN 262
+#define END 263
+#define READ 264
+#define WRITE 265
+#define EQ 266
+#define NE 267
+#define LE 268
+#define GE 269
+#define AND 270
+#define OR 271
+#define NOT 272
+#define IF 273
+#define THEN 274
+#define ELSE 275
+#define ENDIF 276
+#define WHILE 277
+#define DO 278
+#define ENDWHILE 279
+#define CONST 280
+#define VAR 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -99,7 +107,7 @@ union YYSTYPE
 int ival;
 struct NodeTag* nval;
 
-#line 103 "y.tab.h" /* yacc.c:1909  */
+#line 111 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

@@ -10,8 +10,13 @@ identifiers {alphabets}({alphabets}|{digits})*
 
 %%
 
+decl		return DECL;
+enddecl		return ENDDECL;
+int		return INTEGER;
+boolean		return BOOLEAN;
+
 {digits}+	{yylval.ival = atoi(yytext);
-		return INTEGER;
+		return CONST;
 		}
 
 [-+*/;]		{return *yytext;}
