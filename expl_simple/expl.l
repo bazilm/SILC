@@ -13,7 +13,6 @@ identifiers {alphabets}({alphabets}|{digits})*
 decl		return DECL;
 enddecl		return ENDDECL;
 int		return INTEGER;
-boolean		return BOOLEAN;
 
 {digits}+	{yylval.ival = atoi(yytext);
 		return CONST;
@@ -38,6 +37,10 @@ endif		return ENDIF;
 while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
+\".+\"		{
+		yylval.nval = makeConNode(0,yytext);
+		return STRCONST;
+		}
 {identifiers}	{
 		yylval.nval = makeVarNode(yytext);
 		return VAR;}

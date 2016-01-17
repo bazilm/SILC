@@ -1,0 +1,34 @@
+begin
+decl
+int a[100],n,i,temp,j;
+enddecl
+
+read(n);
+i=0;
+while (i<n) do
+	read(a[i]);
+	i=i+1;
+endwhile;
+
+i=0;
+j=0;
+
+while (i<n) do
+	j=i+1;
+	while(j<n) do
+		if (a[i]>a[j]) then
+			temp = a[j];
+			a[j]=a[i];
+			a[i]=temp;
+		endif;
+	j=j+1;
+	endwhile;
+i=i+1;
+endwhile;
+
+i=0;
+while(i<n) do
+	write(a[i]);
+	i=i+1;
+endwhile;
+end
