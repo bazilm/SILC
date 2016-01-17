@@ -2,9 +2,10 @@ begin
 decl
 int a[100],n,i,temp,j;
 enddecl
-
+write("Enter the number of elements");
 read(n);
 i=0;
+write("Enter the elements");
 while (i<n) do
 	read(a[i]);
 	i=i+1;
@@ -25,7 +26,7 @@ while (i<n) do
 	endwhile;
 i=i+1;
 endwhile;
-
+write("The sorted array is:");
 i=0;
 while(i<n) do
 	write(a[i]);

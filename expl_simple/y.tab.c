@@ -2039,8 +2039,8 @@ else
 	{
 	p->nodeType = CONSTANT;
 	p->type = STRING;
-	p->con.string = malloc(sizeof(string)-3);
-	strncpy(p->con.string,string,string+strlen(string)-string+2);
+	p->con.string = malloc(sizeof(string));
+	strncpy(p->con.string,string+1,strlen(string)-2);
 	}
 return p;
 }
@@ -2494,7 +2494,7 @@ case OPERATOR:
 				if(root->oper.operands[0].type==INT)
 					printf("%d\n",oper1);
 				else
-					printf("%.*s\n",(int)strlen((char*)oper1)-1,(char*)oper1+1);
+					printf("%s\n",(char*)oper1);
 				}			
 			return 1;
 			break;
