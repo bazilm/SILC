@@ -13,7 +13,7 @@ identifiers {alphabets}({alphabets}|{digits})*
 decl		return DECL;
 enddecl		return ENDDECL;
 int		return INTEGER;
-
+string		return STR;
 {digits}+	{yylval.ival = atoi(yytext);
 		return CONST;
 		}
@@ -38,8 +38,7 @@ while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
 \".+\"		{
-		printf("%s\n",yytext);
-		yylval.sval=yytext;
+		yylval.nval = makeConNode(0,yytext);
 		return STRCONST;
 		}
 {identifiers}	{

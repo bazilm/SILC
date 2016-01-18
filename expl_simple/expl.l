@@ -13,16 +13,16 @@ identifiers {alphabets}({alphabets}|{digits})*
 decl		return DECL;
 enddecl		return ENDDECL;
 int		return INTEGER;
-
+string		return STR;
 {digits}+	{yylval.ival = atoi(yytext);
 		return CONST;
 		}
 
 [-+*/;]		{return *yytext;}
-\=\=		return EQ;
-\<\=		return LE;
-\>\=		return GE;
-!=		return NE;
+"=="		return EQ;
+"<="		return LE;
+">="		return GE;
+"!="		return NE;
 and		return AND;
 or		return OR;
 not		return NOT;

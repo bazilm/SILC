@@ -16,7 +16,7 @@ char * sval;
 struct NodeTag* nval;
 }
 
-%token BEG DECL ENDDECL INTEGER END READ WRITE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE
+%token BEG DECL ENDDECL INTEGER STR END READ WRITE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE
 %token <ival> CONST
 %token <nval> STRCONST
 %token <nval> VAR
@@ -40,7 +40,9 @@ declblock:DECL decl_stmt ENDDECL
 	 ;
 
 decl_stmt:	decl_stmt INTEGER var_list ';'			{makeSTable($3,INT);}
+		|decl_stmt STR var_list ';'			{makeSTable($3,STRING);}
 		|INTEGER var_list ';'				{makeSTable($2,INT);}
+		|STR var_list ';'				{makeSTable($2,STRING);}
 		;
 
 var_list: var_list ',' VAR 					{$3->var.index=NULL;$$=makeOperNode('S',2,$1,$3);	}
@@ -71,26 +73,16 @@ expr :
 	|expr '*' expr				{$$ = makeOperNode('*',2,$1,$3);	}
 	|expr '/' expr				{$$ = makeOperNode('/',2,$1,$3);	}
 	|expr '%' expr				{$$ = makeOperNode('%',2,$1,$3);	}
-	|'('expr '+' expr')'			{$$ = makeOperNode('+',2,$2,$4);	}
-	|'('expr '-' expr')'			{$$ = makeOperNode('-',2,$2,$4);	}
-	|'('expr '*' expr')'			{$$ = makeOperNode('*',2,$2,$4);	}
-	|'('expr '/' expr')'			{$$ = makeOperNode('/',2,$2,$4);	}
-	|'('expr '%' expr')'			{$$ = makeOperNode('%',2,$2,$4);	}
 	|expr EQ expr				{$$ = makeOperNode(EQ,2,$1,$3);		}
 	|expr '<' expr				{$$ = makeOperNode('<',2,$1,$3);	}
 	|expr '>' expr				{$$ = makeOperNode('>',2,$1,$3);	}
 	|expr LE expr				{$$ = makeOperNode(LE,2,$1,$3);		}
 	|expr GE expr				{$$ = makeOperNode(GE,2,$1,$3);		}
 	|expr NE expr				{$$ = makeOperNode(NE,2,$1,$3);		}
-	|'('expr EQ expr ')'			{$$ = makeOperNode(EQ,2,$2,$4);		}
-	|'('expr '<' expr')'			{$$ = makeOperNode('<',2,$2,$4);	}
-	|'('expr '>' expr')'			{$$ = makeOperNode('>',2,$2,$4);	}
-	|'('expr LE expr ')'			{$$ = makeOperNode(LE,2,$2,$4);		}
-	|'('expr GE expr ')'			{$$ = makeOperNode(GE,2,$2,$4);		}
-	|'('expr NE expr ')'			{$$ = makeOperNode(NE,2,$2,$4);		}
 	|expr AND expr				{$$ = makeOperNode(AND,2,$1,$3);	}
 	|expr OR expr				{$$ = makeOperNode(OR,2,$1,$3);		}
 	|NOT expr				{$$ = makeOperNode(NOT,1,$2);		}
+	|'('expr')'				{$$=$2;					}
 	|CONST					{$$ = makeConNode($1,NULL);		}
 	|STRCONST				{$$ = $1;		}
 	|VAR					{$1->var.index=NULL;$$ = $1;		}
@@ -138,13 +130,13 @@ switch(root->nodeType)
 				if(root->var.index==NULL)
 					GInstall(root->var.name,type,1);
 			
-				else if(interpret(&root->var.index)<1)
+				else if(interpret(root->var.index)<1)
 					{
 					printf("Error: Cant have size less than 1\n");
 					exit(1);
 					}
 				else
-					GInstall(root->var.name,type,interpret(&root->var.index));
+					GInstall(root->var.name,type,interpret(root->var.index));
 				break;
 				}
 			else
@@ -166,15 +158,15 @@ switch(type)
 {
 	case INT:
 		{
-		sTable->size = 1;
+		sTable->size = size;
 		sTable->binding = malloc(sizeof(int)*size);
 		break;
 		}
 
-	case BOOLEAN:
+	case STRING:
 		{
-		sTable->size=1;
-		sTable->binding = malloc(sizeof(bool)*size);
+		sTable->size=size;
+		sTable->binding = malloc(sizeof(char)*24);
 		break;
 		}
 }
@@ -219,6 +211,7 @@ if((p =malloc(sizeof(Node))) == NULL)
 	}
 if(!string)
 	{
+	
 	p->nodeType = CONSTANT;
 	p->type = INT;
 	p->con.value = value;
@@ -287,7 +280,7 @@ int interpret(Node * root)
 {
 
 STable * sTableEntry;
-
+int oper1,oper2,oper3;
 if(!root)
 	{
 	//printf("Error: Parse Tree root NULL\n");
@@ -315,21 +308,20 @@ case VARIABLE:
 		return 0;
 		}
 
-	else if(sTableEntry->size==0)
-		{
-		printf("Error: Variable %s not initialized\n",root->var.name);
-		return 0;
-		}
 	root->type = sTableEntry->type;
+	oper1 = interpret(root->var.index);
 	
-	return *((int *)sTableEntry->binding + interpret(root->var.index));
+	if(root->type==INT)
+		return *((int *)sTableEntry->binding + interpret(root->var.index));
+	else
+		return sTableEntry->binding + interpret(root->var.index);
 	
 	break;
 	}
 
 case OPERATOR:
 	{
-	int oper1,oper2,oper3;
+	
 	switch(root->oper.op)
 	{
 		case '+':
@@ -433,8 +425,18 @@ case OPERATOR:
 				printf("Type mismatch in =\n");
 				exit(1);
 				}	
+			oper2 = interpret(root->oper.operands[0].var.index);
 
-			*((int *)(sTableEntry->binding)+interpret(root->oper.operands[0].var.index)) = oper1;
+			if(oper2>=sTableEntry->size)
+				{
+				printf("Error: Array index out of bounds\n");
+				exit(1);
+				}
+			if(root->oper.operands[1].type==INT)
+				*((int *)(sTableEntry->binding)+oper2) = oper1;
+
+			else
+				*((char *)(sTableEntry->binding)+oper2)=*(char *)oper1;
 			
 			
 			return 1;
@@ -647,7 +649,13 @@ case OPERATOR:
 				exit(1);
 				}
 			
-			scanf("%d",(int *)(sTableEntry->binding)+interpret(root->oper.operands[0].var.index));
+			oper2 = interpret(root->oper.operands[0].var.index);
+			if(oper2>=sTableEntry->size)
+				{
+				printf("Error: Array index out of bounds\n");
+				exit(1);
+				}
+			scanf("%d",(int *)(sTableEntry->binding)+oper2);
 						
 			return 1;
 			break;
@@ -665,14 +673,15 @@ case OPERATOR:
 				printf("Error: Variable %s Not declared\n",root->oper.operands[0].var.name);
 				return 0;
 				}
-			 else if (sTableEntry->size==0)
-				{
-				printf("Error: Variable %s Not initialized\n",sTableEntry->name);
-				return 0;
-				}
+			oper2 = interpret(root->oper.operands[0].var.index);
 
+			if(oper2>=sTableEntry->size)
+				{
+				printf("Error: Array index out of bounds\n");
+				exit(1);
+				}
 			 else
-				printf("%d\n",*((int *)(sTableEntry->binding)+interpret(root->oper.operands[0].var.index)));
+				printf("%d\n",*((int *)(sTableEntry->binding)+oper2));
 				
 			}
 
@@ -681,7 +690,7 @@ case OPERATOR:
 				oper1 = interpret(&root->oper.operands[0]);
 				if(root->oper.operands[0].type==INT)
 					printf("%d\n",oper1);
-				else
+				else if(root->oper.operands[0].type==STRING)
 					printf("%s\n",(char*)oper1);
 				}			
 			return 1;
