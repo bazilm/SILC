@@ -909,39 +909,41 @@ case 25:
 YY_RULE_SETUP
 #line 40 "expl.l"
 {
-		yylval.nval = makeConNode(0,yytext);
+		yylval.sval = malloc(sizeof(yytext));
+		strcpy(yylval.sval,yytext);
 		return STRCONST;
 		}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 44 "expl.l"
+#line 45 "expl.l"
 {
-		yylval.nval = makeVarNode(yytext);
+		yylval.sval =malloc(sizeof(yytext));
+		strcpy(yylval.sval,yytext);
 		return VAR;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 48 "expl.l"
+#line 50 "expl.l"
 
 	YY_BREAK
 case 28:
 /* rule 28 can match eol */
 YY_RULE_SETUP
-#line 49 "expl.l"
+#line 51 "expl.l"
 lineNo++;		
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 51 "expl.l"
+#line 53 "expl.l"
 return *yytext;	
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 55 "expl.l"
+#line 57 "expl.l"
 ECHO;
 	YY_BREAK
-#line 945 "lex.yy.c"
+#line 947 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1936,7 +1938,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 54 "expl.l"
+#line 56 "expl.l"
 
 
 

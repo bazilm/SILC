@@ -19,10 +19,10 @@ string		return STR;
 		}
 
 [-+*/;]		{return *yytext;}
-\=\=		return EQ;
-\<\=		return LE;
-\>\=		return GE;
-!=		return NE;
+"=="		return EQ;
+"<="		return LE;
+">="		return GE;
+"!="		return NE;
 and		return AND;
 or		return OR;
 not		return NOT;
@@ -38,11 +38,13 @@ while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
 \".+\"		{
-		yylval.nval = makeConNode(0,yytext);
-		return STRCONST;
+		yylval.sval = malloc(sizeof(yytext));
+		strcpy(yylval.sval,yytext);
+		return CONST;
 		}
 {identifiers}	{
-		yylval.nval = makeVarNode(yytext);
+		yylval.sval =malloc(sizeof(yytext));
+		strcpy(yylval.sval,yytext);
 		return VAR;}
 
 [ \t]

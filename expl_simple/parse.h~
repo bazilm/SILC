@@ -2,7 +2,7 @@
 #include<stdarg.h>
 
 typedef enum  {CONSTANT,OPERATOR,VARIABLE} NodeType ;
-typedef enum  {INT,STRING} Type;
+typedef enum  {INT,STRING,BOOLEAN} Type;
 
 typedef struct SymTable
 {
@@ -50,7 +50,7 @@ VarNode var;
 }Node;
 
 Node * makeConNode(int,char *);
-Node * makeVarNode(char *);
+Node * makeVarNode(char *,Node *);
 Node * makeOperNode(int,int,...);
 int interpret(Node *);
 void freeNode(Node *);

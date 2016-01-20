@@ -19,7 +19,7 @@ struct NodeTag* nval;
 %token BEG DECL ENDDECL INTEGER STR END READ WRITE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE
 %token <ival> CONST
 %token <nval> STRCONST
-%token <nval> VAR
+%token <sval> VAR
 %type <nval> expr stmt stmt_list var_list
 
 %left AND OR
@@ -45,10 +45,10 @@ decl_stmt:	decl_stmt INTEGER var_list ';'			{makeSTable($3,INT);}
 		|STR var_list ';'				{makeSTable($2,STRING);}
 		;
 
-var_list: var_list ',' VAR 					{$3->var.index=NULL;$$=makeOperNode('S',2,$1,$3);	}
-	|var_list ',' VAR'['CONST']'  				{$3->var.index=makeConNode($5,NULL);$$=makeOperNode('S',2,$1,$3); 	}
-	|VAR							{$1->var.index=NULL;$$=$1;			}
-	|VAR'['CONST']'						{$1->var.index=makeConNode($3,NULL);$$=$1;			}
+var_list: var_list ',' VAR 					{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL));	}
+	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,makeVarNode($1,makeConNode($5,NULL)),$3); 	}
+	|VAR							{$$=makeVarNode($1,NULL);			}
+	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode($3,NULL));			}
 	;
 
 
@@ -56,14 +56,14 @@ stmt_list: stmt_list stmt					{$$ = makeOperNode('$',2,$1,$2);	}
 	   |stmt						{$$ = $1;				}
     	  
 
-stmt: 	READ '(' VAR ')' ';'	        			{$$ = makeOperNode(READ,1,$3);			}
-	|READ '(' VAR '['expr']'')' ';'				{$3->var.index=$5;$$=makeOperNode(READ,1,$3);	}
+stmt: 	READ '(' VAR ')' ';'	        			{$$ = makeOperNode(READ,1,makeVarNode($3,NULL));			}
+	|READ '(' VAR '['expr']'')' ';'				{$$ = makeOperNode(READ,1,makeVarNode($3,$5));	}
  	|WRITE '(' expr ')' ';'					{$$ = makeOperNode(WRITE,1,$3);			}
 	|IF '('expr')' THEN stmt_list ELSE stmt_list ENDIF ';'	{$$ = makeOperNode(IF,3,$3,$6,$8);		}
 	|IF '('expr')' THEN stmt_list ENDIF ';'			{$$ = makeOperNode(IF,2,$3,$6);			}
 	|WHILE '(' expr ')' DO stmt_list ENDWHILE ';'		{$$ = makeOperNode(WHILE,2,$3,$6);		}
-	|VAR '=' expr ';'					{$$ = makeOperNode('=',2,$1,$3);		}
-	|VAR'['expr']' '=' expr ';'				{$1->var.index=$3;$$ = makeOperNode('=',2,$1,$6);}
+	|VAR '=' expr ';'					{$$ = makeOperNode('=',2,makeVarNode($1,NULL),$3);		}
+	|VAR'['expr']' '=' expr ';'				{$$ = makeOperNode('=',2,makeVarNode($1,$3),$6);}
 	;
 
 
@@ -82,11 +82,12 @@ expr :
 	|expr AND expr				{$$ = makeOperNode(AND,2,$1,$3);	}
 	|expr OR expr				{$$ = makeOperNode(OR,2,$1,$3);		}
 	|NOT expr				{$$ = makeOperNode(NOT,1,$2);		}
-	|'('expr')'				{$$=$2;					}
+	|'-'expr				{$$ = makeOperNode('-',1,$2);		}
+	|'('expr')'				{$$ = $2;				}
 	|CONST					{$$ = makeConNode($1,NULL);		}
-	|STRCONST				{$$ = $1;		}
-	|VAR					{$1->var.index=NULL;$$ = $1;		}
-	|VAR'['expr']'				{$1->var.index=$3;$$=$1;		}
+	|STRCONST				{$$ = makeConNode(0,$1);		}
+	|VAR					{$$ = makeVarNode($1,NULL);		}
+	|VAR'['expr']'				{$$ = makeVarNode($1,$3);		}
 	;
 %%
 
@@ -165,8 +166,8 @@ switch(type)
 
 	case STRING:
 		{
-		sTable->size=size;
-		sTable->binding = malloc(sizeof(char)*24);
+		sTable->size=24*size;
+		sTable->binding = malloc(sizeof(char)*24*size);
 		break;
 		}
 }
@@ -226,7 +227,7 @@ else
 return p;
 }
 
-Node * makeVarNode(char *name)
+Node * makeVarNode(char *name,Node *index)
 {
 
 Node *p;
@@ -239,7 +240,7 @@ p->nodeType = VARIABLE;
 p->type = INT;
 p->var.name = malloc(sizeof(name));
 strcpy(p->var.name,name);
-p->var.index=0;
+p->var.index=index;
 return p;
 }
 
@@ -348,7 +349,10 @@ case OPERATOR:
 			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
 				{
 				root->type = INT;
-				return oper1 - oper2;
+				if(root->oper.nops==1)
+					return -oper1;
+				else
+					return oper1 - oper2;
 				}
 			else
 				{
@@ -429,14 +433,13 @@ case OPERATOR:
 
 			if(oper2>=sTableEntry->size)
 				{
-				printf("Error: Array index out of bounds\n");
-				exit(1);
+				sTableEntry=NULL;
 				}
 			if(root->oper.operands[1].type==INT)
 				*((int *)(sTableEntry->binding)+oper2) = oper1;
 
 			else
-				*((char *)(sTableEntry->binding)+oper2)=*(char *)oper1;
+				sTableEntry->binding = oper1;
 			
 			
 			return 1;
@@ -641,21 +644,21 @@ case OPERATOR:
 		case READ:
 			{
 			sTableEntry =  LookUp(root->oper.operands[0].var.name);
-			
 			if(!sTableEntry)
 				{
-				printf("here\n");
+				
 				printf("Error: Variable %s not declared\n",root->oper.operands[0].var.name);
 				exit(1);
 				}
 			
 			oper2 = interpret(root->oper.operands[0].var.index);
-			if(oper2>=sTableEntry->size)
-				{
-				printf("Error: Array index out of bounds\n");
-				exit(1);
-				}
-			scanf("%d",(int *)(sTableEntry->binding)+oper2);
+			oper1 = interpret(&root->oper.operands[0]);			
+			
+			if(root->oper.operands[0].type==INT)
+				scanf("%d",(int *)(sTableEntry->binding)+oper2);
+			
+			else
+				scanf("%s",(char *)sTableEntry->binding+oper2);
 						
 			return 1;
 			break;
@@ -673,15 +676,14 @@ case OPERATOR:
 				printf("Error: Variable %s Not declared\n",root->oper.operands[0].var.name);
 				return 0;
 				}
+			oper1 = interpret(&root->oper.operands[0]);
 			oper2 = interpret(root->oper.operands[0].var.index);
 
-			if(oper2>=sTableEntry->size)
-				{
-				printf("Error: Array index out of bounds\n");
-				exit(1);
-				}
-			 else
+			if(root->oper.operands[0].type==INT)
 				printf("%d\n",*((int *)(sTableEntry->binding)+oper2));
+				
+			else
+				printf("%s\n",(char *)sTableEntry->binding+oper2);
 				
 			}
 

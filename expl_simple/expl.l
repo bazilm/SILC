@@ -38,11 +38,13 @@ while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
 \".+\"		{
-		yylval.nval = makeConNode(0,yytext);
+		yylval.sval = malloc(sizeof(yytext));
+		strcpy(yylval.sval,yytext);
 		return STRCONST;
 		}
 {identifiers}	{
-		yylval.nval = makeVarNode(yytext);
+		yylval.sval =malloc(sizeof(yytext));
+		strcpy(yylval.sval,yytext);
 		return VAR;}
 
 [ \t]
