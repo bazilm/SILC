@@ -53,12 +53,15 @@ Node * makeConNode(int,char *);
 Node * makeVarNode(char *,Node *);
 Node * makeOperNode(int,int,...);
 int interpret(Node *);
+void semanticAnalyzer(Node *);
 void freeNode(Node *);
 
 void makeSTable(Node *,Type);
 STable * GInstall(char *,Type,int);
 STable * LookUp(char *);
 
+void setVariableValue(char * name,Node * index,Node * value);
+int getVariableValue(char * name,Node * index);
 extern int *sym[26];
 
 

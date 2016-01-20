@@ -200,6 +200,35 @@ while(sTable!=NULL)
 return NULL;
 }
 
+void setVariableValue(char *name,Node *index,Node * value_node)
+{
+STable *sTableEntry = LookUp(name);
+
+int offset = interpret(index);
+int value = interpret(value_node);
+if(sTableEntry->type==INT)
+	*(int *)(sTableEntry->binding + offset)=value;
+else
+	{
+	int valAddress = sTableEntry->binding+offset*24;
+	*(char *)valAddress = *(char *)value;
+	}
+}
+
+int getVariableValue(char *name,Node *index)
+{
+STable *sTableEntry = LookUp(name);
+int offset = interpret(index);
+
+if(sTableEntry->type==INT)
+	return *(int*)(sTableEntry->binding + offset);
+else
+	{
+	int valAddress = sTableEntry->binding+offset*24;
+	return valAddress;
+	}
+}
+
 	
 Node * makeConNode(int value,char * string)
 {
@@ -281,12 +310,11 @@ int interpret(Node * root)
 {
 
 STable * sTableEntry;
-int oper1,oper2,oper3;
+int res1,res2,res3;
+Node *oper1,*oper2,*oper3;
+
 if(!root)
-	{
-	//printf("Error: Parse Tree root NULL\n");
 	return 0;
-	}
 
 
 switch(root->nodeType)
@@ -302,363 +330,128 @@ case CONSTANT:
 
 case VARIABLE:
 	{
-	sTableEntry = LookUp(root->var.name);
-	if(sTableEntry==NULL)
-		{
-		printf("Error: Variable %s not declared\n",root->var.name);
-		return 0;
-		}
-
-	root->type = sTableEntry->type;
-	oper1 = interpret(root->var.index);
-	
-	if(root->type==INT)
-		return *((int *)sTableEntry->binding + interpret(root->var.index));
-	else
-		return sTableEntry->binding + interpret(root->var.index);
-	
+	return getVariableValue(root->var.name,root->var.index);
 	break;
 	}
 
 case OPERATOR:
 	{
+	oper1 = &root->oper.operands[0];
+	if(root->oper.nops==2)
+		oper2 = &root->oper.operands[1];
+
+	if(root->oper.nops==3)
+		oper3 = &root->oper.operands[2];
 	
 	switch(root->oper.op)
 	{
 		case '+':
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
-				{
-				root->type = INT;
-				return oper1 + oper2;
-				}
-			else
-				{
-				printf("Type Mismatch in %c \n",root->oper.op);
-				exit(1);
-				}
+			return interpret(oper1)+interpret(oper2);
 			break;
 			}
 
 		case '-':
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
-				{
-				root->type = INT;
-				if(root->oper.nops==1)
-					return -oper1;
-				else
-					return oper1 - oper2;
-				}
-			else
-				{
-				printf("Type Mismatch in %c\n",root->oper.op);
-				exit(1);
-				}
+			return interpret(oper1)-interpret(oper2);
 			break;
 			}
 	
 		case '*':
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
-				{
-				root->type = INT;
-				return oper1 * oper2;	
-				}
-			else
-				{
-				printf("Type Mismatch in %c\n",root->oper.op);
-				exit(1);
-				}
+			return interpret(oper1)*interpret(oper2);
 			break;
 			}
 	
 		case '/':
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
-				{
-				root->type = INT;
-				return oper1 / oper2;
-				}
-			else
-				{
-				printf("Type Mismatch in %c\n",root->oper.op);
-				exit(1);
-				}
+			return interpret(oper1)/interpret(oper2);
 			break;
 			}
 	
 		case '%':
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if((root->oper.operands[0].type == INT) && (root->oper.operands[1].type == INT))
-				{
-				root->type = INT;
-				return oper1 % oper2;
-				}
-			else
-				{
-				printf("Type Mismatch in %c\n",root->oper.op);
-				exit(1);
-				}
+			return interpret(oper1)%interpret(oper2);
 			break;
 			}
 
 		case '=':
 			{
-			
-			oper1 = interpret(&root->oper.operands[1]);
-			sTableEntry = LookUp(root->oper.operands[0].var.name);
-
-			
-			if(!sTableEntry)
-				{printf("Error: Variable %s not declared\n",root->oper.operands[0].var.name);
-				exit(1);
-				}
-			if(sTableEntry->type != root->oper.operands[1].type)
-				{
-				printf("Type mismatch in =\n");
-				exit(1);
-				}	
-			oper2 = interpret(root->oper.operands[0].var.index);
-
-			if(oper2>=sTableEntry->size)
-				{
-				sTableEntry=NULL;
-				}
-			if(root->oper.operands[1].type==INT)
-				*((int *)(sTableEntry->binding)+oper2) = oper1;
-
-			else
-				sTableEntry->binding + oper2 = oper1;
-			
-			
+			setVariableValue(oper1->var.name,oper1->var.index,oper2);
 			return 1;
 			break;
 			}	
 			
 		case EQ:
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if(root->oper.operands[0].type == root->oper.operands[1].type)
-			{
-				root->type = BOOLEAN;
-				if (oper1==oper2)
-					return 1;
-				
-				else
-					return 0;
-			}
-			else
-			{
-				
-				printf("Type Mismatch in ==\n");
-				exit(1);
-				
-			}
+			return interpret(oper1)==interpret(oper2);
 			break;
 			}
 		case '<':
 			{
-			
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if(root->oper.operands[0].type == root->oper.operands[1].type)
-			{
-				root->type = BOOLEAN;
-				if (oper1<oper2)
-					return 1;
-				
-				else
-					return 0;
-			}
-			else
-			{
-				
-				printf("Type Mismatch in <\n");
-				exit(1);
-				
-			}
+			return interpret(oper1)<interpret(oper2);
 			break;
 			}
 
 		case '>':
 			{
 			
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if(root->oper.operands[0].type == root->oper.operands[1].type)
-			{
-				root->type = BOOLEAN;
-				if (oper1>oper2)
-					return 1;
-				
-				else
-					return 0;
-			}
-			else
-			{
-				
-				printf("Type Mismatch in >\n");
-				exit(1);
-				
-			}
+			return interpret(oper1)>interpret(oper2);
 			break;
 							
 			}
 
 		case LE:
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if(root->oper.operands[0].type == root->oper.operands[1].type)
-			{
-				root->type = BOOLEAN;
-				if (oper1<=oper2)
-					return 1;
-				
-				else
-					return 0;
-			}
-			else
-			{
-				
-				printf("Type Mismatch in <=\n");
-				exit(1);
-				
-			}
+			return interpret(oper1)<=interpret(oper2);
 			break;
 			}
 
 		case GE:
 			{
 			
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if(root->oper.operands[0].type == root->oper.operands[1].type)
-			{
-				root->type = BOOLEAN;
-				if (oper1>=oper2)
-					return 1;
-				
-				else
-					return 0;
-			}
-			else
-			{
-				
-				printf("Type Mismatch in >=\n");
-				exit(1);
-				
-			}
+			return interpret(oper1)>=interpret(oper2);
 			break;		
 			}
 
 		case NE:
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if(root->oper.operands[0].type == root->oper.operands[1].type)
-			{
-				root->type = BOOLEAN;
-				if (oper1!=oper2)
-					return 1;
-				
-				else
-					return 0;
-			}
-			else
-			{
-				
-				printf("Type Mismatch in !=\n");
-				exit(1);
-				
-			}
+			return interpret(oper1)!=interpret(oper2);
 			break;
 			}
 	
 		case AND:
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if((root->oper.operands[0].type==BOOLEAN)&&(root->oper.operands[1].type==BOOLEAN))
-			{
-				root->type = BOOLEAN;
-				return interpret(&root->oper.operands[0])&&interpret(&root->oper.operands[1]);
+			return interpret(oper1)&&interpret(oper2);
+			break;
 			}
-			else
-			{
-				
-				printf("Type Mismatch in AND\n");
-				exit(1);
-				
-			}
-			break;}
 
 		case OR:
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(&root->oper.operands[1]);
-			if((root->oper.operands[0].type ==BOOLEAN)&& (root->oper.operands[1].type==BOOLEAN))
-			{
-				root->type = BOOLEAN;
-				return interpret(&root->oper.operands[0])||interpret(&root->oper.operands[1]);
-
+			return interpret(oper1)||interpret(oper2);
+			break;
 			}
-			else
-			{
-				
-				printf("Type Mismatch in OR\n");
-				exit(1);
-				
-			}
-			break;}
 
 		case NOT:
 			{
-			oper1 = interpret(&root->oper.operands[0]);
-			
-			if(root->oper.operands[0].type == BOOLEAN)
-			{
-				root->type = BOOLEAN;
-				return !interpret(&root->oper.operands[0]);
+			return !interpret(oper1);
+			break;
 			}
-			else
-			{
-				
-				printf("Type Mismatch in NOT\n");
-				exit(1);
-				
-			}
-			break;}
 		case READ:
 			{
-			sTableEntry =  LookUp(root->oper.operands[0].var.name);
-			if(!sTableEntry)
+			int int_value;
+			char *str_value;
+			if(oper1->type==INT)
 				{
-				
-				printf("Error: Variable %s not declared\n",root->oper.operands[0].var.name);
-				exit(1);
+				scanf("%d",&int_value);
+				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(int_value,NULL));
 				}
 			
-			oper2 = interpret(root->oper.operands[0].var.index);
-			oper1 = interpret(&root->oper.operands[0]);			
-			
-			if(root->oper.operands[0].type==INT)
-				scanf("%d",(int *)(sTableEntry->binding)+oper2);
-			
 			else
-				scanf("%s",(char *)sTableEntry->binding+oper2);
+				{
+				scanf("%s",str_value);
+				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(0,str_value));
+				}
 						
 			return 1;
 			break;
@@ -667,33 +460,24 @@ case OPERATOR:
 		case WRITE:
 			{
 			
-			if(root->oper.operands[0].nodeType == VARIABLE)
-			{
-			sTableEntry = LookUp(root->oper.operands[0].var.name);
-
-			 if (!sTableEntry)
+			if(oper1->nodeType == VARIABLE)
 				{
-				printf("Error: Variable %s Not declared\n",root->oper.operands[0].var.name);
-				return 0;
+			
+				if(oper1->type==INT)
+					printf("%d\n",getVariableValue(oper1->var.name,oper1->var.index));
+				
+				else
+					printf("%s\n",(char *)getVariableValue(oper1->var.name,oper1->var.index));
+				
 				}
-			oper1 = interpret(&root->oper.operands[0]);
-			oper2 = interpret(root->oper.operands[0].var.index);
-
-			if(root->oper.operands[0].type==INT)
-				printf("%d\n",*((int *)(sTableEntry->binding)+oper2));
-				
-			else
-				printf("%s\n",(char *)sTableEntry->binding+oper2);
-				
-			}
 
 			else
 				{
-				oper1 = interpret(&root->oper.operands[0]);
-				if(root->oper.operands[0].type==INT)
-					printf("%d\n",oper1);
-				else if(root->oper.operands[0].type==STRING)
-					printf("%s\n",(char*)oper1);
+				
+				if(oper1->type==INT)
+					printf("%d\n",interpret(oper1));
+				else if(oper1->type==STRING)
+					printf("%s\n",(char*)interpret(oper1));
 				}			
 			return 1;
 			break;
@@ -701,24 +485,24 @@ case OPERATOR:
 
 		case IF:
 		       {
-			if(interpret(&root->oper.operands[0]))
-				interpret(&root->oper.operands[1]);
+			if(interpret(oper1))
+				interpret(oper2);
 			else if(root->oper.nops==3)
-				interpret(&root->oper.operands[2]);
+				interpret(oper3);
 			break;
 			}
 
 		case WHILE:
 			{
-			while(interpret(&root->oper.operands[0]))
-				interpret(&root->oper.operands[1]);
+			while(interpret(oper1))
+				interpret(oper2);
 			break;
 			}
 
 		case '$':
 			{
-			interpret(&root->oper.operands[0]);
-			interpret(&root->oper.operands[1]);
+			interpret(oper1);
+			interpret(oper2);
 			break;
 
 			}

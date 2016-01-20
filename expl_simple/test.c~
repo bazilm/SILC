@@ -1,0 +1,15 @@
+#include<stdio.h>
+
+
+int main()
+{
+
+char a[10];
+
+strcpy(a,"werw");
+printf("%s",a);
+
+a[12]='c';
+printf("%s",a);
+return 0;
+}
