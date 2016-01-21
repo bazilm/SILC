@@ -1,10 +1,17 @@
+#include "parse.h"
+#include<stdio.h>
+#include<stdlib.h>
+
+
 void semanticAnalyzer(Node * root)
 {
 
 Node * oper1,*oper2,*oper3;
 if(!root)
+	{
 	printf("Parse Tree Root Null\n");
-
+	exit(1);
+	}
 switch(root->nodeType)
 {
 	case CONSTANT:

@@ -1,6 +1,11 @@
+#include "parse.h"
+#include<stdio.h>
+#include<stdlib.h>
+
+
 void semanticAnalyzer(Node * root)
 {
-
+STable *sTableEntry;
 Node * oper1,*oper2,*oper3;
 if(!root)
 	{

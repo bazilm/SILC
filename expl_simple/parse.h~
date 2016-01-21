@@ -60,7 +60,7 @@ void makeSTable(Node *,Type);
 STable * GInstall(char *,Type,int);
 STable * LookUp(char *);
 
-int setVariableValue(char * name,Node * index,Node * value);
+void setVariableValue(char * name,Node * index,Node * value);
 int getVariableValue(char * name,Node * index);
 extern int *sym[26];
 

@@ -1,0 +1,14 @@
+begin
+decl
+int a,b,c;
+string x,y,z;
+enddecl
+
+write("enter a number");
+read(a);
+
+write("enter a string");
+read(x);
+
+bd=a<2;
+end

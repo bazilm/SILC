@@ -39,7 +39,7 @@ do		return DO;
 endwhile 	return ENDWHILE;
 \".+\"		{
 		yylval.sval = malloc(sizeof(yytext));
-		strcpy(yylval.sval,yytext);
+		strncpy(yylval.sval,yytext+1,strlen(yytext)-2);
 		return STRCONST;
 		}
 {identifiers}	{

@@ -910,7 +910,7 @@ YY_RULE_SETUP
 #line 40 "expl.l"
 {
 		yylval.sval = malloc(sizeof(yytext));
-		strcpy(yylval.sval,yytext);
+		strncpy(yylval.sval,yytext+1,strlen(yytext)-2);
 		return STRCONST;
 		}
 	YY_BREAK

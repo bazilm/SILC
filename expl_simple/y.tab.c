@@ -1374,7 +1374,7 @@ yyreduce:
     {
         case 2:
 #line 34 "expl.y" /* yacc.c:1646  */
-    {interpret((yyvsp[-1].nval));	return 0;			}
+    {semanticAnalyzer((yyvsp[-1].nval));interpret((yyvsp[-1].nval));	return 0;			}
 #line 1379 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -1959,12 +1959,14 @@ STable *sTableEntry = LookUp(name);
 
 int offset = interpret(index);
 int value = interpret(value_node);
+
 if(sTableEntry->type==INT)
-	*(int *)(sTableEntry->binding + offset)=value;
+	*((int *)(sTableEntry->binding) + offset)=value;
 else
 	{
 	int valAddress = sTableEntry->binding+offset*24;
-	*(char *)valAddress = *(char *)value;
+	strcpy((char *)valAddress,(char *)value);
+	
 	}
 }
 
@@ -1974,10 +1976,10 @@ STable *sTableEntry = LookUp(name);
 int offset = interpret(index);
 
 if(sTableEntry->type==INT)
-	return *(int*)(sTableEntry->binding + offset);
+	return *((int*)(sTableEntry->binding) + offset);
 else
 	{
-	int valAddress = sTableEntry->binding+offset*24;
+	int valAddress = sTableEntry->binding+(offset*24);
 	return valAddress;
 	}
 }
@@ -2004,7 +2006,7 @@ else
 	p->nodeType = CONSTANT;
 	p->type = STRING;
 	p->con.string = malloc(sizeof(string));
-	strncpy(p->con.string,string+1,strlen(string)-2);
+	strcpy(p->con.string,string);
 	}
 return p;
 }
@@ -2193,9 +2195,10 @@ case OPERATOR:
 		case READ:
 			{
 			int int_value;
-			char *str_value;
+			char *str_value = malloc(sizeof(char)*24);
 			if(oper1->type==INT)
 				{
+				
 				scanf("%d",&int_value);
 				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(int_value,NULL));
 				}
@@ -2220,7 +2223,9 @@ case OPERATOR:
 					printf("%d\n",getVariableValue(oper1->var.name,oper1->var.index));
 				
 				else
+					{
 					printf("%s\n",(char *)getVariableValue(oper1->var.name,oper1->var.index));
+					}
 				
 				}
 
@@ -2262,6 +2267,154 @@ case OPERATOR:
 	}
 	}
 }
+}
+
+
+void semanticAnalyzer(Node * root)
+{
+STable *sTableEntry;
+Node * oper1,*oper2,*oper3;
+if(!root)
+	{
+	printf("Parse Tree Root Null\n");
+	exit(1);
+	}
+switch(root->nodeType)
+{
+	case CONSTANT:
+		break;
+
+	case VARIABLE:
+		{
+		sTableEntry = LookUp(root->var.name);
+		
+		if(sTableEntry==NULL)
+			{
+			printf("Error: Variable %s not declared\n",root->var.name);
+			exit(1);
+			}
+		root->type = sTableEntry->type;
+		break;
+		}
+
+	case OPERATOR:
+		{
+		oper1 = &root->oper.operands[0];
+		if(root->oper.nops==2)
+			oper2 = &root->oper.operands[1];
+
+		if(root->oper.nops==3)
+			oper3 = &root->oper.operands[2];
+
+		switch(root->oper.op)
+			{
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+			case '%':
+			{
+			semanticAnalyzer(oper1);
+			semanticAnalyzer(oper2);
+			if((oper1->type == INT) && (oper2->type == INT))
+				root->type = INT;
+				
+			else
+				{
+				printf("Type Mismatch in %c \n",root->oper.op);
+				exit(1);
+				}
+			break;
+			}
+
+		case '=':
+			{
+			
+			semanticAnalyzer(oper1);
+			semanticAnalyzer(oper2);
+			
+			if(oper1->type != oper2->type)
+				{
+				printf("Type mismatch in =\n");
+				exit(1);
+				}	
+			break;
+			}	
+			
+		case EQ:
+		case '<':
+		case '>':
+		case LE:
+		case GE:
+		case NE:
+		case AND:
+		case OR:
+			{
+			semanticAnalyzer(oper1);
+			semanticAnalyzer(oper2);
+			
+			if(oper1->type == oper2->type)
+				root->type = BOOLEAN;
+				
+			else
+			{
+				printf("Type Mismatch in logical operator\n");
+				exit(1);
+			}
+			break;
+			}
+
+		case NOT:
+			{
+			semanticAnalyzer(oper1);
+			if(oper1->type == BOOLEAN)
+				root->type = BOOLEAN;
+			
+			else
+			{
+				printf("Type Mismatch in NOT\n");
+				exit(1);
+			}
+			break;
+
+			}
+		case READ:
+			{
+			semanticAnalyzer(oper1);
+			break;
+			}
+
+		case WRITE:
+			{
+			semanticAnalyzer(oper1);
+			break;
+			}
+
+		case IF:
+		       {
+			semanticAnalyzer(oper1);
+			semanticAnalyzer(oper2);
+			semanticAnalyzer(oper3);
+			break;
+			}
+
+		case WHILE:
+			{
+			semanticAnalyzer(oper1);
+			semanticAnalyzer(oper2);
+			break;
+			}
+
+		case '$':
+			{
+			semanticAnalyzer(oper1);
+			semanticAnalyzer(oper2);
+			break;
+			}
+
+			}
+		}
+	}
 }
 
 void freeNode (Node * node)
