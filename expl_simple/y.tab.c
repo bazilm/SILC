@@ -72,8 +72,9 @@
 
 STable *sTableBeg,*sTableEnd;
 int lineNo;
+bool has_error = false;
 
-#line 77 "y.tab.c" /* yacc.c:339  */
+#line 78 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -167,13 +168,13 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 13 "expl.y" /* yacc.c:355  */
+#line 14 "expl.y" /* yacc.c:355  */
 
 int ival;
 char * sval;
 struct NodeTag* nval;
 
-#line 177 "y.tab.c" /* yacc.c:355  */
+#line 178 "y.tab.c" /* yacc.c:355  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
@@ -188,7 +189,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 192 "y.tab.c" /* yacc.c:358  */
+#line 193 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -488,11 +489,11 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    34,    34,    35,    38,    39,    42,    43,    44,    45,
-      48,    49,    50,    51,    55,    56,    59,    60,    61,    62,
-      63,    64,    65,    66,    71,    72,    73,    74,    75,    76,
-      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,    88,    89,    90
+       0,    35,    35,    36,    39,    40,    43,    44,    45,    46,
+      49,    50,    51,    52,    56,    57,    60,    61,    62,    63,
+      64,    65,    66,    67,    72,    73,    74,    75,    76,    77,
+      78,    79,    80,    81,    82,    83,    84,    85,    86,    87,
+      88,    89,    90,    91
 };
 #endif
 
@@ -1373,247 +1374,247 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 34 "expl.y" /* yacc.c:1646  */
-    {semanticAnalyzer((yyvsp[-1].nval));interpret((yyvsp[-1].nval));	return 0;			}
-#line 1379 "y.tab.c" /* yacc.c:1646  */
+#line 35 "expl.y" /* yacc.c:1646  */
+    {semanticAnalyzer((yyvsp[-1].nval));if(!has_error)interpret((yyvsp[-1].nval));return 0;}
+#line 1380 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 35 "expl.y" /* yacc.c:1646  */
+#line 36 "expl.y" /* yacc.c:1646  */
     { return 0;					}
-#line 1385 "y.tab.c" /* yacc.c:1646  */
+#line 1386 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 42 "expl.y" /* yacc.c:1646  */
+#line 43 "expl.y" /* yacc.c:1646  */
     {makeSTable((yyvsp[-1].nval),INT);}
-#line 1391 "y.tab.c" /* yacc.c:1646  */
+#line 1392 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 43 "expl.y" /* yacc.c:1646  */
+#line 44 "expl.y" /* yacc.c:1646  */
     {makeSTable((yyvsp[-1].nval),STRING);}
-#line 1397 "y.tab.c" /* yacc.c:1646  */
+#line 1398 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 44 "expl.y" /* yacc.c:1646  */
+#line 45 "expl.y" /* yacc.c:1646  */
     {makeSTable((yyvsp[-1].nval),INT);}
-#line 1403 "y.tab.c" /* yacc.c:1646  */
+#line 1404 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 45 "expl.y" /* yacc.c:1646  */
+#line 46 "expl.y" /* yacc.c:1646  */
     {makeSTable((yyvsp[-1].nval),STRING);}
-#line 1409 "y.tab.c" /* yacc.c:1646  */
+#line 1410 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 48 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval)=makeOperNode('S',2,(yyvsp[-2].nval),makeVarNode((yyvsp[0].sval),NULL));	}
-#line 1415 "y.tab.c" /* yacc.c:1646  */
+#line 49 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval)=makeOperNode('S',2,(yyvsp[-2].nval),makeVarNode((yyvsp[0].sval),NULL));			}
+#line 1416 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 49 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval)=makeOperNode('S',2,makeVarNode((yyvsp[-5].nval),makeConNode((yyvsp[-1].ival),NULL)),(yyvsp[-3].sval)); 	}
-#line 1421 "y.tab.c" /* yacc.c:1646  */
+#line 50 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval)=makeOperNode('S',2,(yyvsp[-5].nval),makeVarNode((yyvsp[-3].sval),makeConNode((yyvsp[-1].ival),NULL))); 	}
+#line 1422 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 50 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval)=makeVarNode((yyvsp[0].sval),NULL);			}
-#line 1427 "y.tab.c" /* yacc.c:1646  */
+#line 51 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval)=makeVarNode((yyvsp[0].sval),NULL);						}
+#line 1428 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 51 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval)=makeVarNode((yyvsp[-3].sval),makeConNode((yyvsp[-1].ival),NULL));			}
-#line 1433 "y.tab.c" /* yacc.c:1646  */
+#line 52 "expl.y" /* yacc.c:1646  */
+    {(yyval.nval)=makeVarNode((yyvsp[-3].sval),makeConNode((yyvsp[-1].ival),NULL));				}
+#line 1434 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 55 "expl.y" /* yacc.c:1646  */
+#line 56 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('$',2,(yyvsp[-1].nval),(yyvsp[0].nval));	}
-#line 1439 "y.tab.c" /* yacc.c:1646  */
+#line 1440 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 56 "expl.y" /* yacc.c:1646  */
+#line 57 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = (yyvsp[0].nval);				}
-#line 1445 "y.tab.c" /* yacc.c:1646  */
+#line 1446 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 59 "expl.y" /* yacc.c:1646  */
+#line 60 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(READ,1,makeVarNode((yyvsp[-2].sval),NULL));			}
-#line 1451 "y.tab.c" /* yacc.c:1646  */
+#line 1452 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 60 "expl.y" /* yacc.c:1646  */
+#line 61 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(READ,1,makeVarNode((yyvsp[-5].sval),(yyvsp[-3].nval)));	}
-#line 1457 "y.tab.c" /* yacc.c:1646  */
+#line 1458 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 61 "expl.y" /* yacc.c:1646  */
+#line 62 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(WRITE,1,(yyvsp[-2].nval));			}
-#line 1463 "y.tab.c" /* yacc.c:1646  */
+#line 1464 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 62 "expl.y" /* yacc.c:1646  */
+#line 63 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(IF,3,(yyvsp[-7].nval),(yyvsp[-4].nval),(yyvsp[-2].nval));		}
-#line 1469 "y.tab.c" /* yacc.c:1646  */
+#line 1470 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 63 "expl.y" /* yacc.c:1646  */
+#line 64 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(IF,2,(yyvsp[-5].nval),(yyvsp[-2].nval));			}
-#line 1475 "y.tab.c" /* yacc.c:1646  */
+#line 1476 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 64 "expl.y" /* yacc.c:1646  */
+#line 65 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(WHILE,2,(yyvsp[-5].nval),(yyvsp[-2].nval));		}
-#line 1481 "y.tab.c" /* yacc.c:1646  */
+#line 1482 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 65 "expl.y" /* yacc.c:1646  */
+#line 66 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('=',2,makeVarNode((yyvsp[-3].sval),NULL),(yyvsp[-1].nval));		}
-#line 1487 "y.tab.c" /* yacc.c:1646  */
+#line 1488 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 66 "expl.y" /* yacc.c:1646  */
+#line 67 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('=',2,makeVarNode((yyvsp[-6].sval),(yyvsp[-4].nval)),(yyvsp[-1].nval));}
-#line 1493 "y.tab.c" /* yacc.c:1646  */
+#line 1494 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 71 "expl.y" /* yacc.c:1646  */
+#line 72 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('+',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1499 "y.tab.c" /* yacc.c:1646  */
+#line 1500 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 72 "expl.y" /* yacc.c:1646  */
+#line 73 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('-',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1505 "y.tab.c" /* yacc.c:1646  */
+#line 1506 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 73 "expl.y" /* yacc.c:1646  */
+#line 74 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('*',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1511 "y.tab.c" /* yacc.c:1646  */
+#line 1512 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 74 "expl.y" /* yacc.c:1646  */
+#line 75 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('/',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1517 "y.tab.c" /* yacc.c:1646  */
+#line 1518 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 75 "expl.y" /* yacc.c:1646  */
+#line 76 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('%',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1523 "y.tab.c" /* yacc.c:1646  */
+#line 1524 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 76 "expl.y" /* yacc.c:1646  */
+#line 77 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(EQ,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1529 "y.tab.c" /* yacc.c:1646  */
+#line 1530 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 77 "expl.y" /* yacc.c:1646  */
+#line 78 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('<',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1535 "y.tab.c" /* yacc.c:1646  */
+#line 1536 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 78 "expl.y" /* yacc.c:1646  */
+#line 79 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('>',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1541 "y.tab.c" /* yacc.c:1646  */
+#line 1542 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 79 "expl.y" /* yacc.c:1646  */
+#line 80 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(LE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1547 "y.tab.c" /* yacc.c:1646  */
+#line 1548 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 80 "expl.y" /* yacc.c:1646  */
+#line 81 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(GE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1553 "y.tab.c" /* yacc.c:1646  */
+#line 1554 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 81 "expl.y" /* yacc.c:1646  */
+#line 82 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1559 "y.tab.c" /* yacc.c:1646  */
+#line 1560 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 82 "expl.y" /* yacc.c:1646  */
+#line 83 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(AND,2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1565 "y.tab.c" /* yacc.c:1646  */
+#line 1566 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 83 "expl.y" /* yacc.c:1646  */
+#line 84 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(OR,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1571 "y.tab.c" /* yacc.c:1646  */
+#line 1572 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 84 "expl.y" /* yacc.c:1646  */
+#line 85 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NOT,1,(yyvsp[0].nval));		}
-#line 1577 "y.tab.c" /* yacc.c:1646  */
+#line 1578 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 85 "expl.y" /* yacc.c:1646  */
+#line 86 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('-',1,(yyvsp[0].nval));		}
-#line 1583 "y.tab.c" /* yacc.c:1646  */
+#line 1584 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 86 "expl.y" /* yacc.c:1646  */
+#line 87 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = (yyvsp[-1].nval);				}
-#line 1589 "y.tab.c" /* yacc.c:1646  */
+#line 1590 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 87 "expl.y" /* yacc.c:1646  */
+#line 88 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeConNode((yyvsp[0].ival),NULL);		}
-#line 1595 "y.tab.c" /* yacc.c:1646  */
+#line 1596 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 88 "expl.y" /* yacc.c:1646  */
+#line 89 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeConNode(0,(yyvsp[0].nval));		}
-#line 1601 "y.tab.c" /* yacc.c:1646  */
+#line 1602 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 89 "expl.y" /* yacc.c:1646  */
+#line 90 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeVarNode((yyvsp[0].sval),NULL);		}
-#line 1607 "y.tab.c" /* yacc.c:1646  */
+#line 1608 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 90 "expl.y" /* yacc.c:1646  */
+#line 91 "expl.y" /* yacc.c:1646  */
     {(yyval.nval) = makeVarNode((yyvsp[-3].sval),(yyvsp[-1].nval));		}
-#line 1613 "y.tab.c" /* yacc.c:1646  */
+#line 1614 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1617 "y.tab.c" /* yacc.c:1646  */
+#line 1618 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1841,7 +1842,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 92 "expl.y" /* yacc.c:1906  */
+#line 93 "expl.y" /* yacc.c:1906  */
 
 
 int main(int argc, char *argv[])
@@ -1866,9 +1867,10 @@ printf("%s:%d\n",s,lineNo);
 void makeSTable(Node * root,Type type)
 {
 STable * sTableEntry;
+
 switch(root->nodeType)
 {
-	
+
 	case OPERATOR:
 			{
 			makeSTable(&root->oper.operands[0],type);
@@ -1878,6 +1880,7 @@ switch(root->nodeType)
 
 	case VARIABLE:
 			{
+			
 			sTableEntry = LookUp(root->var.name);
 			if(!sTableEntry)
 				{
@@ -1886,8 +1889,8 @@ switch(root->nodeType)
 			
 				else if(interpret(root->var.index)<1)
 					{
-					printf("Error: Cant have size less than 1\n");
-					exit(1);
+					printf("Error in %d: Cant have size less than 1\n",root->lineNo);
+					has_error=true;
 					}
 				else
 					GInstall(root->var.name,type,interpret(root->var.index));
@@ -1895,8 +1898,9 @@ switch(root->nodeType)
 				}
 			else
 				{
-				printf("Error:Variable %s declared once\n",root->var.name);
-				exit(1);
+				printf("Error in %d :Variable %s declared once\n",root->lineNo,root->var.name);
+				has_error=true;
+				break;
 				}
 			}
 }
@@ -2008,6 +2012,7 @@ else
 	p->con.string = malloc(sizeof(string));
 	strcpy(p->con.string,string);
 	}
+p->lineNo=lineNo;
 return p;
 }
 
@@ -2025,6 +2030,7 @@ p->type = INT;
 p->var.name = malloc(sizeof(name));
 strcpy(p->var.name,name);
 p->var.index=index;
+p->lineNo=lineNo;
 return p;
 }
 
@@ -2056,7 +2062,7 @@ for(i=0;i<nops;i++)
 {
 p->oper.operands[i] = *va_arg(temp_args,Node*);
 }
-
+p->lineNo=lineNo;
 return p;
 }
 
@@ -2290,10 +2296,11 @@ switch(root->nodeType)
 		
 		if(sTableEntry==NULL)
 			{
-			printf("Error: Variable %s not declared\n",root->var.name);
-			exit(1);
+			printf("Error in %d: Variable %s not declared\n",root->lineNo,root->var.name);
+			has_error = true;
 			}
-		root->type = sTableEntry->type;
+		else
+			root->type = sTableEntry->type;
 		break;
 		}
 
@@ -2321,8 +2328,8 @@ switch(root->nodeType)
 				
 			else
 				{
-				printf("Type Mismatch in %c \n",root->oper.op);
-				exit(1);
+				printf("Error in %d: Type Mismatch in %c \n",root->lineNo,root->oper.op);
+				has_error = true;
 				}
 			break;
 			}
@@ -2335,8 +2342,8 @@ switch(root->nodeType)
 			
 			if(oper1->type != oper2->type)
 				{
-				printf("Type mismatch in =\n");
-				exit(1);
+				printf("Error in %d: Type mismatch in =\n",root->lineNo);
+				has_error = true;
 				}	
 			break;
 			}	
@@ -2358,8 +2365,8 @@ switch(root->nodeType)
 				
 			else
 			{
-				printf("Type Mismatch in logical operator\n");
-				exit(1);
+				printf("Error in %d: Type Mismatch in logical operator\n",root->lineNo);
+				has_error = true;
 			}
 			break;
 			}
@@ -2372,8 +2379,8 @@ switch(root->nodeType)
 			
 			else
 			{
-				printf("Type Mismatch in NOT\n");
-				exit(1);
+				printf("Error in %d: Type Mismatch in NOT\n",root->lineNo);
+				has_error = true;
 			}
 			break;
 

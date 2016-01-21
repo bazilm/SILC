@@ -7,6 +7,7 @@
 
 STable *sTableBeg,*sTableEnd;
 int lineNo;
+bool has_error = false;
 %}
 
 %union
@@ -31,7 +32,7 @@ struct NodeTag* nval;
 
 %%
 
-program: BEG declblock stmt_list END				{semanticAnalyzer($3);interpret($3);	return 0;			}
+program: BEG declblock stmt_list END				{semanticAnalyzer($3);if(!has_error)interpret($3);return 0;}
 	 |error 						{ return 0;					}
 	 ;
 
@@ -45,10 +46,10 @@ decl_stmt:	decl_stmt INTEGER var_list ';'			{makeSTable($3,INT);}
 		|STR var_list ';'				{makeSTable($2,STRING);}
 		;
 
-var_list: var_list ',' VAR 					{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL));	}
-	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,makeVarNode($1,makeConNode($5,NULL)),$3); 	}
-	|VAR							{$$=makeVarNode($1,NULL);			}
-	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode($3,NULL));			}
+var_list: var_list ',' VAR 					{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL));			}
+	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,$1,makeVarNode($3,makeConNode($5,NULL))); 	}
+	|VAR							{$$=makeVarNode($1,NULL);						}
+	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode($3,NULL));				}
 	;
 
 
@@ -113,9 +114,10 @@ printf("%s:%d\n",s,lineNo);
 void makeSTable(Node * root,Type type)
 {
 STable * sTableEntry;
+
 switch(root->nodeType)
 {
-	
+
 	case OPERATOR:
 			{
 			makeSTable(&root->oper.operands[0],type);
@@ -125,6 +127,7 @@ switch(root->nodeType)
 
 	case VARIABLE:
 			{
+			
 			sTableEntry = LookUp(root->var.name);
 			if(!sTableEntry)
 				{
@@ -133,8 +136,8 @@ switch(root->nodeType)
 			
 				else if(interpret(root->var.index)<1)
 					{
-					printf("Error: Cant have size less than 1\n");
-					exit(1);
+					printf("Error in %d: Cant have size less than 1\n",root->lineNo);
+					has_error=true;
 					}
 				else
 					GInstall(root->var.name,type,interpret(root->var.index));
@@ -142,8 +145,9 @@ switch(root->nodeType)
 				}
 			else
 				{
-				printf("Error:Variable %s declared once\n",root->var.name);
-				exit(1);
+				printf("Error in %d :Variable %s declared once\n",root->lineNo,root->var.name);
+				has_error=true;
+				break;
 				}
 			}
 }
@@ -255,6 +259,7 @@ else
 	p->con.string = malloc(sizeof(string));
 	strcpy(p->con.string,string);
 	}
+p->lineNo=lineNo;
 return p;
 }
 
@@ -272,6 +277,7 @@ p->type = INT;
 p->var.name = malloc(sizeof(name));
 strcpy(p->var.name,name);
 p->var.index=index;
+p->lineNo=lineNo;
 return p;
 }
 
@@ -303,7 +309,7 @@ for(i=0;i<nops;i++)
 {
 p->oper.operands[i] = *va_arg(temp_args,Node*);
 }
-
+p->lineNo=lineNo;
 return p;
 }
 
@@ -537,10 +543,11 @@ switch(root->nodeType)
 		
 		if(sTableEntry==NULL)
 			{
-			printf("Error: Variable %s not declared\n",root->var.name);
-			exit(1);
+			printf("Error in %d: Variable %s not declared\n",root->lineNo,root->var.name);
+			has_error = true;
 			}
-		root->type = sTableEntry->type;
+		else
+			root->type = sTableEntry->type;
 		break;
 		}
 
@@ -568,8 +575,8 @@ switch(root->nodeType)
 				
 			else
 				{
-				printf("Type Mismatch in %c \n",root->oper.op);
-				exit(1);
+				printf("Error in %d: Type Mismatch in %c \n",root->lineNo,root->oper.op);
+				has_error = true;
 				}
 			break;
 			}
@@ -582,8 +589,8 @@ switch(root->nodeType)
 			
 			if(oper1->type != oper2->type)
 				{
-				printf("Type mismatch in =\n");
-				exit(1);
+				printf("Error in %d: Type mismatch in =\n",root->lineNo);
+				has_error = true;
 				}	
 			break;
 			}	
@@ -605,8 +612,8 @@ switch(root->nodeType)
 				
 			else
 			{
-				printf("Type Mismatch in logical operator\n");
-				exit(1);
+				printf("Error in %d: Type Mismatch in logical operator\n",root->lineNo);
+				has_error = true;
 			}
 			break;
 			}
@@ -619,8 +626,8 @@ switch(root->nodeType)
 			
 			else
 			{
-				printf("Type Mismatch in NOT\n");
-				exit(1);
+				printf("Error in %d: Type Mismatch in NOT\n",root->lineNo);
+				has_error = true;
 			}
 			break;
 

@@ -40,6 +40,7 @@ typedef struct NodeTag
 {
 NodeType nodeType;
 Type type;
+int lineNo;
 union
 {
 ConNode con;

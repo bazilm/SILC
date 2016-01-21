@@ -1,14 +1,16 @@
 begin
 decl
 int a,b,c;
-string x,y,z;
+string d[2],w,z[2];
+int f,e,g;
 enddecl
 
 write("enter a number");
-read(a);
+read(w);
 
 write("enter a string");
-read(x);
+read(w);
 
-bd=a<2;
+w="asf"+"asfd";
+write(w);
 end
