@@ -17,7 +17,7 @@ char * sval;
 struct NodeTag* nval;
 }
 
-%token BEG DECL ENDDECL INTEGER STR END READ WRITE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE
+%token BEG DECL ENDDECL INTEGER STR BOOL END READ WRITE TRUE FALSE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE
 %token <ival> CONST
 %token <nval> STRCONST
 %token <sval> VAR
@@ -32,7 +32,7 @@ struct NodeTag* nval;
 
 %%
 
-program: BEG declblock stmt_list END				{semanticAnalyzer($3);if(!has_error)interpret($3);//freeNode($3);return 0;}
+program: BEG declblock stmt_list END				{semanticAnalyzer($3);if(!has_error)interpret($3);return 0;}
 	 |error 						{ return 0;					}
 	 ;
 
@@ -42,14 +42,16 @@ declblock:DECL decl_stmt ENDDECL
 
 decl_stmt:	decl_stmt INTEGER var_list ';'			{makeSTable($3,INT);}
 		|decl_stmt STR var_list ';'			{makeSTable($3,STRING);}
+		|decl_stmt BOOL var_list ';'			{makeSTable($3,BOOLEAN);}
 		|INTEGER var_list ';'				{makeSTable($2,INT);}
 		|STR var_list ';'				{makeSTable($2,STRING);}
+		|BOOL var_list ';'				{makeSTable($2,BOOLEAN);}
 		;
 
 var_list: var_list ',' VAR 					{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL));			}
-	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,$1,makeVarNode($3,makeConNode($5,NULL))); 	}
+	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,$1,makeVarNode($3,makeConNode(INTEGER,$5,NULL)));}
 	|VAR							{$$=makeVarNode($1,NULL);						}
-	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode($3,NULL));				}
+	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode(INTEGER,$3,NULL));			}
 	;
 
 
@@ -85,8 +87,10 @@ expr :
 	|NOT expr				{$$ = makeOperNode(NOT,1,$2);		}
 	|'-'expr				{$$ = makeOperNode('-',1,$2);		}
 	|'('expr')'				{$$ = $2;				}
-	|CONST					{$$ = makeConNode($1,NULL);		}
-	|STRCONST				{$$ = makeConNode(0,$1);		}
+	|CONST					{$$ = makeConNode(INTEGER,$1,NULL);}
+	|STRCONST				{$$ = makeConNode(STRING,0,$1);	}
+	|TRUE					{$$ = makeConNode(BOOLEAN,1,NULL);	}
+	|FALSE					{$$ = makeConNode(BOOLEAN,0,NULL);}
 	|VAR					{$$ = makeVarNode($1,NULL);		}
 	|VAR'['expr']'				{$$ = makeVarNode($1,$3);		}
 	;
@@ -174,6 +178,13 @@ switch(type)
 		sTable->binding = malloc(sizeof(char)*24*size);
 		break;
 		}
+
+	case BOOLEAN:
+		{
+		sTable->size=size;
+		sTable->binding = malloc(sizeof(bool)*size);
+		break;
+		}
 }
 
 sTable->next = NULL;
@@ -211,7 +222,10 @@ STable *sTableEntry = LookUp(name);
 int offset = interpret(index);
 int value = interpret(value_node);
 
-if(sTableEntry->type==INT)
+if(sTableEntry->type==INT )
+	*((int *)(sTableEntry->binding) + offset)=value;
+
+else if(sTableEntry->type==BOOLEAN )
 	*((int *)(sTableEntry->binding) + offset)=value;
 else
 	{
@@ -226,7 +240,10 @@ int getVariableValue(char *name,Node *index)
 STable *sTableEntry = LookUp(name);
 int offset = interpret(index);
 
-if(sTableEntry->type==INT)
+if(sTableEntry->type==INT )
+	return *((int*)(sTableEntry->binding) + offset);
+
+else if(sTableEntry->type==BOOLEAN )
 	return *((int*)(sTableEntry->binding) + offset);
 else
 	{
@@ -236,7 +253,7 @@ else
 }
 
 	
-Node * makeConNode(int value,char * string)
+Node * makeConNode(Type type,int value,char * string)
 {
 
 Node * p;
@@ -245,20 +262,33 @@ if((p =malloc(sizeof(Node))) == NULL)
 	printf("No memory\n");
 	exit(0);
 	}
-if(!string)
+switch(type)
+{
+case INTEGER:
 	{
 	
 	p->nodeType = CONSTANT;
 	p->type = INT;
 	p->con.value = value;
+	break;
 	}
-else
+case STRING:
 	{
 	p->nodeType = CONSTANT;
 	p->type = STRING;
 	p->con.string = malloc(sizeof(string));
 	strcpy(p->con.string,string);
+	break;
 	}
+
+case BOOLEAN:
+	{
+	p->nodeType = CONSTANT;
+	p->type = BOOLEAN;
+	p->con.value = value;
+	break;
+	}
+}
 p->lineNo=lineNo;
 return p;
 }
@@ -345,7 +375,7 @@ case VARIABLE:
 case OPERATOR:
 	{
 	oper1 = &root->oper.operands[0];
-	if(root->oper.nops==2)
+	if(root->oper.nops>=2)
 		oper2 = &root->oper.operands[1];
 
 	if(root->oper.nops==3)
@@ -453,13 +483,13 @@ case OPERATOR:
 				{
 				
 				scanf("%d",&int_value);
-				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(int_value,NULL));
+				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(INTEGER,int_value,NULL));
 				}
 			
 			else
 				{
 				scanf("%s",str_value);
-				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(0,str_value));
+				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(STRING,0,str_value));
 				}
 						
 			return 1;
@@ -496,6 +526,7 @@ case OPERATOR:
 
 		case IF:
 		       {
+			
 			if(interpret(oper1))
 				interpret(oper2);
 			else if(root->oper.nops==3)
@@ -601,13 +632,27 @@ switch(root->nodeType)
 		case LE:
 		case GE:
 		case NE:
+			{
+			semanticAnalyzer(oper1);
+			semanticAnalyzer(oper2);
+			
+			if((oper1->type == oper2->type) && oper1->type!=STRING)
+				root->type = BOOLEAN;
+				
+			else
+			{
+				printf("Error in %d: Type Mismatch in logical operator\n",root->lineNo);
+				has_error = true;
+			}
+			break;
+			}
 		case AND:
 		case OR:
 			{
 			semanticAnalyzer(oper1);
 			semanticAnalyzer(oper2);
 			
-			if(oper1->type == oper2->type)
+			if((oper1->type == BOOLEAN) && (oper2->type==BOOLEAN))
 				root->type = BOOLEAN;
 				
 			else
@@ -635,11 +680,21 @@ switch(root->nodeType)
 		case READ:
 			{
 			semanticAnalyzer(oper1);
+			if(oper1->type==BOOLEAN)
+				{
+				printf("Error in %d: Type Mismatch in READ\n",root->lineNo);
+				has_error=true;
+				}
 			break;
 			}
 
 		case WRITE:
 			{
+			if(oper1->type==BOOLEAN)
+				{
+				printf("Error in %d: Type Mismatch in READ\n",root->lineNo);
+				has_error=true;
+				}
 			semanticAnalyzer(oper1);
 			break;
 			}
@@ -648,7 +703,8 @@ switch(root->nodeType)
 		       {
 			semanticAnalyzer(oper1);
 			semanticAnalyzer(oper2);
-			semanticAnalyzer(oper3);
+			if(root->oper.nops==3)
+				semanticAnalyzer(oper3);
 			break;
 			}
 

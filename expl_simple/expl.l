@@ -13,11 +13,13 @@ identifiers {alphabets}({alphabets}|{digits})*
 decl		return DECL;
 enddecl		return ENDDECL;
 int		return INTEGER;
+boolean		return BOOL;
 string		return STR;
 {digits}+	{yylval.ival = atoi(yytext);
 		return CONST;
 		}
-
+"true"		{yylval.ival = 1;return TRUE;}
+"false"		{yylval.ival = 0;return FALSE;}
 [-+*/;]		{return *yytext;}
 "=="		return EQ;
 "<="		return LE;

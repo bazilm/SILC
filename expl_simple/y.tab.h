@@ -50,26 +50,29 @@ extern int yydebug;
     ENDDECL = 260,
     INTEGER = 261,
     STR = 262,
-    END = 263,
-    READ = 264,
-    WRITE = 265,
-    EQ = 266,
-    NE = 267,
-    LE = 268,
-    GE = 269,
-    AND = 270,
-    OR = 271,
-    NOT = 272,
-    IF = 273,
-    THEN = 274,
-    ELSE = 275,
-    ENDIF = 276,
-    WHILE = 277,
-    DO = 278,
-    ENDWHILE = 279,
-    CONST = 280,
-    STRCONST = 281,
-    VAR = 282
+    BOOL = 263,
+    END = 264,
+    READ = 265,
+    WRITE = 266,
+    TRUE = 267,
+    FALSE = 268,
+    EQ = 269,
+    NE = 270,
+    LE = 271,
+    GE = 272,
+    AND = 273,
+    OR = 274,
+    NOT = 275,
+    IF = 276,
+    THEN = 277,
+    ELSE = 278,
+    ENDIF = 279,
+    WHILE = 280,
+    DO = 281,
+    ENDWHILE = 282,
+    CONST = 283,
+    STRCONST = 284,
+    VAR = 285
   };
 #endif
 /* Tokens.  */
@@ -78,26 +81,29 @@ extern int yydebug;
 #define ENDDECL 260
 #define INTEGER 261
 #define STR 262
-#define END 263
-#define READ 264
-#define WRITE 265
-#define EQ 266
-#define NE 267
-#define LE 268
-#define GE 269
-#define AND 270
-#define OR 271
-#define NOT 272
-#define IF 273
-#define THEN 274
-#define ELSE 275
-#define ENDIF 276
-#define WHILE 277
-#define DO 278
-#define ENDWHILE 279
-#define CONST 280
-#define STRCONST 281
-#define VAR 282
+#define BOOL 263
+#define END 264
+#define READ 265
+#define WRITE 266
+#define TRUE 267
+#define FALSE 268
+#define EQ 269
+#define NE 270
+#define LE 271
+#define GE 272
+#define AND 273
+#define OR 274
+#define NOT 275
+#define IF 276
+#define THEN 277
+#define ELSE 278
+#define ENDIF 279
+#define WHILE 280
+#define DO 281
+#define ENDWHILE 282
+#define CONST 283
+#define STRCONST 284
+#define VAR 285
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -110,7 +116,7 @@ int ival;
 char * sval;
 struct NodeTag* nval;
 
-#line 114 "y.tab.h" /* yacc.c:1909  */
+#line 120 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

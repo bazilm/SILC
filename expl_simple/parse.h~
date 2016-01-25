@@ -50,7 +50,7 @@ VarNode var;
 
 }Node;
 
-Node * makeConNode(int,char *);
+Node * makeConNode(Type,int,char *,bool);
 Node * makeVarNode(char *,Node *);
 Node * makeOperNode(int,int,...);
 int interpret(Node *);

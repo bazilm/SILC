@@ -1,16 +1,24 @@
 begin
 decl
 int a,b,c;
-string d[2],w,z[2];
+string d[12],w,z[2];
+boolean here,there;
 int f,e,g;
 enddecl
 
 write("enter a number");
-read(w);
+read(a);
 
 write("enter a string");
 read(w);
 
-w="asf"+"asfd";
-write(w);
+b=1+2;
+here = false;
+
+if (not here) then
+	write("Yeah");
+else
+	write("Nops");
+endif;
+
 end
