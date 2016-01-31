@@ -1473,43 +1473,43 @@ yyreduce:
 
   case 19:
 #line 63 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(READ,1,makeVarNode((yyvsp[-5].sval),(yyvsp[-3].nval)));	}
+    {(yyval.nval) = makeOperNode(READ,1,makeVarNode((yyvsp[-5].sval),(yyvsp[-3].nval)));				}
 #line 1478 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
 #line 64 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(WRITE,1,(yyvsp[-2].nval));			}
+    {(yyval.nval) = makeOperNode(WRITE,1,(yyvsp[-2].nval));						}
 #line 1484 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
 #line 65 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(IF,3,(yyvsp[-7].nval),(yyvsp[-4].nval),(yyvsp[-2].nval));		}
+    {(yyval.nval) = makeOperNode(IF,3,(yyvsp[-7].nval),(yyvsp[-4].nval),(yyvsp[-2].nval));					}
 #line 1490 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 66 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(IF,2,(yyvsp[-5].nval),(yyvsp[-2].nval));			}
+    {(yyval.nval) = makeOperNode(IF,2,(yyvsp[-5].nval),(yyvsp[-2].nval));						}
 #line 1496 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
 #line 67 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode(WHILE,2,(yyvsp[-5].nval),(yyvsp[-2].nval));		}
+    {(yyval.nval) = makeOperNode(WHILE,2,(yyvsp[-5].nval),(yyvsp[-2].nval));					}
 #line 1502 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 68 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode('=',2,makeVarNode((yyvsp[-3].sval),NULL),(yyvsp[-1].nval));		}
+    {(yyval.nval) = makeOperNode('=',2,makeVarNode((yyvsp[-3].sval),NULL),(yyvsp[-1].nval));			}
 #line 1508 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
 #line 69 "expl.y" /* yacc.c:1646  */
-    {(yyval.nval) = makeOperNode('=',2,makeVarNode((yyvsp[-6].sval),(yyvsp[-4].nval)),(yyvsp[-1].nval));}
+    {(yyval.nval) = makeOperNode('=',2,makeVarNode((yyvsp[-6].sval),(yyvsp[-4].nval)),(yyvsp[-1].nval));			}
 #line 1514 "y.tab.c" /* yacc.c:1646  */
     break;
 
@@ -2130,6 +2130,7 @@ int interpret(Node * root)
 
 STable * sTableEntry;
 int res1,res2,res3;
+int nops;
 Node *oper1,*oper2,*oper3;
 
 if(!root)
@@ -2161,7 +2162,7 @@ case OPERATOR:
 
 	if(root->oper.nops==3)
 		oper3 = &root->oper.operands[2];
-	
+	nops = root->oper.nops;
 	switch(root->oper.op)
 	{
 		case '+':
@@ -2172,7 +2173,10 @@ case OPERATOR:
 
 		case '-':
 			{
-			return interpret(oper1)-interpret(oper2);
+			if(nops==1)
+				return -interpret(oper1);
+			else
+				return interpret(oper1)-interpret(oper2);
 			break;
 			}
 	
@@ -2339,6 +2343,7 @@ void semanticAnalyzer(Node * root)
 {
 STable *sTableEntry;
 Node * oper1,*oper2,*oper3;
+int nops;
 if(!root)
 	{
 	printf("Parse Tree Root Null\n");
@@ -2360,18 +2365,29 @@ switch(root->nodeType)
 			}
 		else
 			root->type = sTableEntry->type;
+
+		if(root->var.index)
+		{
+		semanticAnalyzer(root->var.index);
+
+		if(root->var.index->type!=INT)
+			{
+			printf("Error in %d: Index must be a number\n",root->lineNo);
+			has_error=true;
+			}
+		}
 		break;
 		}
 
 	case OPERATOR:
 		{
 		oper1 = &root->oper.operands[0];
-		if(root->oper.nops==2)
+		if(root->oper.nops>=2)
 			oper2 = &root->oper.operands[1];
 
 		if(root->oper.nops==3)
 			oper3 = &root->oper.operands[2];
-
+		nops = root->oper.nops;
 		switch(root->oper.op)
 			{
 			case '+':
@@ -2380,6 +2396,13 @@ switch(root->nodeType)
 			case '/':
 			case '%':
 			{
+			if(nops==1)
+			{
+				semanticAnalyzer(oper1);
+				root->type=oper1->type;
+			}
+			else
+			{
 			semanticAnalyzer(oper1);
 			semanticAnalyzer(oper2);
 			if((oper1->type == INT) && (oper2->type == INT))
@@ -2387,9 +2410,10 @@ switch(root->nodeType)
 				
 			else
 				{
-				printf("Error in %d: Type Mismatch in %c \n",root->lineNo,root->oper.op);
+				printf("Error in %d: Type Error in %c \n",root->lineNo,root->oper.op);
 				has_error = true;
 				}
+			}
 			break;
 			}
 
@@ -2401,9 +2425,11 @@ switch(root->nodeType)
 			
 			if(oper1->type != oper2->type)
 				{
-				printf("Error in %d: Type mismatch in =\n",root->lineNo);
+				printf("Error in %d: Type Error in =\n",root->lineNo);
 				has_error = true;
-				}	
+				}
+
+				
 			break;
 			}	
 			
@@ -2422,7 +2448,7 @@ switch(root->nodeType)
 				
 			else
 			{
-				printf("Error in %d: Type Mismatch in logical operator\n",root->lineNo);
+				printf("Error in %d: Type Error in logical operator\n",root->lineNo);
 				has_error = true;
 			}
 			break;
@@ -2438,7 +2464,7 @@ switch(root->nodeType)
 				
 			else
 			{
-				printf("Error in %d: Type Mismatch in logical operator\n",root->lineNo);
+				printf("Error in %d: Type Error in logical operator\n",root->lineNo);
 				has_error = true;
 			}
 			break;
@@ -2452,7 +2478,7 @@ switch(root->nodeType)
 			
 			else
 			{
-				printf("Error in %d: Type Mismatch in NOT\n",root->lineNo);
+				printf("Error in %d: Type Error in NOT\n",root->lineNo);
 				has_error = true;
 			}
 			break;
@@ -2463,7 +2489,7 @@ switch(root->nodeType)
 			semanticAnalyzer(oper1);
 			if(oper1->type==BOOLEAN)
 				{
-				printf("Error in %d: Type Mismatch in READ\n",root->lineNo);
+				printf("Error in %d: Type Error in READ\n",root->lineNo);
 				has_error=true;
 				}
 			break;
@@ -2474,7 +2500,7 @@ switch(root->nodeType)
 			semanticAnalyzer(oper1);
 			if(oper1->type==BOOLEAN)
 				{
-				printf("Error in %d: Type Mismatch in READ\n",root->lineNo);
+				printf("Error in %d: Type Error in READ\n",root->lineNo);
 				has_error=true;
 				}
 			

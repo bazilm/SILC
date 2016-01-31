@@ -2,7 +2,7 @@ begin
 decl
 int a[100],n,i,temp,j;
 enddecl
-write("Enter the number of elements");
+write("Number of elements");
 read(n);
 i=0;
 write("Enter the elements");

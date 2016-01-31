@@ -7,6 +7,7 @@ extern int lineNo;
 digits	[0-9]
 alphabets [a-zA-Z]
 identifiers {alphabets}({alphabets}|{digits})*
+
 %%
 
 decl		return DECL;
@@ -18,7 +19,7 @@ string		return STR;
 		return CONST;
 		}
 "true"		{yylval.ival = 1;return TRUE;}
-"false"		{yylval.ival = 0;return FALSE;}@
+"false"		{yylval.ival = 0;return FALSE;}
 [-+*/;]		{return *yytext;}
 "=="		return EQ;
 "<="		return LE;

@@ -8,11 +8,15 @@ enddecl
 
 write("enter a number");
 read(a);
-
+b = -a*2;
+write(b);
+d[9]="asdf";
 write("enter a string");
 read(w);
 
-b=1+2;
+
+a=b+c;
+here = -true;
 here = false;
 
 if (not here) then
