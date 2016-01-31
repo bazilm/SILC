@@ -1,0 +1,17 @@
+begin
+decl
+int a,b,c[10];
+boolean d,e;
+enddecl
+a=2;
+read(b);
+
+c=b*2*2*2*2*2*2*2;
+write(c);
+
+d = c>b;
+read(c[3]);
+
+write(a);
+write(a+c[3]);
+end

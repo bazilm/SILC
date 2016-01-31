@@ -8,6 +8,11 @@
 STable *sTableBeg,*sTableEnd;
 int lineNo;
 bool has_error = false;
+FILE * out;
+int reg_count=-1;
+int mem = 0;
+
+#include "compiler.c"
 %}
 
 %union
@@ -32,7 +37,15 @@ struct NodeTag* nval;
 
 %%
 
-program: BEG declblock stmt_list END				{semanticAnalyzer($3);if(!has_error)interpret($3);return 0;}
+program: BEG declblock stmt_list END				{semanticAnalyzer($3);
+								if(!has_error)
+								{
+								out = fopen("sil.out","w");
+								fprintf(out,"START\n");
+								compile($3);
+								fprintf(out,"HALT");
+								}
+								return 0;}
 	 |error 						{ return 0;					}
 	 ;
 
@@ -46,10 +59,10 @@ decl_stmt:	decl_stmt INTEGER var_list ';'			{makeSTable($3,INT);}
 		|BOOL var_list ';'				{makeSTable($2,BOOLEAN);}
 		;
 
-var_list: var_list ',' VAR 					{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL));			}
-	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,$1,makeVarNode($3,makeConNode(INTEGER,$5)));}
-	|VAR							{$$=makeVarNode($1,NULL);						}
-	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode(INTEGER,$3));			}
+var_list: var_list ',' VAR 					{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL,1));			}
+	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL,$5));}
+	|VAR							{$$=makeVarNode($1,NULL,1);						}
+	|VAR'['CONST']'						{$$=makeVarNode($1,NULL,$3);			}
 	;
 
 
@@ -57,14 +70,14 @@ stmt_list: stmt_list stmt					{$$ = makeOperNode('$',2,$1,$2);	}
 	   |stmt						{$$ = $1;				}
     	  
 
-stmt: 	READ '(' VAR ')' ';'	        			{$$ = makeOperNode(READ,1,makeVarNode($3,NULL));			}
-	|READ '(' VAR '['expr']'')' ';'				{$$ = makeOperNode(READ,1,makeVarNode($3,$5));				}
+stmt: 	READ '(' VAR ')' ';'	        			{$$ = makeOperNode(READ,1,makeVarNode($3,NULL,0));			}
+	|READ '(' VAR '['expr']'')' ';'				{$$ = makeOperNode(READ,1,makeVarNode($3,$5,0));			}
  	|WRITE '(' expr ')' ';'					{$$ = makeOperNode(WRITE,1,$3);						}
 	|IF '('expr')' THEN stmt_list ELSE stmt_list ENDIF ';'	{$$ = makeOperNode(IF,3,$3,$6,$8);					}
 	|IF '('expr')' THEN stmt_list ENDIF ';'			{$$ = makeOperNode(IF,2,$3,$6);						}
 	|WHILE '(' expr ')' DO stmt_list ENDWHILE ';'		{$$ = makeOperNode(WHILE,2,$3,$6);					}
-	|VAR '=' expr ';'					{$$ = makeOperNode('=',2,makeVarNode($1,NULL),$3);			}
-	|VAR'['expr']' '=' expr ';'				{$$ = makeOperNode('=',2,makeVarNode($1,$3),$6);			}
+	|VAR '=' expr ';'					{$$ = makeOperNode('=',2,makeVarNode($1,NULL,0),$3);			}
+	|VAR'['expr']' '=' expr ';'				{$$ = makeOperNode('=',2,makeVarNode($1,$3,0),$6);			}
 	;
 
 
@@ -88,8 +101,8 @@ expr :
 	|CONST					{$$ = makeConNode(INTEGER,$1);}
 	|TRUE					{$$ = makeConNode(BOOLEAN,1);	}
 	|FALSE					{$$ = makeConNode(BOOLEAN,0);}
-	|VAR					{$$ = makeVarNode($1,NULL);		}
-	|VAR'['expr']'				{$$ = makeVarNode($1,$3);		}
+	|VAR					{$$ = makeVarNode($1,NULL,0);		}
+	|VAR'['expr']'				{$$ = makeVarNode($1,$3,0);		}
 	;
 %%
 
@@ -132,16 +145,14 @@ switch(root->nodeType)
 			sTableEntry = LookUp(root->var.name);
 			if(!sTableEntry)
 				{
-				if(root->var.index==NULL)
-					GInstall(root->var.name,type,1);
-			
-				else if(interpret(root->var.index)<1)
+				
+				if(root->var.size<1)
 					{
 					printf("Error in %d: Cant have size less than 1\n",root->lineNo);
 					has_error=true;
 					}
 				else
-					GInstall(root->var.name,type,interpret(root->var.index));
+					GInstall(root->var.name,type,root->var.size);
 				break;
 				}
 			else
@@ -165,7 +176,7 @@ switch(type)
 	case INT:
 		{
 		sTable->size = size;
-		sTable->binding = malloc(sizeof(int)*size);
+		sTable->binding = mem++;
 		break;
 		}
 
@@ -173,7 +184,7 @@ switch(type)
 	case BOOLEAN:
 		{
 		sTable->size=size;
-		sTable->binding = malloc(sizeof(bool)*size);
+		sTable->binding = mem++;
 		break;
 		}
 }
@@ -206,41 +217,43 @@ while(sTable!=NULL)
 return NULL;
 }
 
-void setVariableValue(char *name,Node *index,Node * value_node)
+void setVariableValue(char *name,Node *index)
 {
 STable *sTableEntry = LookUp(name);
-
-int offset = interpret(index);
-int value = interpret(value_node);
-
-if(sTableEntry->type==INT )
-	*((int *)(sTableEntry->binding) + offset)=value;
-
-else if(sTableEntry->type==BOOLEAN )
-	*((int *)(sTableEntry->binding) + offset)=value;
+if(!index)
+{
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+}
 else
-	{
-	int valAddress = sTableEntry->binding+offset*24;
-	strcpy((char *)valAddress,(char *)value);
-	
-	}
+{
+compile(index);
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+reg_count--;
 }
 
-int getVariableValue(char *name,Node *index)
+}
+
+void getVariableValue(char *name,Node *index)
 {
 STable *sTableEntry = LookUp(name);
-int offset = interpret(index);
-
-if(sTableEntry->type==INT )
-	return *((int*)(sTableEntry->binding) + offset);
-
-else if(sTableEntry->type==BOOLEAN )
-	return *((int*)(sTableEntry->binding) + offset);
+if(!index)
+{
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+}
 else
-	{
-	int valAddress = sTableEntry->binding+(offset*24);
-	return valAddress;
-	}
+{
+compile(index);
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+reg_count--;
+fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+}
 }
 
 	
@@ -276,7 +289,7 @@ p->lineNo=lineNo;
 return p;
 }
 
-Node * makeVarNode(char *name,Node *index)
+Node * makeVarNode(char *name,Node *index,int size)
 {
 
 Node *p;
@@ -290,6 +303,7 @@ p->type = INT;
 p->var.name = malloc(sizeof(name));
 strcpy(p->var.name,name);
 p->var.index=index;
+p->var.size = size;
 p->lineNo=lineNo;
 return p;
 }
@@ -326,7 +340,7 @@ p->lineNo=lineNo;
 return p;
 }
 
-
+/*
 int interpret(Node * root)
 {
 
@@ -513,7 +527,7 @@ case OPERATOR:
 	}
 }
 }
-
+*/
 
 void semanticAnalyzer(Node * root)
 {

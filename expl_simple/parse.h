@@ -9,7 +9,7 @@ typedef struct SymTable
 char * name;
 Type type;
 int size;
-void * binding;
+int binding;
 struct SymTable * next;
 }STable;
 
@@ -25,6 +25,7 @@ typedef struct
 {
 char * name;
 struct NodeTag *index;
+int size;
 }VarNode;
 
 typedef struct 
@@ -49,7 +50,7 @@ VarNode var;
 }Node;
 
 Node * makeConNode(Type,int);
-Node * makeVarNode(char *,Node *);
+Node * makeVarNode(char *,Node *,int);
 Node * makeOperNode(int,int,...);
 int interpret(Node *);
 void semanticAnalyzer(Node *);
@@ -59,8 +60,8 @@ void makeSTable(Node *,Type);
 STable * GInstall(char *,Type,int);
 STable * LookUp(char *);
 
-void setVariableValue(char * name,Node * index,Node * value);
-int getVariableValue(char * name,Node * index);
+void setVariableValue(char * name,Node * index);
+void getVariableValue(char * name,Node * index);
 
 
 
