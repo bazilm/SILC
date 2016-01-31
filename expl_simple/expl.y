@@ -17,7 +17,7 @@ char * sval;
 struct NodeTag* nval;
 }
 
-%token BEG DECL ENDDECL INTEGER STR BOOL END READ WRITE TRUE FALSE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE
+%token BEG DECL ENDDECL INTEGER BOOL END READ WRITE TRUE FALSE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE
 %token <ival> CONST
 %token <nval> STRCONST
 %token <sval> VAR
@@ -41,17 +41,15 @@ declblock:DECL decl_stmt ENDDECL
 	 ;
 
 decl_stmt:	decl_stmt INTEGER var_list ';'			{makeSTable($3,INT);}
-		|decl_stmt STR var_list ';'			{makeSTable($3,STRING);}
 		|decl_stmt BOOL var_list ';'			{makeSTable($3,BOOLEAN);}
 		|INTEGER var_list ';'				{makeSTable($2,INT);}
-		|STR var_list ';'				{makeSTable($2,STRING);}
 		|BOOL var_list ';'				{makeSTable($2,BOOLEAN);}
 		;
 
 var_list: var_list ',' VAR 					{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL));			}
-	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,$1,makeVarNode($3,makeConNode(INTEGER,$5,NULL)));}
+	|var_list ',' VAR'['CONST']'  				{$$=makeOperNode('S',2,$1,makeVarNode($3,makeConNode(INTEGER,$5)));}
 	|VAR							{$$=makeVarNode($1,NULL);						}
-	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode(INTEGER,$3,NULL));			}
+	|VAR'['CONST']'						{$$=makeVarNode($1,makeConNode(INTEGER,$3));			}
 	;
 
 
@@ -87,10 +85,9 @@ expr :
 	|NOT expr				{$$ = makeOperNode(NOT,1,$2);		}
 	|'-'expr				{$$ = makeOperNode('-',1,$2);		}
 	|'('expr')'				{$$ = $2;				}
-	|CONST					{$$ = makeConNode(INTEGER,$1,NULL);}
-	|STRCONST				{$$ = makeConNode(STRING,0,$1);	}
-	|TRUE					{$$ = makeConNode(BOOLEAN,1,NULL);	}
-	|FALSE					{$$ = makeConNode(BOOLEAN,0,NULL);}
+	|CONST					{$$ = makeConNode(INTEGER,$1);}
+	|TRUE					{$$ = makeConNode(BOOLEAN,1);	}
+	|FALSE					{$$ = makeConNode(BOOLEAN,0);}
 	|VAR					{$$ = makeVarNode($1,NULL);		}
 	|VAR'['expr']'				{$$ = makeVarNode($1,$3);		}
 	;
@@ -172,13 +169,7 @@ switch(type)
 		break;
 		}
 
-	case STRING:
-		{
-		sTable->size=24*size;
-		sTable->binding = malloc(sizeof(char)*24*size);
-		break;
-		}
-
+	
 	case BOOLEAN:
 		{
 		sTable->size=size;
@@ -229,7 +220,7 @@ else if(sTableEntry->type==BOOLEAN )
 	*((int *)(sTableEntry->binding) + offset)=value;
 else
 	{
-	int valAddress = sTableEntry->binding+offset*24;
+	int valAddress = (int)sTableEntry->binding+offset*24;
 	strcpy((char *)valAddress,(char *)value);
 	
 	}
@@ -247,13 +238,13 @@ else if(sTableEntry->type==BOOLEAN )
 	return *((int*)(sTableEntry->binding) + offset);
 else
 	{
-	int valAddress = sTableEntry->binding+(offset*24);
+	int valAddress = (int)sTableEntry->binding+(offset*24);
 	return valAddress;
 	}
 }
 
 	
-Node * makeConNode(Type type,int value,char * string)
+Node * makeConNode(Type type,int value)
 {
 
 Node * p;
@@ -270,14 +261,6 @@ case INTEGER:
 	p->nodeType = CONSTANT;
 	p->type = INT;
 	p->con.value = value;
-	break;
-	}
-case STRING:
-	{
-	p->nodeType = CONSTANT;
-	p->type = STRING;
-	p->con.string = malloc(sizeof(string));
-	strcpy(p->con.string,string);
 	break;
 	}
 
@@ -360,10 +343,7 @@ switch(root->nodeType)
 {
 case CONSTANT:
 	{
-	if(root->type==INT)
-		return root->con.value;
-	else
-		return root->con.string;
+	return root->con.value;
 	break;
 	}
 
@@ -483,19 +463,9 @@ case OPERATOR:
 			{
 			int int_value;
 			char *str_value = malloc(sizeof(char)*24);
-			if(oper1->type==INT)
-				{
-				
-				scanf("%d",&int_value);
-				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(INTEGER,int_value,NULL));
-				}
-			
-			else
-				{
-				scanf("%s",str_value);
-				setVariableValue(oper1->var.name,oper1->var.index,makeConNode(STRING,0,str_value));
-				}
-						
+			scanf("%d",&int_value);
+			setVariableValue(oper1->var.name,oper1->var.index,makeConNode(INTEGER,int_value));
+									
 			return 1;
 			break;
 			}
@@ -504,26 +474,13 @@ case OPERATOR:
 			{
 			
 			if(oper1->nodeType == VARIABLE)
-				{
+				printf("%d\n",getVariableValue(oper1->var.name,oper1->var.index));
+					
 			
-				if(oper1->type==INT)
-					printf("%d\n",getVariableValue(oper1->var.name,oper1->var.index));
-				
-				else
-					{
-					printf("%s\n",(char *)getVariableValue(oper1->var.name,oper1->var.index));
-					}
-				
-				}
-
 			else
-				{
+				printf("%d\n",interpret(oper1));
 				
-				if(oper1->type==INT)
-					printf("%d\n",interpret(oper1));
-				else if(oper1->type==STRING)
-					printf("%s\n",(char*)interpret(oper1));
-				}			
+							
 			return 1;
 			break;
 			}
@@ -662,7 +619,7 @@ switch(root->nodeType)
 			semanticAnalyzer(oper1);
 			semanticAnalyzer(oper2);
 			
-			if((oper1->type == oper2->type) && oper1->type!=STRING)
+			if(oper1->type == INT && oper2->type==INT)
 				root->type = BOOLEAN;
 				
 			else

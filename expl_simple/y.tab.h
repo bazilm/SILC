@@ -49,30 +49,29 @@ extern int yydebug;
     DECL = 259,
     ENDDECL = 260,
     INTEGER = 261,
-    STR = 262,
-    BOOL = 263,
-    END = 264,
-    READ = 265,
-    WRITE = 266,
-    TRUE = 267,
-    FALSE = 268,
-    EQ = 269,
-    NE = 270,
-    LE = 271,
-    GE = 272,
-    AND = 273,
-    OR = 274,
-    NOT = 275,
-    IF = 276,
-    THEN = 277,
-    ELSE = 278,
-    ENDIF = 279,
-    WHILE = 280,
-    DO = 281,
-    ENDWHILE = 282,
-    CONST = 283,
-    STRCONST = 284,
-    VAR = 285
+    BOOL = 262,
+    END = 263,
+    READ = 264,
+    WRITE = 265,
+    TRUE = 266,
+    FALSE = 267,
+    EQ = 268,
+    NE = 269,
+    LE = 270,
+    GE = 271,
+    AND = 272,
+    OR = 273,
+    NOT = 274,
+    IF = 275,
+    THEN = 276,
+    ELSE = 277,
+    ENDIF = 278,
+    WHILE = 279,
+    DO = 280,
+    ENDWHILE = 281,
+    CONST = 282,
+    STRCONST = 283,
+    VAR = 284
   };
 #endif
 /* Tokens.  */
@@ -80,30 +79,29 @@ extern int yydebug;
 #define DECL 259
 #define ENDDECL 260
 #define INTEGER 261
-#define STR 262
-#define BOOL 263
-#define END 264
-#define READ 265
-#define WRITE 266
-#define TRUE 267
-#define FALSE 268
-#define EQ 269
-#define NE 270
-#define LE 271
-#define GE 272
-#define AND 273
-#define OR 274
-#define NOT 275
-#define IF 276
-#define THEN 277
-#define ELSE 278
-#define ENDIF 279
-#define WHILE 280
-#define DO 281
-#define ENDWHILE 282
-#define CONST 283
-#define STRCONST 284
-#define VAR 285
+#define BOOL 262
+#define END 263
+#define READ 264
+#define WRITE 265
+#define TRUE 266
+#define FALSE 267
+#define EQ 268
+#define NE 269
+#define LE 270
+#define GE 271
+#define AND 272
+#define OR 273
+#define NOT 274
+#define IF 275
+#define THEN 276
+#define ELSE 277
+#define ENDIF 278
+#define WHILE 279
+#define DO 280
+#define ENDWHILE 281
+#define CONST 282
+#define STRCONST 283
+#define VAR 284
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -116,7 +114,7 @@ int ival;
 char * sval;
 struct NodeTag* nval;
 
-#line 120 "y.tab.h" /* yacc.c:1909  */
+#line 118 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

@@ -14,7 +14,7 @@ decl		return DECL;
 enddecl		return ENDDECL;
 int		return INTEGER;
 boolean		return BOOL;
-string		return STR;
+
 {digits}+	{yylval.ival = atoi(yytext);
 		return CONST;
 		}
