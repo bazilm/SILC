@@ -10,7 +10,7 @@ int lineNo;
 bool has_error = false;
 FILE * out;
 int reg_count=-1;
-int mem = 0;
+int mem = 0,if_count=1,while_count=1;
 
 #include "compiler.c"
 %}
@@ -42,6 +42,8 @@ program: BEG declblock stmt_list END				{semanticAnalyzer($3);
 								{
 								out = fopen("sil.out","w");
 								fprintf(out,"START\n");
+								fprintf(out,"MOV SP,1535\n");
+								fprintf(out,"MOV BP,1535\n");
 								compile($3);
 								fprintf(out,"HALT");
 								}

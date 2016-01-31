@@ -126,7 +126,6 @@ switch(root->nodeType)
 				{
 				compile(oper1);
 				compile(oper2);
-				reg_count++;
 				fprintf(out,"EQ R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 				break;
@@ -135,7 +134,6 @@ switch(root->nodeType)
 				{
 				compile(oper1);
 				compile(oper2);
-				reg_count++;
 				fprintf(out,"LT R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 				break;
@@ -146,7 +144,6 @@ switch(root->nodeType)
 			
 				compile(oper1);
 				compile(oper2);
-				reg_count++;
 				fprintf(out,"GT R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 				break;
@@ -157,7 +154,6 @@ switch(root->nodeType)
 				{
 				compile(oper1);
 				compile(oper2);
-				reg_count++;
 				fprintf(out,"LE R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 				break;
@@ -168,7 +164,6 @@ switch(root->nodeType)
 			
 				compile(oper1);
 				compile(oper2);
-				reg_count++;
 				fprintf(out,"GE R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 				break;		
@@ -178,7 +173,6 @@ switch(root->nodeType)
 				{
 				compile(oper1);
 				compile(oper2);
-				reg_count++;
 				fprintf(out,"NE R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 				break;
@@ -222,7 +216,19 @@ switch(root->nodeType)
 
 			case IF:
 			       {
-			
+				int cnt = if_count;
+				if_count++;
+				compile(oper1);
+				fprintf(out,"JZ R%d,ELSE%d\n",reg_count,cnt);
+				compile(oper2);
+				fprintf(out,"JMP ENDIF%d\n",cnt);
+				fprintf(out,"ELSE%d:\n",cnt);
+				
+				if(root->oper.nops==3)
+					compile(oper3);
+				fprintf(out,"ENDIF%d:\n",cnt);
+				
+				
 				/*if(interpret(oper1))
 					interpret(oper2);
 				else if(root->oper.nops==3)
@@ -233,6 +239,16 @@ switch(root->nodeType)
 
 			case WHILE:
 				{
+				int cnt = while_count;
+				while_count++;
+				fprintf(out,"WHILEBEG%d:\n",cnt);
+				compile(oper1);
+				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count,cnt);
+				compile(oper2);
+				fprintf(out,"JMP WHILEBEG%d\n",cnt);
+				fprintf(out,"WHILEEND%d:\n",cnt);
+				
+				
 				//while(interpret(oper1))
 				//	interpret(oper2);
 				break;

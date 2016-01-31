@@ -10,7 +10,7 @@ int lineNo;
 bool has_error = false;
 FILE * out;
 int reg_count=-1;
-int mem = 0;
+int mem = 0,if_count=1,while_count=1;
 
 #include "compiler.c"
 %}
@@ -178,7 +178,8 @@ switch(type)
 	case INT:
 		{
 		sTable->size = size;
-		sTable->binding = mem++;
+		sTable->binding = mem;
+		mem+=size;
 		break;
 		}
 
@@ -186,7 +187,8 @@ switch(type)
 	case BOOLEAN:
 		{
 		sTable->size=size;
-		sTable->binding = mem++;
+		sTable->binding = mem;
+		mem+=size;
 		break;
 		}
 }

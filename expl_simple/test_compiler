@@ -1,17 +1,13 @@
 begin
 decl
-int a,b,c[10];
+int a,b,c[100];
 boolean d,e;
 enddecl
-a=2;
+a=0;
 read(b);
-
-c=b*(2*(2*(2*(2*(2*(2*2))))));
-write(c);
-
-d = c>b;
-read(c[3]);
-
+while(a<b) do
+	read(c[a]);
+	a=a+1;
+endwhile;
 write(a);
-write(a+c[3]);
 end

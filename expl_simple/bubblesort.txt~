@@ -11,7 +11,7 @@ while (i<n) do
 	i=i+1;
 endwhile;
 
-
+write(i);
 i=0;
 j=0;
 
@@ -23,7 +23,7 @@ while (i<n) do
 			a[j]=a[i];
 			a[i]=temp;
 		endif;
-	
+	write(j);
 	j=j+1;
 	endwhile;
 i=i+1;
