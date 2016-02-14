@@ -4,14 +4,33 @@
 typedef enum  {CONSTANT,OPERATOR,VARIABLE} NodeType ;
 typedef enum  {INT,BOOLEAN} Type;
 
+typedef struct
+{
+char * name;
+Type type;
+int value;
+int ref;
+}Arglist;
+
+typedef struct LSymTable
+{
+char * name;
+Type type;
+int binding;
+struct LSymTable * next;
+}LTable;
+
 typedef struct SymTable
 {
 char * name;
 Type type;
 int size;
 int binding;
+Arglist * args;
+LTable * symbolTable;
 struct SymTable * next;
 }STable;
+
 
 
 typedef struct 
@@ -59,6 +78,12 @@ void freeNode(Node *);
 void makeSTable(Node *,Type);
 STable * GInstall(char *,Type,int);
 STable * LookUp(char *);
+
+void makeLTable(Node *,Type);
+LTable * LInstall(char *,Type,int);
+LTable * LookUp(char *);
+
+void AddArg(char *,Type,int,int);
 
 void setVariableValue(char * name,Node * index);
 void getVariableValue(char * name,Node * index);

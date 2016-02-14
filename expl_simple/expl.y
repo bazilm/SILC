@@ -6,11 +6,12 @@
 #include "parse.h"
 
 STable *sTableBeg,*sTableEnd;
+LTable *lTableBeg,*lTableEnd;
 int lineNo;
 bool has_error = false;
 FILE * out;
 int reg_count=-1;
-int mem = 0,if_count=1,while_count=1;
+int mem = 0,if_count=1,while_count=1,fmem;
 
 #include "compiler.c"
 %}
@@ -37,7 +38,59 @@ struct NodeTag* nval;
 
 %%
 
-program: BEG declblock stmt_list END				{semanticAnalyzer($3);
+program: 	Gdeclblock Fdeflist Main 
+		;
+
+Gdeclblock:	DECL Gdecllist ENDDECL
+		;
+
+Gdecllist:	Gdecllist INTEGER Gvarlist ';'				{makeSTable($3,INT);}
+		|Gdecllist BOOL Gvarlist ';'				{makeSTable($3,BOOL);}
+		|INTEGER Gvarlist ';'					{makeSTable($3,INT);}
+		|BOOL Gvarlist ';'					{makeSTable($3,INT);}
+		;
+
+Gvarlist:	Gvarlist ',' VAR				{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL,1));}
+		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeOperNode('S',2,$1,makeVarNode($3,NULL,$5));}
+		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeOperNode('S',3,$1,makeVarNode($3,NULL,1),$5);}
+		|VAR						{$$=makeVarNode($1,NULL,1);}
+		|VAR '[' CONST ']'				{$$=makeVarNode($1,NULL,$3);}
+		|VAR '(' Farglist ')'				{$$=makeOperNode('F',2,$1,$3);}
+		;
+
+Farglist:	Farglist INTEGER Fvarlist ';'			{$$ = makeArgList($1,$3,INT);		}
+		|Farglist BOOL Fvarlist ';'			{$$ = makeArgList($1,$3,BOOL);		}
+		|INTEGER Fvarlist ';'				{$$ = makeArgList($2,NULL,INT);		}
+		|BOOL Fvarlist ';'				{$$ = makeArgList($2,NULL,BOOL);	}
+		;
+
+Fvarlist:	Fvarlist ',' VAR				{$$ = makeOperNode('S',2,$1,makeVarNode($3,NULL,1));}
+		|Fvarlist ',' '&' VAR				{$$ = makeOperNode('S',2,$1,makeVarNode($4,makeVarNode('&',NULL,1),1));}
+		|VAR						{$$=makeVarNode($1,NULL,1);}
+		|'&' VAR					{$$=makeVarNode($1,makeVarNode('&',NULL,1),1);}
+		;
+
+Fdeflist:	Fdeflist Fdef
+		|Fdef
+		;
+
+Fdef:		INTEGER VAR '(' Farglist ')' '{'Fdecllist Fbody '}'
+		|BOOL VAR '(' Farglist ')' '{' Fdecllist Fbody '}'
+		;
+
+Fdecllist:	Fdecllist INTEGER Fvarlist ';'
+		|Fdecllist BOOL Fvarlist ';'
+		|INTEGER Fvarlist ';'
+		|BOOL Fvarlist ';'
+		;
+
+Fvarlist:	Fvarlist ',' VAR
+		|VAR
+		;
+
+Fbody:		BEG stmt_list ret_stmt	END
+		;
+program: 	BEG declblock stmt_list END				{semanticAnalyzer($3);
 								if(!has_error)
 								{
 								out = fopen("sil.out","w");
@@ -220,6 +273,162 @@ while(sTable!=NULL)
 	}
 return NULL;
 }
+
+void makeLTable(Node * root,Type type)
+{
+LTable * lTableEntry;
+
+switch(root->nodeType)
+{
+
+	case OPERATOR:
+			{
+			makeLTable(&root->oper.operands[0],type);
+			makeLTable(&root->oper.operands[1],type);
+			break;
+			}
+
+	case VARIABLE:
+			{
+			
+			lTableEntry = LookUp(root->var.name);
+			if(!lTableEntry)
+				{
+				
+				if(root->var.size<1)
+					{
+					printf("Error in %d: Cant have size less than 1\n",root->lineNo);
+					has_error=true;
+					}
+				else
+					LInstall(root->var.name,type,root->var.size);
+					
+				break;
+				}
+			else
+				{
+				printf("Error in %d :Variable %s declared once\n",root->lineNo,root->var.name);
+				has_error=true;
+				break;
+				}
+			}
+}
+}
+
+LTable *LInstall(char *name,Type type,int size)
+{
+LTable *lTable = malloc(sizeof(LTable));
+lTable->name = name;
+lTable->type = type;
+
+switch(type)
+{
+	case INT:
+		{
+		lTable->size = size;
+		lTable->binding = fmem;
+		fmem+=size;
+		break;
+		}
+
+	
+	case BOOLEAN:
+		{
+		sTable->size=size;
+		sTable->binding = fmem;
+		fmem+=size;
+		break;
+		}
+}
+
+lTable->next = NULL;
+
+if(lTableBeg==NULL)
+	{
+	lTableBeg=lTable;
+	lTableEnd=lTable;
+	}
+else
+	{
+	lTableEnd->next = lTable;
+	lTableEnd = lTable;
+	}
+return lTableEnd;
+}
+
+LTable * LLookUp(char * name,LTable * lTable)
+{
+
+while(lTable!=NULL)
+	{
+	if(strcmp(lTable->name,name)==0)
+		return lTable;
+
+	lTable=lTable->next;
+	}
+return NULL;
+}
+
+Arglist * AddArgs(Node * left,Arglist * right,Type type)
+{
+
+Arglist * argList,*argList1,*argList2;
+if(right==NULL)
+{
+switch(left->nodeType)
+{
+	case OPERATOR:
+		{
+		argList1 = AddArgs(&left->oper.operands[0],NULL,type);
+		argList2 = AddArgs(&left->oper.operands[1],NULL,type);
+		argList1->next = argList2;
+		return argList2;
+		break;
+		}
+	case VARIABLE:
+		{
+		argList = malloc(sizeof(Arglist));
+		strcpy(argList->name,left->var.name);
+		argList->type = type;
+		if(left->var.index==NULL)
+			argList->ref = 0;
+		else
+			argList->ref = 1;
+		argList->next = NULL;
+		return argList;
+		break;
+		} 
+}
+}
+else
+{
+switch(left->nodeType)
+{
+	case OPERATOR:
+		{
+		argList1 = AddArgs(&left->oper.operands[0],NULL,type);
+		argList2 = AddArgs(&left->oper.operands[1],NULL,type);
+		argList1->next = argList2;
+		return argList2;
+		break;
+		}
+	case VARIABLE:
+		{
+		argList = right;
+		strcpy(argList->name,left->var.name);
+		argList->type = type;
+		if(left->var.index==NULL)
+			argList->ref = 0;
+		else
+			argList->ref = 1;
+		argList->next = NULL;
+		return argList;
+		break;
+		} 
+}
+}
+
+		
 
 void setVariableValue(char *name,Node *index)
 {
