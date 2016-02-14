@@ -1,14 +1,16 @@
 begin
 decl
 int a[100],n,i,temp,j;
+boolean b;
 enddecl
 
 read(n);
 i=0;
-
-while (i<n) do
+b=i<n;
+while (b) do
 	read(a[i]);
 	i=i+1;
+	b=(i<n);
 endwhile;
 
 
@@ -23,7 +25,7 @@ while (i<n) do
 			a[j]=a[i];
 			a[i]=temp;
 		endif;
-	
+
 	j=j+1;
 	endwhile;
 i=i+1;

@@ -239,14 +239,15 @@ switch(root->nodeType)
 
 			case WHILE:
 				{
-				
-				fprintf(out,"WHILEBEG%d:\n",while_count);
-				compile(oper1);
-				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count,while_count);
-				compile(oper2);
-				fprintf(out,"JMP WHILEBEG%d\n",while_count);
-				fprintf(out,"WHILEEND%d:\n",while_count);
+				int cnt = while_count;
 				while_count++;
+				fprintf(out,"WHILEBEG%d:\n",cnt);
+				compile(oper1);
+				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count--,cnt);
+				compile(oper2);
+				fprintf(out,"JMP WHILEBEG%d\n",cnt);
+				fprintf(out,"WHILEEND%d:\n",cnt);
+				
 				
 				//while(interpret(oper1))
 				//	interpret(oper2);

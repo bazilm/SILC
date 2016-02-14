@@ -219,7 +219,7 @@ switch(root->nodeType)
 				int cnt = if_count;
 				if_count++;
 				compile(oper1);
-				fprintf(out,"JZ R%d,ELSE%d\n",reg_count,cnt);
+				fprintf(out,"JZ R%d,ELSE%d\n",reg_count--,cnt);
 				compile(oper2);
 				fprintf(out,"JMP ENDIF%d\n",cnt);
 				fprintf(out,"ELSE%d:\n",cnt);
@@ -243,7 +243,7 @@ switch(root->nodeType)
 				while_count++;
 				fprintf(out,"WHILEBEG%d:\n",cnt);
 				compile(oper1);
-				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count,cnt);
+				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count--,cnt);
 				compile(oper2);
 				fprintf(out,"JMP WHILEBEG%d\n",cnt);
 				fprintf(out,"WHILEEND%d:\n",cnt);
