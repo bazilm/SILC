@@ -31,7 +31,15 @@ LTable * symbolTable;
 struct SymTable * next;
 }STable;
 
+typedef struct IDList
+{
+char * name;
+Type type;
+int size;
+ArgList * argList;
+int ref;
 
+}Idlist;
 
 typedef struct 
 {
@@ -82,6 +90,10 @@ STable * LookUp(char *);
 void makeLTable(Node *,Type);
 LTable * LInstall(char *,Type,int);
 LTable * LookUp(char *);
+
+void AddArg(char *,Type,int,int);
+
+Idlist * makeIdList(char *,Type,Arglist ,int);
 
 void setVariableValue(char * name,Node * index);
 void getVariableValue(char * name,Node * index);
