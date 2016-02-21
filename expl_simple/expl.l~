@@ -14,7 +14,7 @@ decl		return DECL;
 enddecl		return ENDDECL;
 int		return INTEGER;
 boolean		return BOOL;
-string		return STR;
+
 {digits}+	{yylval.ival = atoi(yytext);
 		return CONST;
 		}
@@ -39,6 +39,7 @@ endif		return ENDIF;
 while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
+"return"	return RET;
 \".+\"		{
 		yylval.sval = malloc(sizeof(yytext));
 		strncpy(yylval.sval,yytext+1,strlen(yytext)-2);

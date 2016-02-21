@@ -1,13 +1,31 @@
-begin
 decl
-int a,b,c[100];
-boolean d,e;
+int a,b,c;
+boolean swap(int num1,num2;);
+int temp;
 enddecl
-a=0;
-read(b);
-while(a<b) do
-	read(c[a]);
-	a=a+1;
-endwhile;
-write(a);
+
+boolean swap(int num1;int num2;)
+{
+
+begin
+
+temp = num1-1;
+return true;
 end
+}
+
+
+int main()
+{
+decl
+int a;
+boolean c;
+enddecl
+begin
+c = swap(2,b);
+
+
+return 2+3*34;
+end
+}
+

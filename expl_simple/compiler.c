@@ -221,7 +221,9 @@ switch(root->nodeType)
 	
 			case AND:
 				{
-				//return interpret(oper1)&&interpret(oper2);
+				compile(oper1);
+				compile(oper2);
+				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 				break;
 				}
 

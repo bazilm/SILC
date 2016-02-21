@@ -1,5 +1,46 @@
 #include "y.tab.h"
 
+
+void setVariableValue(char *name,Node *index)
+{
+STable *sTableEntry = LookUp(name);
+if(!index)
+{
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+}
+else
+{
+compile(index);
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+reg_count--;
+}
+
+}
+
+void getVariableValue(char *name,Node *index)
+{
+STable *sTableEntry = LookUp(name);
+if(!index)
+{
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+}
+else
+{
+compile(index);
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+reg_count--;
+fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+}
+}
+
+
 void compile(Node * root)
 {
 

@@ -4,19 +4,22 @@
 typedef enum  {CONSTANT,OPERATOR,VARIABLE} NodeType ;
 typedef enum  {INT,BOOLEAN} Type;
 
-typedef struct
+typedef struct ArgList
 {
 char * name;
 Type type;
 int value;
 int ref;
-}Arglist;
+struct ArgList * next;
+}ArgList;
 
 typedef struct LSymTable
 {
 char * name;
 Type type;
+int size;
 int binding;
+int ref;
 struct LSymTable * next;
 }LTable;
 
@@ -26,20 +29,20 @@ char * name;
 Type type;
 int size;
 int binding;
-Arglist * args;
+ArgList * args;
 LTable * symbolTable;
 struct SymTable * next;
 }STable;
 
-typedef struct IDList
+typedef struct IdList
 {
 char * name;
 Type type;
 int size;
 ArgList * argList;
 int ref;
-
-}Idlist;
+struct IDList * next;
+}IdList;
 
 typedef struct 
 {
@@ -52,6 +55,7 @@ typedef struct
 {
 char * name;
 struct NodeTag *index;
+ArgList * argList;
 int size;
 }VarNode;
 
@@ -77,28 +81,29 @@ VarNode var;
 }Node;
 
 Node * makeConNode(Type,int);
-Node * makeVarNode(char *,Node *,int);
+Node * makeVarNode(char *,Node *,ArgList *,int);
 Node * makeOperNode(int,int,...);
 int interpret(Node *);
 void semanticAnalyzer(Node *);
 void freeNode(Node *);
 
-void makeSTable(Node *,Type);
-STable * GInstall(char *,Type,int);
-STable * LookUp(char *);
+void makeSTable(IdList *,Type);
+STable * GInstall(char *,Type,int,ArgList *, int);
+void * LookUp(char *);
 
-void makeLTable(Node *,Type);
+void makeLTable(IdList *,Type);
 LTable * LInstall(char *,Type,int);
-LTable * LookUp(char *);
 
-void AddArg(char *,Type,int,int);
+ArgList * makeCallList(ArgList *,char *,Type,int);
 
-Idlist * makeIdList(char *,Type,Arglist ,int);
+IdList * makeIdList(IdList *,char *,Type,int,ArgList *,int);
 
 void setVariableValue(char * name,Node * index);
 void getVariableValue(char * name,Node * index);
 
 
+void showContents(STable *);
+void LshowContents(LTable *);
 
 
 

@@ -1,13 +1,16 @@
 #include "y.tab.h"
+
+LTable * lTable =NULL;
+STable * sTable = NULL;
 void semanticAnalyzer(Node * root)
 {
 STable *sTableEntry;
+LTable *lTableEntry;
 Node * oper1,*oper2,*oper3;
 int nops;
 if(!root)
 	{
-	printf("Parse Tree Root Null\n");
-	exit(1);
+	return;
 	}
 switch(root->nodeType)
 {
@@ -16,18 +19,33 @@ switch(root->nodeType)
 
 	case VARIABLE:
 		{
-		sTableEntry = LookUp(root->var.name);
 		
-		if(sTableEntry==NULL)
-			{
-			printf("Error in %d: Variable %s not declared\n",root->lineNo,root->var.name);
-			has_error = true;
-			}
+		
+		lTableEntry = LLookUp(root->var.name,lTable);
+		
+		if(lTableEntry==NULL)
+		{
+		
+			sTableEntry = LookUp(root->var.name);
+			if(sTableEntry==NULL)
+				{
+				printf("Error in %d: Variable %s not declared\n",root->lineNo,root->var.name);
+				has_error = true;
+				}
+			else
+				{
+				//printf("%s found from global Table in memory address %d\n",root->var.name,sTableEntry->binding);
+				root->type = sTableEntry->type;
+				}
+		}
 		else
-			root->type = sTableEntry->type;
-
+			{
+			//printf("%s found from local Table in memory address %d\n",root->var.name,lTableEntry->binding);
+			root->type = lTableEntry->type;
+			}
 		if(root->var.index)
 		{
+		
 		semanticAnalyzer(root->var.index);
 
 		if(root->var.index->type!=INT)
@@ -183,15 +201,153 @@ switch(root->nodeType)
 			break;
 			}
 
-		case '$':
+		case 'S':
 			{
 			semanticAnalyzer(oper1);
 			semanticAnalyzer(oper2);
 			break;
 			}
+		case 'F':
+			{
+			sTableEntry = LookUp(oper1->var.name);
+			
+			//no sTableEntry, so function not declared
+			if(!sTableEntry)
+			{
+			printf("Error in %d: Function %s not declared\n",root->lineNo,oper1->var.name);
+			has_error = true;
+			}
+			
+			else 
+				{
+				//checking whether return types match
+				if(oper1->type!=sTableEntry->type)
+				{
+				printf("Error in %d: Return type mismatch in function %s\n",root->lineNo,oper1->var.name);
+				has_error = true;
+				}
+				//setting sTable to be used by the function body
+				sTable = sTableEntry;
+				//setting lTable to be used by the function body
+				lTable = sTable->symbolTable;
+				
+				//function has args, checking whether declaration and definition args match
+				if(sTableEntry->args)
+				{
+				ArgList * funcArgList = oper1->var.argList;
+				ArgList * symArgList = sTableEntry->args;
+				
+				while(symArgList!=NULL&&funcArgList!=NULL)
+				{	
+					//checking for name equivalence
+					if(strcmp(symArgList->name,funcArgList->name)!=0)
+					{
+					printf("Error in %d: Arguments name mismatch in function %s\n",root->lineNo,oper1->var.name);
+					has_error = true;
+					}
+					//checking for type equivalence
+					if(symArgList->type!=funcArgList->type)
+					{
+					
+					printf("Error in %d: Type mismatch in arguments of function %s\n",root->lineNo,oper1->var.name);
+					has_error =true;
+					}
+						
+				symArgList = symArgList->next;
+				funcArgList = funcArgList->next;
+				}
+				//checking whether no. of arguments match
+				if(symArgList!=NULL||funcArgList!=NULL)
+				{
+				printf("Error in %d: No of arguments doesnt match in function %s\n",root->lineNo,oper1->var.name);
+				has_error = true;
+				}
+			}
+				
+			}
+			//calling semantic analyzer for function body
+		       	semanticAnalyzer(oper1->var.index);
 
+			//Resetting sTable and lTable
+			lTable = NULL;
+			sTable = NULL;
+			break;
+			}
+		case 'f':
+			{
+			sTableEntry = LookUp(oper1->var.name);
+			
+			if(!sTableEntry)
+			{
+			printf("Error in %d: Function %s not declared\n",root->lineNo,oper1->var.name);
+			has_error = true;
+			}
+			
+			else
+				{
+				root->type = sTableEntry->type;
+				
+				if(sTableEntry->args)
+				{
+				ArgList * funcArgList = oper1->var.argList;
+				ArgList * symArgList = sTableEntry->args;
+				
+				while(symArgList!=NULL&&funcArgList!=NULL)
+				{
+					//checking whether variables in arglist are declared 
+					if(funcArgList->name)
+					{
+					lTableEntry = LLookUp(funcArgList->name,lTable);
+					if(lTableEntry)
+						funcArgList->type = lTableEntry->type;
+					else
+						{
+						sTableEntry = LookUp(funcArgList->name);
+						if(sTableEntry)
+							funcArgList->type = sTableEntry->type;
+
+						else
+							{
+							printf("Error in %d: %s not declared\n",root->lineNo,funcArgList->name);
+							has_error=true;
+							}
+						}
+					}
+					//checking whether type matches
+					if(symArgList->type!=funcArgList->type)
+					{
+					
+					printf("Error in %d: Type mismatch in arguments of function %s\n",root->lineNo,oper1->var.name);
+					has_error =true;
+					}
+				symArgList = symArgList->next;
+				funcArgList = funcArgList->next;
+				}
+				//checking whether no. of arguments match
+				if(symArgList!=NULL||funcArgList!=NULL)
+				{
+				printf("Error in %d: No of arguments doesnt match in function %s\n",root->lineNo,oper1->var.name);
+				has_error = true;
+				}
+				}
+			}
+			break;
+			
+			}
+		case 'R':
+			{
+
+			semanticAnalyzer(oper1);
+			if(oper1->type!=sTable->type)
+			{
+			printf("Error in %d: Return type of function %s doesnt match with declaration\n",root->lineNo,sTable->name);
+			has_error = true;
+
+			}
+			break;
 			}
 		}
 	}
+}
 }
 

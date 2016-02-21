@@ -3,7 +3,8 @@ decl
 int a[100],n,i,temp,j;
 boolean b;
 enddecl
-
+b=True;
+b = True and True
 read(n);
 i=0;
 b=i<n;

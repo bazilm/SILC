@@ -39,6 +39,8 @@ endif		return ENDIF;
 while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
+"return"	return RET;
+main		return MAIN;
 \".+\"		{
 		yylval.sval = malloc(sizeof(yytext));
 		strncpy(yylval.sval,yytext+1,strlen(yytext)-2);

@@ -1,10 +1,10 @@
 #include "y.tab.h"
 
-void makeSTable(Idlist * root,Type type)
+void makeSTable(IdList * root,Type type)
 {
 STable * sTableEntry;
 
-Idlist * idListEntry = root;
+IdList * idListEntry = root;
 
 while(idListEntry!=NULL)
 {
@@ -19,14 +19,14 @@ while(idListEntry!=NULL)
 			has_error=true;
 			}
 		else
-			{GInstall(idListEntry->name,idListEntry->type,idListEntry->size,idListEntry->argList,idListEntry->ref);
+			{GInstall(idListEntry->name,type,idListEntry->size,idListEntry->argList,idListEntry->ref);
 			idListEntry = idListEntry->next;
 			}
 		
 		}
 	else
 		{
-		printf("Error:Variable %s declared once\n",idListEntry->name);
+		printf("Error: Multiple Declarations for %s\n",idListEntry->name);
 		has_error=true;
 		idListEntry = idListEntry->next;
 		}
@@ -43,6 +43,41 @@ STable *sTable = malloc(sizeof(STable));
 sTable->name = name;
 sTable->type = type;
 
+//Putting the arguments to local symbol table
+if(func)
+{
+sTable->args = argList;
+LTable *end,*LTableEntry;
+int bind=-3;
+while(argList!=NULL)
+	{
+	LTableEntry = malloc(sizeof(LTable));
+	LTableEntry->name = malloc(sizeof(argList->name));
+	strcpy(LTableEntry->name,argList->name);
+	LTableEntry->type = argList->type;
+	LTableEntry->size = 1;
+	LTableEntry->binding = bind;
+	LTableEntry->ref = argList->ref;
+	LTableEntry->next = NULL;
+	
+	if(sTable->symbolTable==NULL)
+		{
+		sTable->symbolTable = LTableEntry;
+		end = LTableEntry;
+		}
+	else
+		{
+		end->next = LTableEntry;
+		end = end->next;
+		}
+
+	bind--;
+	argList = argList->next;
+	}
+}
+
+
+//setting binding for global variables
 switch(type)
 {
 	case INT:
@@ -86,6 +121,7 @@ return sTableEnd;
 
 STable *LookUp(char * name)
 {
+
 STable * sTable = sTableBeg;
 while(sTable!=NULL)
 	{
@@ -100,7 +136,7 @@ return NULL;
 void makeLTable(IdList *root,Type type)
 {
 LTable * lTableEntry;
-Idlist * idListEntry = root;
+IdList * idListEntry = root;
 
 while(idListEntry!=NULL)
 {
@@ -115,14 +151,14 @@ while(idListEntry!=NULL)
 			has_error=true;
 			}
 		else
-			{LInstall(idListEntry->name,idListEntry->type,idListEntry->size);
+			{LInstall(idListEntry->name,type,idListEntry->size);
 			idListEntry = idListEntry->next;
 			}
 		
 		}
 	else
 		{
-		printf("Error:Variable %s declared once\n",idListEntry->name);
+		printf("Error: Multiple declarations for %s \n",idListEntry->name);
 		has_error=true;
 		idListEntry = idListEntry->next;
 		}
@@ -151,8 +187,8 @@ switch(type)
 	
 	case BOOLEAN:
 		{
-		sTable->size=size;
-		sTable->binding = fmem;
+		lTable->size=size;
+		lTable->binding = fmem;
 		fmem+=size;
 		break;
 		}
@@ -186,16 +222,16 @@ while(lTable!=NULL)
 return NULL;
 }
 
-Idlist * makeIdList(Idlist * idListLeft,char * name,Type type,int size,Arglist * arglist,int ref)
+IdList * makeIdList(IdList * idListLeft,char * name,Type type,int size,ArgList * arglist,int ref)
 {
-Idlist * idList = malloc(sizeof(Idlist));
+IdList * idList = malloc(sizeof(IdList));
 idList->name = name;
 idList->type = type;
 idList->size = size;
 idList->argList=arglist;
 idList->ref=ref;
 if(idListLeft)
-	{Idlist * idListEntry = idListLeft;
+	{IdList * idListEntry = idListLeft;
 	while(idListEntry->next !=NULL)
 		idListEntry = idListEntry->next;
 	
@@ -208,24 +244,30 @@ return idList;
 
 	
 
-ArgList * makeArgList(ArgList * argList,Idlist * idList, Type type)
+ArgList * makeArgList(ArgList * argList,IdList * idList, Type type)
 {
-ArgList * argListRight,*argListBeg;
+ArgList * argListRight,*argListBeg=NULL,*argListEntry;
 
 while(idList != NULL)
 {
+	
 	argListEntry = malloc(sizeof(ArgList));
+	argListEntry->name = malloc(sizeof(idList->name));
 	strcpy(argListEntry->name,idList->name);
+	
 	argListEntry->type = type;
 	argListEntry->value = 0;
 	argListEntry->ref = idList->ref;
 	
 	if(argListBeg == NULL)
-		{argListBeg = argListEntry;
+		{
+		
+		argListBeg = argListEntry;
 		argListRight = argListEntry;
 		}
 	else
 		{
+		
 		argListRight->next = argListEntry;
 		argListRight = argListEntry;
 		
@@ -236,6 +278,7 @@ while(idList != NULL)
 
 if(argList)
 {
+
 argListRight = argList;
 while(argListRight->next !=NULL)
 	argListRight = argListRight->next;
@@ -247,38 +290,87 @@ return argList;
 return argListBeg;
 }
 	
-void setType(Idlist * idListLeft,Idlist * idListRight,Type type)
+ArgList * makeCallList(ArgList * left,char * name,Type type,int value)
 {
-Idlist * idListPointer = idListRight;
-idListBeg = NULL;
-idListEnd = NULL;
-while(idListPointer!=NULL)
+//printf("in MakeCallLIst\n");
+ArgList *argListEntry = malloc(sizeof(ArgList));
+if(name)
 {
-	idListPointer->type = type;
-	idListPointer = idListPointer->next;
+argListEntry->name = malloc(sizeof(name));
+strcpy(argListEntry->name,name);
+
 }
+argListEntry->type = type;
+argListEntry->value = value;
+argListEntry->next = NULL;
 
-if(idListLeft)
-	{
-	idListPointer = idListLeft;
-	while(idListPointer->next!=NULL)
-	{
-	idListPointer = idListPointer->next;
-	}
-	idListPointer->next = idListRight;
-	return idListLeft;
-	}
-return idListRight;
+if(left!=NULL)
+{
+ArgList * end = left;
+while(end->next!=NULL)
+	end=end->next;
+
+end->next = argListEntry;
+return left;
 }
-
-
+return argListEntry;
+}
 /*Constructors for different node types*/
 
 Node * makeFuncNode(Type type,char * name,ArgList * argList,Node * func_body)
 {
-Node * funcNode = makeVarNode(name,func_body,1);
+
+
+if(LookUp(name)==NULL)
+{
+
+//Putting main to symbol Table
+if(strcmp(name,"main")==0)
+{
+
+STable *sTable = malloc(sizeof(STable));
+sTable->name = malloc(sizeof(name));
+strcpy(sTable->name,name);
+sTable->type = INT;
+sTable->symbolTable = malloc(sizeof(LTable));
+sTable->symbolTable = lTableBeg;
+sTableEnd->next = sTable;
+}
+else
+{
+printf("Error in %d: Function %s not declared\n",lineNo,name);
+has_error=true;
+return NULL;
+}
+}
+else
+{
+STable *sTable = LookUp(name);
+
+LTable *lTable = sTable->symbolTable;
+	if(!lTable)
+	{
+	lTable = malloc(sizeof(LTable));
+	lTable = lTableBeg;
+	sTable->symbolTable = lTable;
+	}
+	else
+	{
+	LTable *lTableEntry;
+
+	lTableEntry = lTable;
+	while(lTableEntry->next!=NULL)
+		lTableEntry = lTableEntry->next;
+
+	lTableEntry->next = lTableBeg;
+	
+	}
+}
+lTableBeg = NULL;
+fmem=0;
+
+Node * funcNode = makeVarNode(name,func_body,argList,1);
 funcNode->type = type;
-funcNode->argList = argList;
 
 return makeOperNode('F',1,funcNode);
 
@@ -316,7 +408,7 @@ p->lineNo=lineNo;
 return p;
 }
 
-Node * makeVarNode(char *name,Node *index,int size)
+Node * makeVarNode(char *name,Node *index,ArgList * argList,int size)
 {
 
 Node *p;
@@ -330,6 +422,7 @@ p->type = INT;
 p->var.name = malloc(sizeof(name));
 strcpy(p->var.name,name);
 p->var.index=index;
+p->var.argList = argList;
 p->var.size = size;
 p->lineNo=lineNo;
 return p;
@@ -350,7 +443,7 @@ if((p =malloc(sizeof(Node))) == NULL)
 
 p->nodeType = OPERATOR;
 p->oper.op = oper;
-p->oper.nops = nops;
+
 
 if((p->oper.operands = malloc(nops * sizeof(Node)))==NULL)
 	{
@@ -361,9 +454,44 @@ if((p->oper.operands = malloc(nops * sizeof(Node)))==NULL)
 int i=0;
 for(i=0;i<nops;i++)
 {
-p->oper.operands[i] = *va_arg(temp_args,Node*);
+Node * temp = va_arg(temp_args,Node *);
+if(temp)
+	p->oper.operands[i] = *temp;
+else
+	i--;
 }
 p->lineNo=lineNo;
+p->oper.nops = i;
 return p;
 }
+
+void showContents(STable * beg)
+{
+
+while(beg!=NULL)
+{
+printf("%s\n",beg->name);
+if(beg->symbolTable)
+{
+	LTable * temp = beg->symbolTable;
+	while(temp!=NULL)
+		{	
+		printf("\t%s  %d\n",temp->name,temp->binding);
+		temp=temp->next;
+		}
+}
+	
+beg=beg->next;
+}
+}
+
+void LshowContents(LTable * beg)
+{
+while(beg!=NULL)
+{
+printf("%s  %d\n",beg->name,beg->binding);
+beg=beg->next;
+}
+}
+
 

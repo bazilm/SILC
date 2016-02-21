@@ -65,13 +65,15 @@ extern int yydebug;
     IF = 275,
     THEN = 276,
     ELSE = 277,
-    ENDIF = 278,
-    WHILE = 279,
-    DO = 280,
-    ENDWHILE = 281,
-    CONST = 282,
-    STRCONST = 283,
-    VAR = 284
+    MAIN = 278,
+    ENDIF = 279,
+    WHILE = 280,
+    DO = 281,
+    ENDWHILE = 282,
+    RET = 283,
+    CONST = 284,
+    STRCONST = 285,
+    VAR = 286
   };
 #endif
 /* Tokens.  */
@@ -95,26 +97,30 @@ extern int yydebug;
 #define IF 275
 #define THEN 276
 #define ELSE 277
-#define ENDIF 278
-#define WHILE 279
-#define DO 280
-#define ENDWHILE 281
-#define CONST 282
-#define STRCONST 283
-#define VAR 284
+#define MAIN 278
+#define ENDIF 279
+#define WHILE 280
+#define DO 281
+#define ENDWHILE 282
+#define RET 283
+#define CONST 284
+#define STRCONST 285
+#define VAR 286
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 19 "expl.y" /* yacc.c:1909  */
+#line 25 "expl.y" /* yacc.c:1909  */
 
 int ival;
 char * sval;
 struct NodeTag* nval;
+struct ArgList * argval;
+struct IdList * idval;
 
-#line 118 "y.tab.h" /* yacc.c:1909  */
+#line 124 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
