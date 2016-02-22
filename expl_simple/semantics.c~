@@ -2,6 +2,7 @@
 
 LTable * lTable =NULL;
 STable * sTable = NULL;
+bool hasReturn = false;
 void semanticAnalyzer(Node * root)
 {
 STable *sTableEntry;
@@ -267,10 +268,17 @@ switch(root->nodeType)
 			}
 			//calling semantic analyzer for function body
 		       	semanticAnalyzer(oper1->var.index);
-
+			
+			//checking whether return statement present
+			if(!hasReturn)
+				{
+				printf("Error in %d: No return statement for function %s\n",root->lineNo,oper1->var.name);
+				has_error=true;
+				}
 			//Resetting sTable and lTable
 			lTable = NULL;
 			sTable = NULL;
+			hasReturn = false;
 			break;
 			}
 		case 'f':
@@ -340,10 +348,11 @@ switch(root->nodeType)
 			semanticAnalyzer(oper1);
 			if(oper1->type!=sTable->type)
 			{
-			printf("Error in %d: Return type of function %s doesnt match with declaration\n",root->lineNo,sTable->name);
+			printf("Error in %d: Return type of function %s doesnt match with its declaration\n",root->lineNo,sTable->name);
 			has_error = true;
 
 			}
+			hasReturn = true;
 			break;
 			}
 		}

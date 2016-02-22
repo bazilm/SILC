@@ -34,7 +34,7 @@ struct IdList * idval;
 %token <ival> CONST
 %token <nval> STRCONST
 %token <sval> VAR
-%type <nval> expr stmt stmt_list Main program Fdeflist Fdef Fbody ret_stmt
+%type <nval> expr stmt stmt_list Main program Fdeflist Fdef Fbody 
 %type <argval> Farglist Fcalllist
 %type <idval> Fvarlist Gvarlist Fargvarlist
 %left AND OR
@@ -124,7 +124,7 @@ Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,INT,1,NULL,0);}
 		|VAR						{$$ =makeIdList(NULL,$1,INT,1,NULL,0);}
 		;
 
-Fbody:		BEG stmt_list ret_stmt	END			{$$ = makeOperNode('S',2,$2,$3);}
+Fbody:		BEG stmt_list END				{$$ = $2;}
 		;
 
 Main:		INTEGER MAIN '('')''{'Fdeclblock Fbody '}'	{$$ = makeFuncNode(INT,"main",NULL,$7);}
@@ -142,10 +142,9 @@ stmt: 	READ '(' VAR ')' ';'	        			{$$ = makeOperNode(READ,1,makeVarNode($3,
 	|WHILE '(' expr ')' DO stmt_list ENDWHILE ';'		{$$ = makeOperNode(WHILE,2,$3,$6);					}
 	|VAR '=' expr ';'					{$$ = makeOperNode('=',2,makeVarNode($1,NULL,NULL,0),$3);		}
 	|VAR'['expr']' '=' expr ';'				{$$ = makeOperNode('=',2,makeVarNode($1,$3,NULL,0),$6);			}
+	|RET expr ';'						{$$ = makeOperNode('R',1,$2);						}
 	;
 
-ret_stmt: RET expr ';'						{$$ = makeOperNode('R',1,$2);		}
-	  ;
 
 expr : 
 	 expr '+' expr 				{$$ = makeOperNode('+',2,$1,$3);	}
@@ -179,7 +178,7 @@ Fcalllist:Fcalllist ',' CONST			{$$ = makeCallList($1,NULL,INT,$3);}
 	  |CONST				{$$ = makeCallList(NULL,NULL,INT,$1);}
 	  |VAR					{$$ = makeCallList(NULL,$1,INT,0);}
 	  |TRUE					{$$ = makeCallList(NULL,NULL,BOOLEAN,1);}
-	  |FALSE 				{$$ = makeCallList(NULL,NULL,BOOLEAN,0);}
+	  |FALSE				{$$ = makeCallList(NULL,NULL,BOOLEAN,0);}
 	  ;
 %%
 

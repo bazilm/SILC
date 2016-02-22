@@ -290,10 +290,11 @@ return argList;
 return argListBeg;
 }
 	
-ArgList * makeCallList(ArgList * left,char * name,Type type,int value)
+ArgList * makeCallList(ArgList * left,Node * node)
 {
 //printf("in MakeCallLIst\n");
 ArgList *argListEntry = malloc(sizeof(ArgList));
+
 if(name)
 {
 argListEntry->name = malloc(sizeof(name));
@@ -367,7 +368,7 @@ LTable *lTable = sTable->symbolTable;
 	}
 }
 lTableBeg = NULL;
-fmem=0;
+fmem=1;
 
 Node * funcNode = makeVarNode(name,func_body,argList,1);
 funcNode->type = type;
