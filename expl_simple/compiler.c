@@ -33,7 +33,7 @@ else
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	//if it is a reference variable,get the address it is storing
-	if(lTable->ref==1)
+	if(lTableEntry->ref==1)
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	
 	}
@@ -70,7 +70,8 @@ else
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
-	if(lTable->ref ==1)
+	
+	if(lTableEntry->ref ==1)
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	}
 }

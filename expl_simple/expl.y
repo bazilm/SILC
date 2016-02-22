@@ -9,7 +9,7 @@ STable *sTableBeg=NULL,*sTableEnd;
 LTable *lTableBeg=NULL,*lTableEnd;
 IdList * idListBeg=NULL, *idListEnd;
 int lineNo;
-bool has_error = false;
+bool has_error = false,has_main=false;
 FILE * out;
 int reg_count=-1;
 int mem = 0,if_count=1,while_count=1,fmem=1;
@@ -35,7 +35,7 @@ struct IdList * idval;
 %token <nval> STRCONST
 %token <sval> VAR
 %type <nval> expr stmt stmt_list Main program Fdeflist Fdef Fbody 
-%type <argval> Farglist Fcalllist
+%type <argval> Farglist Fcalllist Fargtypelist
 %type <idval> Fvarlist Gvarlist Fargvarlist
 %left AND OR
 %nonassoc '=' EQ '>' '<' LE GE NE NOT
@@ -58,12 +58,12 @@ program: 	Gdeclblock Fdeflist Main 			{
 								fprintf(out,"START\n");
 								fprintf(out,"MOV SP,1535\n");
 								fprintf(out,"MOV BP,1535\n");
-								fprintf(out,"JMP MAIN\n");
-								compile($$);
-								fprintf(out,"MAIN:\n");
 								fprintf(out,"PUSH R0\n");
 								fprintf(out,"CALL main\n");
-								fprintf(out,"HALT");
+								fprintf(out,"HALT\n");
+								compile($$);
+								
+								
 								}
 								return 0;
 								}
@@ -79,21 +79,25 @@ Gdecllist:	Gdecllist INTEGER Gvarlist ';'			{makeSTable($3,INT);}
 		|						{}
 		;
 
-Gvarlist:	Gvarlist ',' VAR				{$$=makeIdList($1,$3,INT,1,NULL,0);}
-		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeIdList($1,$3,INT,$5,NULL,0);}
-		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeIdList($1,$3,INT,1,$5,1);}
-		|VAR						{$$=makeIdList(NULL,$1,INT,1,NULL,0);}
-		|VAR '[' CONST ']'				{$$=makeIdList(NULL,$1,INT,$3,NULL,0);}
-		|VAR '(' Farglist ')'				{$$=makeIdList(NULL,$1,INT,1,$3,1);}
+Gvarlist:	Gvarlist ',' VAR				{$$=makeIdList($1,$3,INT,1,NULL,0);	}
+		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeIdList($1,$3,INT,$5,NULL,0);	}
+		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeIdList($1,$3,INT,1,$5,1);	}
+		|VAR						{$$=makeIdList(NULL,$1,INT,1,NULL,0);	}
+		|VAR '[' CONST ']'				{$$=makeIdList(NULL,$1,INT,$3,NULL,0);	}
+		|VAR '(' Farglist ')'				{$$=makeIdList(NULL,$1,INT,1,$3,1);	}
 		;
 
-Farglist:	Farglist INTEGER Fargvarlist ';'		{$$ = makeArgList($1,$3,INT);		}
-		|Farglist BOOL Fargvarlist ';'			{$$ = makeArgList($1,$3,BOOLEAN);		}
-		|						{$$ = NULL;}
+Farglist:	Farglist ';' Fargtypelist 			{$$ = joinArgList($1,$3);		}
+		|Fargtypelist					{$$ = $1;				}
 		;
 
-Fargvarlist:	Fvarlist ',' VAR				{$$=makeIdList($1,$3,INT,1,NULL,0);}
-		|Fvarlist ',' '&' VAR				{$$=makeIdList($1,$4,INT,1,NULL,1);}
+Fargtypelist:	INTEGER Fargvarlist 				{$$ = makeArgList(NULL,$2,INT);		}
+		|BOOL Fargvarlist 				{$$ = makeArgList(NULL,$2,BOOLEAN);	}
+		|						{$$ = NULL; 				}
+		;
+
+Fargvarlist:	Fargvarlist ',' VAR				{$$=makeIdList($1,$3,INT,1,NULL,0);}
+		|Fargvarlist ',' '&' VAR			{$$=makeIdList($1,$4,INT,1,NULL,1);}
 		|VAR						{$$=makeIdList(NULL,$1,INT,1,NULL,0);}
 		|'&' VAR					{$$=makeIdList(NULL,$2,INT,1,NULL,1);}
 		;
@@ -179,6 +183,7 @@ Fcalllist:Fcalllist ',' CONST			{$$ = makeCallList($1,NULL,INT,$3);}
 	  |VAR					{$$ = makeCallList(NULL,$1,INT,0);}
 	  |TRUE					{$$ = makeCallList(NULL,NULL,BOOLEAN,1);}
 	  |FALSE				{$$ = makeCallList(NULL,NULL,BOOLEAN,0);}
+	  |					{$$ = NULL;					}
 	  ;
 %%
 
@@ -198,6 +203,6 @@ return 0;
 
 void yyerror(char * s)
 {
-printf("%s:%d\n",s,lineNo);
+printf("Syntax Error in %d\n",lineNo);
 }
 

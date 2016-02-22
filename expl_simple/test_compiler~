@@ -1,33 +1,29 @@
 decl
-int a,b,c;
+int addd(int &a,b);
 int temp;
-int fact(int a;);
 enddecl
-
-int fact(int a;)
+int addd (int &a;int b)
 {
-
 begin
-if(a==1) then
-return 1;
-else
-return 2*fact(a-1);
-endif;
-
+a =3;
+return temp;
 end
 }
 
 int main()
 {
 decl
-int a;
-int fact;
+
+int a,b;
+boolean b;
+int temp;
 enddecl
 begin
 read(a);
-fact = fact(a);
-write(fact);
+read(b);
+temp = 2;
+a= addd(temp,b);
+write(a);
 return 1;
 end
 }
-

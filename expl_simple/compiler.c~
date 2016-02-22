@@ -70,7 +70,8 @@ else
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
-	if(lTable->ref ==1)
+	
+	if(lTableEntry->ref ==1)
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	}
 }
@@ -509,7 +510,7 @@ switch(root->nodeType)
 					}
 
 				//popping back the registers
-				for(i=reg_count;i>=0;i--)
+				for(i=reg_count-1;i>=0;i--)
 					fprintf(out,"POP R%d\n",i);
 				
 				break;

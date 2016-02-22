@@ -5,10 +5,14 @@ STable * sTable = NULL;
 bool hasReturn = false;
 void semanticAnalyzer(Node * root)
 {
+
 STable *sTableEntry;
 LTable *lTableEntry;
 Node * oper1,*oper2,*oper3;
 int nops;
+
+
+
 if(!root)
 	{
 	return;
@@ -221,6 +225,15 @@ switch(root->nodeType)
 			
 			else 
 				{
+				//checking whether it is a function, func binding is set to -1
+				if(sTableEntry->binding!=-1)
+				{
+				printf("Error in %d: %s is not a function\n",root->lineNo,oper1->var.name);
+				has_error=true;
+				break;
+				}
+
+				
 				//checking whether return types match
 				if(oper1->type!=sTableEntry->type)
 				{
@@ -246,11 +259,12 @@ switch(root->nodeType)
 					printf("Error in %d: Arguments name mismatch in function %s\n",root->lineNo,oper1->var.name);
 					has_error = true;
 					}
+					
 					//checking for type equivalence
-					if(symArgList->type!=funcArgList->type)
+					if((symArgList->type!=funcArgList->type)||(symArgList->ref!=funcArgList->ref))
 					{
 					
-					printf("Error in %d: Type mismatch in arguments of function %s\n",root->lineNo,oper1->var.name);
+					printf("Error in %d: Type mismatch in argument %s of function %s\n",root->lineNo,symArgList->name,oper1->var.name);
 					has_error =true;
 					}
 						
@@ -294,6 +308,20 @@ switch(root->nodeType)
 			
 			else
 				{
+				//checking whether it is a function(binding set to -1 for functions)
+				if(sTableEntry->binding!=-1)
+				{
+				printf("Error in %d: %s is not a function\n",root->lineNo,oper1->var.name);
+				has_error = true;
+				break;
+				}
+				
+				//checking whether func is defined
+				if(sTableEntry->size ==0)
+				{
+				printf("Error in %d: %s is not defined\n",root->lineNo,oper1->var.name);
+				has_error = true;
+				}
 				root->type = sTableEntry->type;
 				
 				if(sTableEntry->args)
@@ -329,6 +357,10 @@ switch(root->nodeType)
 					printf("Error in %d: Type mismatch in arguments of function %s\n",root->lineNo,oper1->var.name);
 					has_error =true;
 					}
+
+					//setting whether ref or not
+					funcArgList->ref = symArgList->ref;
+
 				symArgList = symArgList->next;
 				funcArgList = funcArgList->next;
 				}

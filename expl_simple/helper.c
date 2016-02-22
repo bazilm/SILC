@@ -47,11 +47,18 @@ sTable->type = type;
 if(func)
 {
 sTable->args = argList;
+sTable->size = 0;
+sTable->binding = -1;					//func have binding -1
 LTable *end,*LTableEntry;
 int bind=-3;
 while(argList!=NULL)
 	{
 	LTableEntry = malloc(sizeof(LTable));
+	if(LLookUp(argList->name,sTable->symbolTable))
+		{
+		printf("Error in %d: Multiple declarations for %s\n",lineNo,argList->name);
+		has_error=true;
+		}
 	LTableEntry->name = malloc(sizeof(argList->name));
 	strcpy(LTableEntry->name,argList->name);
 	LTableEntry->type = argList->type;
@@ -290,6 +297,17 @@ return argList;
 return argListBeg;
 }
 	
+ArgList * joinArgList(ArgList * left,ArgList * right)
+{
+ArgList * argListEntry = left;
+while(argListEntry->next!=NULL)
+{
+argListEntry=argListEntry->next;
+}
+
+argListEntry->next = right;
+return left;
+}
 ArgList * makeCallList(ArgList * left,char * name,Type type,int value)
 {
 //printf("in MakeCallLIst\n");
@@ -323,18 +341,33 @@ Node * makeFuncNode(Type type,char * name,ArgList * argList,Node * func_body)
 
 if(LookUp(name)==NULL)
 {
-
+//TODO: Move this out of here
 //Putting main to symbol Table
 if(strcmp(name,"main")==0)
 {
-
+has_main =true;
 STable *sTable = malloc(sizeof(STable));
 sTable->name = malloc(sizeof(name));
 strcpy(sTable->name,name);
 sTable->type = INT;
+sTable->size = 1;
+sTable->binding = -1;
 sTable->symbolTable = malloc(sizeof(LTable));
 sTable->symbolTable = lTableBeg;
-sTableEnd->next = sTable;
+if(sTableEnd)
+	{
+	sTableEnd->next = sTable;
+	sTableEnd=sTableEnd->next;
+	sTableEnd->next = NULL;
+	}
+else
+{
+	sTableBeg = sTable;
+	sTableEnd = sTable;
+	sTableEnd->next = NULL;
+}
+
+
 }
 else
 {
@@ -346,7 +379,8 @@ return NULL;
 else
 {
 STable *sTable = LookUp(name);
-
+//size set to 1 to denote that func is defined,initially it was set to zero
+sTable->size = 1;
 LTable *lTable = sTable->symbolTable;
 	if(!lTable)
 	{
