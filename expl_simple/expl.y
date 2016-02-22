@@ -12,7 +12,7 @@ int lineNo;
 bool has_error = false;
 FILE * out;
 int reg_count=-1;
-int mem = 0,if_count=1,while_count=1,fmem=0;
+int mem = 0,if_count=1,while_count=1,fmem=1;
 
 #include "helper.c"
 #include "semantics.c"
@@ -58,7 +58,11 @@ program: 	Gdeclblock Fdeflist Main 			{
 								fprintf(out,"START\n");
 								fprintf(out,"MOV SP,1535\n");
 								fprintf(out,"MOV BP,1535\n");
+								fprintf(out,"JMP MAIN\n");
 								compile($$);
+								fprintf(out,"MAIN:\n");
+								fprintf(out,"PUSH R0\n");
+								fprintf(out,"CALL main\n");
 								fprintf(out,"HALT");
 								}
 								return 0;

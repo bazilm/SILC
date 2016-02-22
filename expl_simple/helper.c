@@ -367,7 +367,7 @@ LTable *lTable = sTable->symbolTable;
 	}
 }
 lTableBeg = NULL;
-fmem=0;
+fmem=1;
 
 Node * funcNode = makeVarNode(name,func_body,argList,1);
 funcNode->type = type;

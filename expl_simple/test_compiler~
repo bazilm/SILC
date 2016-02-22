@@ -1,19 +1,21 @@
 decl
 int a,b,c;
-boolean swap(int num1,num2;);
 int temp;
+int fact(int a;);
 enddecl
 
-boolean swap(int num1;int na;)
+int fact(int a;)
 {
 
 begin
+if(a==1) then
+	return 1;
+else
+	return a * fact(a-1);
+endif;
 
-temp = num1-1;
-return true;
 end
 }
-
 
 int main()
 {
@@ -22,10 +24,9 @@ int a;
 boolean c;
 enddecl
 begin
-c = swap(2,b);
-
-
-return 2+3*34;
+a=print(34,45,1);
+write(a);
+return 1;
 end
 }
 

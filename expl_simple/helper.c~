@@ -338,7 +338,7 @@ sTableEnd->next = sTable;
 }
 else
 {
-printf("Error: Function %s not declared\n",name);
+printf("Error in %d: Function %s not declared\n",lineNo,name);
 has_error=true;
 return NULL;
 }

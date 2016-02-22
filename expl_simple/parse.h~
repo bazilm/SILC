@@ -89,10 +89,11 @@ void freeNode(Node *);
 
 void makeSTable(IdList *,Type);
 STable * GInstall(char *,Type,int,ArgList *, int);
-void * LookUp(char *);
+STable * LookUp(char *);
 
 void makeLTable(IdList *,Type);
 LTable * LInstall(char *,Type,int);
+LTable * LLookUp(char *,LTable *);
 
 ArgList * makeCallList(ArgList *,char *,Type,int);
 
