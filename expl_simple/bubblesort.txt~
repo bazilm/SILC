@@ -1,9 +1,13 @@
-begin
 decl
 int a[100],n,i,temp,j;
 boolean b;
 enddecl
 
+int main()
+{
+begin
+b=True;
+b = True and True;
 read(n);
 i=0;
 b=i<n;
@@ -36,4 +40,6 @@ while(i<n) do
 	write(a[i]);
 	i=i+1;
 endwhile;
+return 1;
 end
+}

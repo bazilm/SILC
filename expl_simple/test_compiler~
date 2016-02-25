@@ -1,12 +1,12 @@
 decl
-int addd(int &a,b);
+boolean addd(int &a,b);
 int temp;
 enddecl
-int addd (int &a;int b)
+boolean addd (int &a;int b)
 {
 begin
 a =3;
-return temp;
+return true;
 end
 }
 
@@ -15,14 +15,19 @@ int main()
 decl
 
 int a,b;
-boolean b;
+boolean c,d;
 int temp;
 enddecl
 begin
-read(a);
-read(b);
+c = true;
+d = true and true;
+if(c and d) then
+write(132);
+else
+write(12312);
+endif;
 temp = 2;
-a= addd(temp,b);
+c= addd(temp,b);
 write(a);
 return 1;
 end

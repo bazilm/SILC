@@ -79,7 +79,7 @@ else
 ArgList * reverseArgList(ArgList * argList)
 {
 ArgList * argLists[100],*revArgList=NULL;
-int count;
+int count=0;
 ArgList * temp = argList;
 //getting the args in an array to reverse
 while(temp!=NULL)
@@ -90,7 +90,7 @@ while(temp!=NULL)
 	}
 
 //traversing the array in the reverse order to get the reversed argList
-for(count;count>=0;count--)
+for(count=count-1;count>=0;count--)
 {
 	if(!revArgList)
 	{
@@ -295,18 +295,29 @@ switch(root->nodeType)
 				{
 				compile(oper1);
 				compile(oper2);
-				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+				fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
 				break;
 				}
 
 			case OR:
 				{
+				compile(oper1);
+				compile(oper2);
+				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+				fprintf(out,"MOV R%d,0\n",++reg_count);
+				fprintf(out,"GT R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
 				//return interpret(oper1)||interpret(oper2);
 				break;
 				}
 
 			case NOT:
 				{
+				compile(oper1);
+				fprintf(out,"MOV R%d,-1\n",++reg_count);
+				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+				fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
 				//return !interpret(oper1);
 				break;
 				}

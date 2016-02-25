@@ -1,0 +1,27 @@
+decl
+	int a(int &x), var1[10], result;
+enddecl
+
+int a(int &x){
+begin
+    write(x);
+    x = 314;
+    write(x);
+	write(var1[5]);
+	return x;
+end
+}
+int main(){
+decl
+int temp;
+enddecl
+begin
+	read(var1[5]);
+    write(var1[5]);
+	temp = var1[5];
+    result = a(temp);
+    write(var1[5]);
+	return 0;
+end
+}
+
