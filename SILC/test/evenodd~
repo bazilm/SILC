@@ -1,0 +1,25 @@
+decl
+int change(&x);
+enddecl
+
+int change(int &x)
+{
+begin
+x = x+1;
+return x+1;
+end
+}
+
+int main()
+{
+decl
+int n,temp;
+enddecl
+begin 
+read(n);
+temp = change(n);
+write(n);
+write(temp);
+return 0;
+end
+}

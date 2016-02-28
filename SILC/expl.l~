@@ -1,0 +1,70 @@
+%{
+#include<stdlib.h>
+#include "y.tab.h"
+extern int lineNo;
+%}
+
+digits	[0-9]
+alphabets [a-zA-Z]
+identifiers {alphabets}({alphabets}|{digits})*
+
+%%
+
+decl		return DECL;
+enddecl		return ENDDECL;
+int		return INTEGER;
+boolean		return BOOL;
+
+{digits}+	{yylval.ival = atoi(yytext);
+		return CONST;
+		}
+"true"		{yylval.ival = 1;return TRUE;}
+"false"		{yylval.ival = 0;return FALSE;}
+[-+*/;]		{return *yytext;}
+"=="		return EQ;
+"<="		return LE;
+">="		return GE;
+"!="		return NE;
+and		return AND;
+or		return OR;
+not		return NOT;
+read		return READ;
+write		return WRITE;
+begin		return BEG;
+end		return END;
+if		return IF;
+then		return THEN;
+else		return ELSE;
+endif		return ENDIF;
+while		return WHILE;
+do		return DO;
+endwhile 	return ENDWHILE;
+"return"	return RET;
+\".+\"		{
+		yylval.sval = malloc(sizeof(yytext));
+		strncpy(yylval.sval,yytext+1,strlen(yytext)-2);
+		return STRCONST;
+		}
+{identifiers}	{
+		yylval.sval =malloc(sizeof(yytext));
+		strcpy(yylval.sval,yytext);
+		return VAR;}
+
+[ \t]
+\n		lineNo++;		
+
+.		return *yytext;	
+
+			
+
+%%
+
+int yywrap()
+{
+return 1;
+}
+
+							
+
+
+

@@ -1,0 +1,20 @@
+begin
+decl
+string names[10];
+int ages[10],i,n;
+enddecl
+write("Enter the number of names\n");
+read(n);
+i=0;
+write("Enter your names\n");
+while(i<n) do
+	read(names[i]);
+	i=i+1;
+endwhile;
+
+i=0;
+while(i<n) do
+	write(names[i]);
+	i=i+1;
+endwhile;
+end

@@ -1,0 +1,34 @@
+decl
+boolean addd(int &a,b);
+int temp;
+enddecl
+boolean addd (int &a;int b)
+{
+begin
+a =3;
+return true;
+end
+}
+
+int main()
+{
+decl
+
+int a,b;
+boolean c,d;
+int temp;
+enddecl
+begin
+c = true;
+d = true;
+if(c and d) then
+write(132);
+else
+write(12312);
+endif;
+temp = 2;
+c= addd(temp,b);
+write(a);
+return 1;
+end
+}

@@ -1,0 +1,79 @@
+decl
+int a[100];
+int partition(int i,j);
+int quicksort(int i,j);
+enddecl
+
+int partition(int i,j)
+{
+decl
+int beg;
+int temp;
+boolean k;
+enddecl
+begin
+beg=i - 1;
+k= i<j ;
+while(k) do
+
+	if(a[i] <= a[j]) then
+	beg=beg+1;
+	temp = a[i];
+	a[i] = a[beg];
+	a[beg] = temp;
+	endif;
+i=i+1;
+k = i<j;
+endwhile;
+
+temp = a[beg+1];
+a[beg+1] = a[j];
+a[j]= temp;
+beg = beg+1;
+return beg;
+end
+}
+
+int quicksort(int i,j)
+{
+decl
+	int p,temp;
+enddecl
+begin
+	if(i<=j) then
+	p = partition(i,j);
+	temp = quicksort(i,p-1);
+	temp = quicksort(p+1,j);
+	endif;
+return p;
+end
+}
+
+int main()
+{
+decl
+	int n,i,temp;
+enddecl
+
+begin
+	read(n);
+	i=0;
+	while(i<n) do
+	read(a[i]);
+	i=i+1;
+endwhile;
+
+i = quicksort(0,n-1);
+
+i=0;
+while(i<n) do
+	write(a[i]);
+	i=i+1;
+endwhile;
+return 1;
+end
+}
+
+
+
+
