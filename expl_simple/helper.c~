@@ -174,7 +174,7 @@ while(idListEntry!=NULL)
 
 }
 
-
+//installs in the local symbol table
 LTable *LInstall(char *name,Type type,int size)
 {
 LTable *lTable = malloc(sizeof(LTable));
@@ -216,6 +216,7 @@ else
 return lTableEnd;
 }
 
+//looks up in the passed local symbol table
 LTable * LLookUp(char * name,LTable * lTable)
 {
 
@@ -229,6 +230,7 @@ while(lTable!=NULL)
 return NULL;
 }
 
+//makes idlist of a certain type
 IdList * makeIdList(IdList * idListLeft,char * name,Type type,int size,ArgList * arglist,int ref)
 {
 IdList * idList = malloc(sizeof(IdList));
@@ -250,7 +252,7 @@ return idList;
 }
 
 	
-
+//makes arglist for func def and func decl of a certain type
 ArgList * makeArgList(ArgList * argList,IdList * idList, Type type)
 {
 ArgList * argListRight,*argListBeg=NULL,*argListEntry;
@@ -296,7 +298,8 @@ return argList;
 
 return argListBeg;
 }
-	
+
+//joins arg lists in func def and func decl	
 ArgList * joinArgList(ArgList * left,ArgList * right)
 {
 ArgList * argListEntry = left;
@@ -308,9 +311,10 @@ argListEntry=argListEntry->next;
 argListEntry->next = right;
 return left;
 }
-ArgList * makeCallList(ArgList * left,char * name,Type type,int value)
+
+//makes function call list
+ArgList * makeCallList(ArgList * left,char * name,Type type,Node * value)
 {
-//printf("in MakeCallLIst\n");
 ArgList *argListEntry = malloc(sizeof(ArgList));
 if(name)
 {
@@ -357,7 +361,7 @@ sTable->symbolTable = lTableBeg;
 if(sTableEnd)
 	{
 	sTableEnd->next = sTable;
-	sTableEnd=STableEnd->next;
+	sTableEnd=sTableEnd->next;
 	sTableEnd->next = NULL;
 	}
 else

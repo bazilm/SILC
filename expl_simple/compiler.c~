@@ -301,12 +301,23 @@ switch(root->nodeType)
 
 			case OR:
 				{
+				compile(oper1);
+				compile(oper2);
+				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+				fprintf(out,"MOV R%d,0\n",++reg_count);
+				fprintf(out,"GT R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
 				//return interpret(oper1)||interpret(oper2);
 				break;
 				}
 
 			case NOT:
 				{
+				compile(oper1);
+				fprintf(out,"MOV R%d,-1\n",++reg_count);
+				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+				fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
 				//return !interpret(oper1);
 				break;
 				}
@@ -459,30 +470,23 @@ switch(root->nodeType)
 
 					while(argListEntry!=NULL)
 					{
-					//if it is not a variable, push the value
-					if(!argListEntry->name)
-						{
-						fprintf(out,"MOV R%d,%d\n",++reg_count,argListEntry->value);
-						fprintf(out,"PUSH R%d\n",reg_count);
-						reg_count--;
-						}
-					//if it is a variable,find the value and push
+
+					//if ref variable find the address and push
+					if(argListEntry->ref)
+					{
+					setVariableValue(argListEntry->name,NULL);		//gets the address of the variable
+					fprintf(out,"PUSH R%d\n",reg_count);
+					reg_count--;
+					}
+					
+					//else finding the value of the expression
 					else
-						{
-						if(argListEntry->ref==0)
-						{
-						getVariableValue(argListEntry->name,NULL);
-						fprintf(out,"PUSH R%d\n",reg_count);
-						reg_count--;
-						}
-						//if it is a reference variable,push the address
-						else
-						{
-						setVariableValue(argListEntry->name,NULL);		//gets the address of the variable
-						fprintf(out,"PUSH R%d\n",reg_count);
-						reg_count--;
-						}
-						}
+					{
+					compile(argListEntry->value);
+					fprintf(out,"PUSH R%d\n",reg_count);
+					reg_count--;
+					}
+					
 					argListEntry = argListEntry->next;
 					}
 					}

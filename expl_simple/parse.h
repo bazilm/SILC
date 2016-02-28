@@ -4,14 +4,52 @@
 typedef enum  {CONSTANT,OPERATOR,VARIABLE} NodeType ;
 typedef enum  {INT,BOOLEAN} Type;
 
+
+typedef struct 
+{
+
+int value;
+
+}ConNode;
+
+typedef struct 
+{
+char * name;
+struct NodeTag *index;
+struct ArgList * argList;
+int size;
+}VarNode;
+
+typedef struct 
+{
+int op;
+int nops;
+struct NodeTag *operands;
+}OperNode;
+
+typedef struct NodeTag
+{
+NodeType nodeType;
+Type type;
+int lineNo;
+union
+{
+ConNode con;
+OperNode oper;
+VarNode var;
+};
+
+}Node;
+
 typedef struct ArgList
 {
 char * name;
 Type type;
-int value;
+Node * value;
 int ref;
 struct ArgList * next;
 }ArgList;
+
 
 typedef struct LSymTable
 {
@@ -44,41 +82,6 @@ int ref;
 struct IDList * next;
 }IdList;
 
-typedef struct 
-{
-
-int value;
-
-}ConNode;
-
-typedef struct 
-{
-char * name;
-struct NodeTag *index;
-ArgList * argList;
-int size;
-}VarNode;
-
-typedef struct 
-{
-int op;
-int nops;
-struct NodeTag *operands;
-}OperNode;
-
-typedef struct NodeTag
-{
-NodeType nodeType;
-Type type;
-int lineNo;
-union
-{
-ConNode con;
-OperNode oper;
-VarNode var;
-};
-
-}Node;
 
 Node * makeConNode(Type,int);
 Node * makeVarNode(char *,Node *,ArgList *,int);
@@ -95,7 +98,7 @@ void makeLTable(IdList *,Type);
 LTable * LInstall(char *,Type,int);
 LTable * LLookUp(char *,LTable *);
 
-ArgList * makeCallList(ArgList *,char *,Type,int);
+ArgList * makeCallList(ArgList *,Node *);
 
 IdList * makeIdList(IdList *,char *,Type,int,ArgList *,int);
 

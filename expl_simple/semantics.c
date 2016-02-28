@@ -2,7 +2,7 @@
 
 LTable * lTable =NULL;
 STable * sTable = NULL;
-bool hasReturn = false;
+bool hasReturn = false,funcArg = false;
 void semanticAnalyzer(Node * root)
 {
 
@@ -41,6 +41,20 @@ switch(root->nodeType)
 				{
 				//printf("%s found from global Table in memory address %d\n",root->var.name,sTableEntry->binding);
 				root->type = sTableEntry->type;
+				if(root->var.index)
+					{
+				
+					semanticAnalyzer(root->var.index);
+
+					if(root->var.index->type!=INT)
+						{
+						printf("Error in %d: Index must be a number\n",root->lineNo);
+						has_error=true;
+						}
+					
+					}
+
+				
 				}
 		}
 		else
@@ -48,17 +62,7 @@ switch(root->nodeType)
 			//printf("%s found from local Table in memory address %d\n",root->var.name,lTableEntry->binding);
 			root->type = lTableEntry->type;
 			}
-		if(root->var.index)
-		{
 		
-		semanticAnalyzer(root->var.index);
-
-		if(root->var.index->type!=INT)
-			{
-			printf("Error in %d: Index must be a number\n",root->lineNo);
-			has_error=true;
-			}
-		}
 		break;
 		}
 
@@ -330,28 +334,12 @@ switch(root->nodeType)
 				ArgList * symArgList = sTableEntry->args;
 				
 				while(symArgList!=NULL&&funcArgList!=NULL)
-				{
+				{	
 					//checking whether variables in arglist are declared 
-					if(funcArgList->name)
-					{
-					lTableEntry = LLookUp(funcArgList->name,lTable);
-					if(lTableEntry)
-						funcArgList->type = lTableEntry->type;
-					else
-						{
-						sTableEntry = LookUp(funcArgList->name);
-						if(sTableEntry)
-							funcArgList->type = sTableEntry->type;
-
-						else
-							{
-							printf("Error in %d: %s not declared\n",root->lineNo,funcArgList->name);
-							has_error=true;
-							}
-						}
-					}
+					semanticAnalyzer(funcArgList->value);
+										
 					//checking whether type matches
-					if(symArgList->type!=funcArgList->type)
+					if(symArgList->type!=funcArgList->value->type)
 					{
 					
 					printf("Error in %d: Type mismatch in arguments of function %s\n",root->lineNo,oper1->var.name);

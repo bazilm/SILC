@@ -470,30 +470,23 @@ switch(root->nodeType)
 
 					while(argListEntry!=NULL)
 					{
-					//if it is not a variable, push the value
-					if(!argListEntry->name)
-						{
-						fprintf(out,"MOV R%d,%d\n",++reg_count,argListEntry->value);
-						fprintf(out,"PUSH R%d\n",reg_count);
-						reg_count--;
-						}
-					//if it is a variable,find the value and push
+
+					//if ref variable find the address and push
+					if(argListEntry->ref)
+					{
+					setVariableValue(argListEntry->value->var.name,NULL);		//gets the address of the variable
+					fprintf(out,"PUSH R%d\n",reg_count);
+					reg_count--;
+					}
+					
+					//else finding the value of the expression
 					else
-						{
-						if(argListEntry->ref==0)
-						{
-						getVariableValue(argListEntry->name,NULL);
-						fprintf(out,"PUSH R%d\n",reg_count);
-						reg_count--;
-						}
-						//if it is a reference variable,push the address
-						else
-						{
-						setVariableValue(argListEntry->name,NULL);		//gets the address of the variable
-						fprintf(out,"PUSH R%d\n",reg_count);
-						reg_count--;
-						}
-						}
+					{
+					compile(argListEntry->value);
+					fprintf(out,"PUSH R%d\n",reg_count);
+					reg_count--;
+					}
+					
 					argListEntry = argListEntry->next;
 					}
 					}
