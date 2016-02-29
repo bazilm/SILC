@@ -1,6 +1,107 @@
 #include "y.tab.h"
 
-void makeSTable(IdList * root,Type type)
+//initializes type table with int and boolean
+void initializeTypeTable()
+{
+TypeTable * typeTableEntry = malloc(sizeof(TypeTable));
+char * name = "int";
+typeTableEntry->name = malloc(sizeof(name));
+strcpy(typeTableEntry->name,name);
+typeTableEntry->members = NULL;
+typeTableEntry->next = NULL;
+
+typeTableBeg = typeTableEntry;
+INT = typeTableEntry;
+
+name = "boolean";
+typeTableEntry = malloc(sizeof(TypeTable));
+typeTableEntry->name = malloc(sizeof(name));
+strcpy(typeTableEntry->name,name);
+typeTableEntry->members = NULL;
+typeTableEntry->next = NULL;
+
+typeTableBeg->next = typeTableEntry;
+BOOLEAN = typeTableEntry;
+typeTableEnd = typeTableEntry;
+}
+
+//installs the type definition to type table
+void typeTableInstall(char * name)
+{
+TypeTable * typeTableEntry = malloc(sizeof(TypeTable));
+typeTableEntry->name = malloc(sizeof(name));
+strcpy(typeTableEntry->name,name);
+
+LTable * lTable = lTableBeg;
+TypeTableId * id,*idBeg,*idEnd;
+while(lTable)
+{
+	id = malloc(sizeof(TypeTableId));
+	id->name = malloc(sizeof(lTable->name));
+	strcpy(id->name,lTable->name);
+	id->type = lTable->type;
+	id->next = NULL;
+	if(!idBeg)
+	{
+	idBeg = id;
+	idEnd = id;
+	}
+	else
+	{
+	idEnd->next = id;
+	idEnd = id;
+	}
+	lTable = lTable->next;
+}
+
+//adding the members to typeTableEntry
+typeTableEntry->members = idBeg;
+typeTableEntry->next = NULL;
+
+//adding the type to typetable
+typeTableEnd->next = typeTableEntry;
+typeTableEnd = typeTableEntry;
+
+//setting back lTableBeg to NULL
+lTableBeg = NULL;
+}
+
+//outputs the type table
+void showTypeTable()
+{
+TypeTable * typeTableEntry = typeTableBeg;
+
+while(typeTableEntry)
+{
+printf("%s\n",typeTableEntry->name);
+TypeTableId * id = typeTableEntry->members;
+while(id)
+	{
+	printf("\t%s - %s\n",id->name,id->type->name);
+	id=id->next;
+	}
+typeTableEntry = typeTableEntry->next;
+printf("\n\n");
+}
+
+}
+
+//checks whether identifier is a type
+TypeTable * isType(char * name)
+{
+TypeTable *beg = typeTableBeg;
+while(beg)
+{
+ if(strcmp(beg->name,name)==0)
+	return beg;
+
+ beg = beg->next;
+}
+return NULL;
+}
+
+
+void makeSTable(IdList * root,TypeTable * type)
 {
 STable * sTableEntry;
 
@@ -37,7 +138,7 @@ while(idListEntry!=NULL)
 
 
 
-STable *GInstall(char *name,Type type,int size,ArgList * argList,int func)
+STable *GInstall(char *name,TypeTable *type,int size,ArgList * argList,int func)
 {
 STable *sTable = malloc(sizeof(STable));
 sTable->name = name;
@@ -81,34 +182,16 @@ while(argList!=NULL)
 	bind--;
 	argList = argList->next;
 	}
-}
+
 
 
 //setting binding for global variables
-switch(type)
+if(!func)
 {
-	case INT:
-		{
-		if(!func)
-		{
-		sTable->size = size;
-		sTable->binding = mem;
-		mem+=size;
-		}
-		break;
-		}
-
-	
-	case BOOLEAN:
-		{
-		if(!func)
-		{
-		sTable->size=size;
-		sTable->binding = mem;
-		mem+=size;
-		}
-		break;
-		}
+sTable->size = size;
+sTable->binding = mem;
+mem+=size;
+}
 }
 
 sTable->next = NULL;
@@ -140,7 +223,7 @@ while(sTable!=NULL)
 return NULL;
 }
 
-void makeLTable(IdList *root,Type type)
+void makeLTable(IdList *root,TypeTable * type)
 {
 LTable * lTableEntry;
 IdList * idListEntry = root;
@@ -175,31 +258,15 @@ while(idListEntry!=NULL)
 }
 
 //installs in the local symbol table
-LTable *LInstall(char *name,Type type,int size)
+LTable *LInstall(char *name,TypeTable *type,int size)
 {
 LTable *lTable = malloc(sizeof(LTable));
 lTable->name = name;
 lTable->type = type;
 
-switch(type)
-{
-	case INT:
-		{
-		lTable->size = size;
-		lTable->binding = fmem;
-		fmem+=size;
-		break;
-		}
-
-	
-	case BOOLEAN:
-		{
-		lTable->size=size;
-		lTable->binding = fmem;
-		fmem+=size;
-		break;
-		}
-}
+lTable->size = size;
+lTable->binding = fmem;
+fmem+=size;
 
 lTable->next = NULL;
 
@@ -231,7 +298,7 @@ return NULL;
 }
 
 //makes idlist of a certain type
-IdList * makeIdList(IdList * idListLeft,char * name,Type type,int size,ArgList * arglist,int ref)
+IdList * makeIdList(IdList * idListLeft,char * name,TypeTable *type,int size,ArgList * arglist,int ref)
 {
 IdList * idList = malloc(sizeof(IdList));
 idList->name = name;
@@ -253,7 +320,7 @@ return idList;
 
 	
 //makes arglist for func def and func decl of a certain type
-ArgList * makeArgList(ArgList * argList,IdList * idList, Type type)
+ArgList * makeArgList(ArgList * argList,IdList * idList, TypeTable *type)
 {
 ArgList * argListRight,*argListBeg=NULL,*argListEntry;
 
@@ -332,7 +399,7 @@ return argListEntry;
 }
 /*Constructors for different node types*/
 
-Node * makeFuncNode(Type type,char * name,ArgList * argList,Node * func_body)
+Node * makeFuncNode(TypeTable *type,char * name,ArgList * argList,Node * func_body)
 {
 
 
@@ -346,7 +413,7 @@ has_main =true;
 STable *sTable = malloc(sizeof(STable));
 sTable->name = malloc(sizeof(name));
 strcpy(sTable->name,name);
-sTable->type = INT;
+sTable->type = type;
 sTable->size = 1;
 sTable->binding = -1;
 sTable->symbolTable = malloc(sizeof(LTable));
@@ -407,7 +474,7 @@ return makeOperNode('F',1,funcNode);
 
 }
 
-Node * makeConNode(Type type,int value)
+Node * makeConNode(TypeTable *type,int value)
 {
 
 Node * p;
@@ -416,25 +483,10 @@ if((p =malloc(sizeof(Node))) == NULL)
 	printf("No memory\n");
 	exit(0);
 	}
-switch(type)
-{
-case INTEGER:
-	{
-	
-	p->nodeType = CONSTANT;
-	p->type = INT;
-	p->con.value = value;
-	break;
-	}
 
-case BOOLEAN:
-	{
-	p->nodeType = CONSTANT;
-	p->type = BOOLEAN;
-	p->con.value = value;
-	break;
-	}
-}
+p->nodeType = CONSTANT;
+p->type = type;
+p->con.value = value;
 p->lineNo=lineNo;
 return p;
 }
@@ -449,7 +501,7 @@ if((p =malloc(sizeof(Node))) == NULL)
 	exit(0);
 	}
 p->nodeType = VARIABLE;
-p->type = INT;
+p->type = NULL;
 p->var.name = malloc(sizeof(name));
 strcpy(p->var.name,name);
 p->var.index=index;

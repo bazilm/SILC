@@ -12,6 +12,9 @@ identifiers {alphabets}({alphabets}|{digits})*
 typedef		return TYPEDEF;
 decl		return DECL;
 enddecl		return ENDDECL;
+int		return INTEGER;
+boolean		return BOOL;
+
 {digits}+	{yylval.ival = atoi(yytext);
 		return CONST;
 		}

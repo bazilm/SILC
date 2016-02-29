@@ -45,11 +45,11 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    BEG = 258,
-    DECL = 259,
-    ENDDECL = 260,
-    INTEGER = 261,
-    BOOL = 262,
+    TYPEDEF = 258,
+    BEG = 259,
+    DECL = 260,
+    ENDDECL = 261,
+    TYPE = 262,
     END = 263,
     READ = 264,
     WRITE = 265,
@@ -77,11 +77,11 @@ extern int yydebug;
   };
 #endif
 /* Tokens.  */
-#define BEG 258
-#define DECL 259
-#define ENDDECL 260
-#define INTEGER 261
-#define BOOL 262
+#define TYPEDEF 258
+#define BEG 259
+#define DECL 260
+#define ENDDECL 261
+#define TYPE 262
 #define END 263
 #define READ 264
 #define WRITE 265
@@ -112,15 +112,16 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 25 "expl.y" /* yacc.c:1909  */
+#line 15 "sil.y" /* yacc.c:1909  */
 
 int ival;
 char * sval;
 struct NodeTag* nval;
 struct ArgList * argval;
+struct typetable * typeTable;
 struct IdList * idval;
 
-#line 124 "y.tab.h" /* yacc.c:1909  */
+#line 125 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

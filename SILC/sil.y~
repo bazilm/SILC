@@ -125,7 +125,7 @@ Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0);}
 Fbody:		BEG stmt_list END				{$$ = $2;}
 		;
 
-Main:		TYPE MAIN '('')''{'Fdeclblock Fbody '}'		{$$ = makeFuncNode($1,"main",NULL,$7);}
+Main:		TYPE MAIN '('')''{'Fdeclblock Fbody '}'		{$$ = makeFuncNode(TYPE,"main",NULL,$7);}
 		;
 
 stmt_list: stmt_list stmt					{$$ = makeOperNode('S',2,$1,$2);	}

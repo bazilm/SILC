@@ -1,5 +1,6 @@
 #include "y.tab.h"
 
+LTable * lTable = NULL;
 
 void setVariableValue(char *name,Node *index)
 {
@@ -474,7 +475,7 @@ switch(root->nodeType)
 					//if ref variable find the address and push
 					if(argListEntry->ref)
 					{
-					setVariableValue(argListEntry->name,NULL);		//gets the address of the variable
+					setVariableValue(argListEntry->value->var.name,NULL);		//gets the address of the variable
 					fprintf(out,"PUSH R%d\n",reg_count);
 					reg_count--;
 					}

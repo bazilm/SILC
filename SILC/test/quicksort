@@ -9,12 +9,12 @@ int partition(int i,j)
 decl
 int beg;
 int temp;
-boolean k;
+
 enddecl
 begin
 beg=i - 1;
-k= i<j ;
-while(k) do
+
+while(i<j) do
 
 	if(a[i] <= a[j]) then
 	beg=beg+1;
@@ -23,14 +23,13 @@ while(k) do
 	a[beg] = temp;
 	endif;
 i=i+1;
-k = i<j;
+
 endwhile;
 
 temp = a[beg+1];
 a[beg+1] = a[j];
 a[j]= temp;
-beg = beg+1;
-return beg;
+return beg+1;
 end
 }
 

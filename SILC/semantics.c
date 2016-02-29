@@ -219,6 +219,14 @@ switch(root->nodeType)
 		case 'F':
 			{
 			sTableEntry = LookUp(oper1->var.name);
+
+			//if main checking the return type
+			if(strcmp(sTableEntry->name,"main")==0&&sTableEntry->type!=INT)
+				{
+				printf("Error: Return type of main must be int\n");
+				has_error = true;
+				}
+			
 			
 			//no sTableEntry, so function not declared
 			if(!sTableEntry)

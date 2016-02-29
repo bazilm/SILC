@@ -2,14 +2,25 @@
 #include<stdarg.h>
 
 typedef enum  {CONSTANT,OPERATOR,VARIABLE} NodeType ;
-typedef enum  {INT,BOOLEAN} Type;
 
+typedef struct typetable TypeTable;
+typedef struct  typetableid
+{
+char * name;
+TypeTable * type;
+struct typetableid * next;
+}TypeTableId;
+
+typedef struct typetable
+{
+char * name;
+TypeTableId * members;
+struct typetable * next;
+}TypeTable;
 
 typedef struct 
 {
-
 int value;
-
 }ConNode;
 
 typedef struct 
@@ -30,7 +41,7 @@ struct NodeTag *operands;
 typedef struct NodeTag
 {
 NodeType nodeType;
-Type type;
+TypeTable *type;
 int lineNo;
 union
 {
@@ -44,7 +55,7 @@ VarNode var;
 typedef struct ArgList
 {
 char * name;
-Type type;
+TypeTable *type;
 Node * value;
 int ref;
 struct ArgList * next;
@@ -54,7 +65,7 @@ struct ArgList * next;
 typedef struct LSymTable
 {
 char * name;
-Type type;
+TypeTable *type;
 int size;
 int binding;
 int ref;
@@ -64,7 +75,7 @@ struct LSymTable * next;
 typedef struct SymTable
 {
 char * name;
-Type type;
+TypeTable *type;
 int size;
 int binding;
 ArgList * args;
@@ -75,7 +86,7 @@ struct SymTable * next;
 typedef struct IdList
 {
 char * name;
-Type type;
+TypeTable *type;
 int size;
 ArgList * argList;
 int ref;
@@ -83,31 +94,48 @@ struct IDList * next;
 }IdList;
 
 
-Node * makeConNode(Type,int);
+//function declarations
+Node * makeConNode(TypeTable *,int);
 Node * makeVarNode(char *,Node *,ArgList *,int);
 Node * makeOperNode(int,int,...);
+
 int interpret(Node *);
 void semanticAnalyzer(Node *);
 void freeNode(Node *);
 
-void makeSTable(IdList *,Type);
-STable * GInstall(char *,Type,int,ArgList *, int);
+void initializeTypeTable();
+void typeTableInstall();
+
+void makeSTable(IdList *,TypeTable *);
+STable * GInstall(char *,TypeTable *,int,ArgList *, int);
 STable * LookUp(char *);
 
-void makeLTable(IdList *,Type);
-LTable * LInstall(char *,Type,int);
+void makeLTable(IdList *,TypeTable *);
+LTable * LInstall(char *,TypeTable *,int);
 LTable * LLookUp(char *,LTable *);
 
-ArgList * makeCallList(ArgList *,char *,Type,int);
+ArgList * makeCallList(ArgList *,Node *);
 
-IdList * makeIdList(IdList *,char *,Type,int,ArgList *,int);
+IdList * makeIdList(IdList *,char *,TypeTable *,int,ArgList *,int);
 
 void setVariableValue(char * name,Node * index);
 void getVariableValue(char * name,Node * index);
 
-
 void showContents(STable *);
 void LshowContents(LTable *);
+void showTypeTable();
+
+
+//global variables
+STable *sTableBeg=NULL,*sTableEnd;
+LTable *lTableBeg=NULL,*lTableEnd;
+IdList * idListBeg=NULL, *idListEnd;
+TypeTable *typeTableBeg=NULL,*typeTableEnd;
+int lineNo;
+bool has_error = false,has_main=false;
+FILE * out;
+int reg_count=-1;
+int mem = 0,if_count=1,while_count=1,fmem=1;
 
 
 

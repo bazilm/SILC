@@ -7,6 +7,7 @@ int main()
 decl
 int a;
 boolean b;
+car c;
 enddecl
 
 begin

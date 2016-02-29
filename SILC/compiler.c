@@ -1,6 +1,5 @@
 #include "y.tab.h"
 
-
 void setVariableValue(char *name,Node *index)
 {
 LTable *lTableEntry = LLookUp(name,lTable);

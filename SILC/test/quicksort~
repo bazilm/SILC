@@ -9,12 +9,12 @@ int partition(int i,j)
 decl
 int beg;
 int temp;
-boolean k;
+
 enddecl
 begin
 beg=i - 1;
-k= i<j ;
-while(k) do
+
+while(i<j) do
 
 	if(a[i] <= a[j]) then
 	beg=beg+1;
@@ -23,7 +23,7 @@ while(k) do
 	a[beg] = temp;
 	endif;
 i=i+1;
-k = i<j;
+
 endwhile;
 
 temp = a[beg+1];
@@ -63,8 +63,7 @@ begin
 	i=i+1;
 endwhile;
 
-temp = n-1;
-i = quicksort(0,temp);
+i = quicksort(0,n-1);
 
 i=0;
 while(i<n) do
