@@ -1,3 +1,15 @@
+typedef car
+{
+int a,b,c;
+boolean e;
+}
+
+typedef swift
+{
+car a;
+int price,mileage;
+}
+
 decl
 int a;
 enddecl
@@ -6,13 +18,14 @@ int main()
 {
 decl
 int a;
+swift c;
 boolean b;
-car c;
 enddecl
 
 begin
 read(a);
-b = false;
+a = c.price;
+a = c.a[2].a;
 write(a);
 return a;
 end

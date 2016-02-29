@@ -26,7 +26,7 @@ struct IdList * idval;
 %token <nval> STRCONST
 %token <sval> VAR
 %type <typeTable> TYPE
-%type <nval> expr stmt stmt_list Main program Fdeflist Fdef Fbody 
+%type <nval> expr stmt stmt_list Main program Fdeflist Fdef Fbody Id
 %type <argval> Farglist Fcalllist Fargtypelist
 %type <idval> Fvarlist Gvarlist Fargvarlist
 %left AND OR
@@ -125,7 +125,7 @@ Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0);}
 Fbody:		BEG stmt_list END				{$$ = $2;}
 		;
 
-Main:		TYPE MAIN '('')''{'Fdeclblock Fbody '}'		{$$ = makeFuncNode(TYPE,"main",NULL,$7);}
+Main:		TYPE MAIN '('')''{'Fdeclblock Fbody '}'		{$$ = makeFuncNode($1,"main",NULL,$7);}
 		;
 
 stmt_list: stmt_list stmt					{$$ = makeOperNode('S',2,$1,$2);	}
@@ -164,10 +164,14 @@ expr :
 	|CONST					{$$ = makeConNode(INT,$1);		}
 	|TRUE					{$$ = makeConNode(BOOLEAN,1);		}
 	|FALSE					{$$ = makeConNode(BOOLEAN,0);		}
-	|VAR					{$$ = makeVarNode($1,NULL,NULL,0);				}
-	|VAR'['expr']'				{$$ = makeVarNode($1,$3,NULL,0);				}
+	|Id					{$$ = $1;				}
 	|VAR'('Fcalllist')'			{$$ = makeOperNode('f',1,makeVarNode($1,NULL,$3,0));		}
 	;
+
+Id	:Id '.' VAR				{$$ = addInnerId($1,$3);					}
+	|VAR					{$$ = makeVarNode($1,NULL,0);				}
+	|VAR'['expr']'				{$$ = makeVarNode($1,$3,NULL,0);				}
+
 
 Fcalllist:Fcalllist ',' expr			{$$ = makeCallList($1,$3);}
 	  |expr					{$$ = makeCallList(NULL,$1);}					

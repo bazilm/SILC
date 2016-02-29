@@ -8,6 +8,7 @@ typedef struct  typetableid
 {
 char * name;
 TypeTable * type;
+int binding;
 struct typetableid * next;
 }TypeTableId;
 
@@ -15,6 +16,7 @@ typedef struct typetable
 {
 char * name;
 TypeTableId * members;
+int size;
 struct typetable * next;
 }TypeTable;
 
@@ -27,7 +29,8 @@ typedef struct
 {
 char * name;
 struct NodeTag *index;
-struct ArgList * argList;
+struct ArgList *argList;
+struct NodeTag *innerId;
 int size;
 }VarNode;
 
@@ -97,6 +100,7 @@ struct IDList * next;
 //function declarations
 Node * makeConNode(TypeTable *,int);
 Node * makeVarNode(char *,Node *,ArgList *,int);
+Node * addInnerId(Node *,char *);
 Node * makeOperNode(int,int,...);
 
 int interpret(Node *);

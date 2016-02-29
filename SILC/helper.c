@@ -8,6 +8,7 @@ char * name = "int";
 typeTableEntry->name = malloc(sizeof(name));
 strcpy(typeTableEntry->name,name);
 typeTableEntry->members = NULL;
+typeTableEntry->size = 1;
 typeTableEntry->next = NULL;
 
 typeTableBeg = typeTableEntry;
@@ -18,6 +19,7 @@ typeTableEntry = malloc(sizeof(TypeTable));
 typeTableEntry->name = malloc(sizeof(name));
 strcpy(typeTableEntry->name,name);
 typeTableEntry->members = NULL;
+typeTableEntry->size = 1;
 typeTableEntry->next = NULL;
 
 typeTableBeg->next = typeTableEntry;
@@ -34,13 +36,16 @@ strcpy(typeTableEntry->name,name);
 
 LTable * lTable = lTableBeg;
 TypeTableId * id,*idBeg,*idEnd;
+int binding = 0;
 while(lTable)
 {
 	id = malloc(sizeof(TypeTableId));
 	id->name = malloc(sizeof(lTable->name));
 	strcpy(id->name,lTable->name);
 	id->type = lTable->type;
+	id->binding = binding;
 	id->next = NULL;
+	binding += lTable->type->size;
 	if(!idBeg)
 	{
 	idBeg = id;
@@ -57,6 +62,7 @@ while(lTable)
 //adding the members to typeTableEntry
 typeTableEntry->members = idBeg;
 typeTableEntry->next = NULL;
+typeTableEntry->size = binding;
 
 //adding the type to typetable
 typeTableEnd->next = typeTableEntry;
@@ -77,7 +83,7 @@ printf("%s\n",typeTableEntry->name);
 TypeTableId * id = typeTableEntry->members;
 while(id)
 	{
-	printf("\t%s - %s\n",id->name,id->type->name);
+	printf("\t%s - %s - %d\n",id->name,id->type->name,id->binding);
 	id=id->next;
 	}
 typeTableEntry = typeTableEntry->next;
@@ -506,9 +512,22 @@ p->var.name = malloc(sizeof(name));
 strcpy(p->var.name,name);
 p->var.index=index;
 p->var.argList = argList;
+p->var.innerId = NULL;
 p->var.size = size;
 p->lineNo=lineNo;
 return p;
+}
+
+//Adds inner id to a variable
+Node * addInnerId(Node * var,char * name)
+{
+Node * beg = var;
+while(beg->var.innerId)
+{
+beg = beg->var.innerId;
+}
+beg->var.innerId = makeVarNode(name,NULL,NULL,0);
+return var;
 }
 
 Node * makeOperNode(int oper,int nops,...)
