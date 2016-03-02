@@ -70,6 +70,7 @@ typeTableEnd = typeTableEntry;
 
 //setting back lTableBeg to NULL
 lTableBeg = NULL;
+fmem = 1;
 }
 
 //outputs the type table
@@ -90,6 +91,31 @@ typeTableEntry = typeTableEntry->next;
 printf("\n\n");
 }
 
+}
+
+//looks up in a typetable entry for an id name
+TypeTable * TLookUp(char * name,TypeTable * typeTable)
+{
+TypeTableId * members = typeTable->members;
+while(members)
+{
+if(strcmp(name,members->name)==0)
+	return members->type;
+members = members->next;
+}
+return NULL;
+}
+
+int getBinding(char * name,TypeTable * typeTable)
+{
+TypeTableId * members = typeTable->members;
+while(members)
+{
+	if(strcmp(name,members->name)==0)
+		return members->binding;
+members = members->next;
+}
+return 0;
 }
 
 //checks whether identifier is a type
@@ -189,16 +215,16 @@ while(argList!=NULL)
 	argList = argList->next;
 	}
 
-
+}
 
 //setting binding for global variables
 if(!func)
 {
-sTable->size = size;
+sTable->size = type->size * size;
 sTable->binding = mem;
-mem+=size;
+mem+=(type->size * size);
 }
-}
+
 
 sTable->next = NULL;
 
@@ -247,7 +273,7 @@ while(idListEntry!=NULL)
 			has_error=true;
 			}
 		else
-			{LInstall(idListEntry->name,type,idListEntry->size);
+			{LInstall(idListEntry->name,type);
 			idListEntry = idListEntry->next;
 			}
 		
@@ -264,15 +290,15 @@ while(idListEntry!=NULL)
 }
 
 //installs in the local symbol table
-LTable *LInstall(char *name,TypeTable *type,int size)
+LTable *LInstall(char *name,TypeTable *type)
 {
 LTable *lTable = malloc(sizeof(LTable));
 lTable->name = name;
 lTable->type = type;
 
-lTable->size = size;
+lTable->size = type->size;
 lTable->binding = fmem;
-fmem+=size;
+fmem+=type->size;
 
 lTable->next = NULL;
 
@@ -572,7 +598,7 @@ void showContents(STable * beg)
 
 while(beg!=NULL)
 {
-printf("%s\n",beg->name);
+printf("%s - %d\n",beg->name,beg->binding);
 if(beg->symbolTable)
 {
 	LTable * temp = beg->symbolTable;

@@ -6,28 +6,39 @@ boolean e;
 
 typedef swift
 {
-car a;
+
 int price,mileage;
+car a;
 }
 
 decl
 int a;
+swift d[10];
+int f;
+swift get();
 enddecl
+
+swift get()
+{
+begin
+return d;
+end
+}
 
 int main()
 {
 decl
-int a;
-swift c;
+
+swift c,e;
 boolean b;
 enddecl
 
 begin
-read(a);
-a = c.price;
-a = c[2].a.a;
-write(a);
-return a;
+read(d[0].a.c);
+write(d[0].a.c);
+e.a= d.a;
+write(e.a.c);
+return 0;
 end
 }
 

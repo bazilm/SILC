@@ -1,34 +1,67 @@
 #include "y.tab.h"
 
-void setVariableValue(char *name,Node *index)
+//gets the binding of the inner variables
+int getInnerBinding(Node * root)
 {
-LTable *lTableEntry = LLookUp(name,lTable);
+Node * innerNode = root->var.innerId;
+Node * node = root;
+int binding = 0;
+TypeTable * innerType;
+if(innerNode)
+{
+	while(innerNode)
+	{
+		binding += getBinding(innerNode->var.name,node->type);
+		//printf("%d\n",binding);
+		node = innerNode;
+		innerNode = innerNode->var.innerId;
+	}
+return binding;
+}
+return 0;
+}
+
+void setVariableValue(Node * root,Node *index)
+{
+LTable *lTableEntry = LLookUp(root->var.name,lTable);
+int innerBinding;
 //if not in local table find in global table
 if(!lTableEntry)
 	{
-	STable *sTableEntry = LookUp(name);
-	
+	STable *sTableEntry = LookUp(root->var.name);
+	//resetting the type which was set in semantic analysis phase
+	root->type = sTableEntry->type;
+	innerBinding = getInnerBinding(root);
+		
 	if(!index)
 	{
 	reg_count++;
-	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
+	printf("%s - sTable - %d\n",root->var.name,sTableEntry->binding);
+	printf("%s - inner - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	}
 	//get the value of the index
 	else
 	{
 	compile(index);
 	reg_count++;
-	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
+	printf("%s - sTable - %d\n",root->var.name,sTableEntry->binding);
+	printf("%s - inner - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	}
 	}
 else
  	{
+	//resetting the type which was set in semantic analysis phase
+	root->type = lTableEntry->type;
+	innerBinding = getInnerBinding(root);
 	reg_count++;
 	fprintf(out,"MOV R%d,BP\n",reg_count);
 	reg_count++;
-	fprintf(out,"MOV R%d,%d\n",reg_count,lTableEntry->binding);
+	fprintf(out,"MOV R%d,%d\n",reg_count,lTableEntry->binding+innerBinding);
+	printf("%s - inner - %d\n",root->var.name,lTableEntry->binding+innerBinding);
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	//if it is a reference variable,get the address it is storing
@@ -38,37 +71,49 @@ else
 	}
 }
 
-void getVariableValue(char *name,Node *index)
+void getVariableValue(Node * root,Node *index)
 {
-LTable *lTableEntry = LLookUp(name,lTable);
+LTable *lTableEntry = LLookUp(root->var.name,lTable);
+int innerBinding;
 if(!lTableEntry)
 	{
-	STable *sTableEntry = LookUp(name);
+	STable *sTableEntry = LookUp(root->var.name);
+	//resetting the type which was set in semantic analysis phase
+	root->type = sTableEntry->type;
+	innerBinding = getInnerBinding(root);
+
 	if(!index)
 	{
 	reg_count++;
-	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
+	printf("%s - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	}
 	else
 	{
 	compile(index);
 	reg_count++;
-	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding);
+	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+	printf("%s - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	}
 	}
 else
 	{
+	//resetting the type which was set in semantic analysis phase
+	root->type = lTableEntry->type;
+	innerBinding = getInnerBinding(root);
+
 	reg_count++;
 	fprintf(out,"MOV R%d,BP\n",reg_count);
 	reg_count++;
-	fprintf(out,"MOV R%d,%d\n",reg_count,lTableEntry->binding);
+	fprintf(out,"MOV R%d,%d\n",reg_count,lTableEntry->binding+innerBinding);
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+	printf("%s - %d\n",root->var.name,lTableEntry->binding+innerBinding);
 	
 	if(lTableEntry->ref ==1)
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
@@ -131,7 +176,7 @@ switch(root->nodeType)
 
 	case VARIABLE:
 		{
-		getVariableValue(root->var.name,root->var.index);
+		getVariableValue(root,root->var.index);
 		break;
 		}
 
@@ -224,8 +269,8 @@ switch(root->nodeType)
 
 			case '=':
 				{
-				
-				setVariableValue(oper1->var.name,oper1->var.index);
+								
+				setVariableValue(oper1,oper1->var.index);
 				
 				compile(oper2);
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
@@ -295,6 +340,7 @@ switch(root->nodeType)
 				compile(oper1);
 				compile(oper2);
 				fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
 				break;
 				}
 
@@ -303,6 +349,7 @@ switch(root->nodeType)
 				compile(oper1);
 				compile(oper2);
 				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
 				fprintf(out,"MOV R%d,0\n",++reg_count);
 				fprintf(out,"GT R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
@@ -322,7 +369,7 @@ switch(root->nodeType)
 				}
 			case READ:
 				{
-				setVariableValue(oper1->var.name,oper1->var.index);
+				setVariableValue(oper1,oper1->var.index);
 				reg_count++;
 				fprintf(out,"IN R%d\n",reg_count);
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
@@ -416,7 +463,11 @@ switch(root->nodeType)
 				//pushing space for the local variables
 				while(lTableEntry!=NULL)
 					{
-					fprintf(out,"PUSH R%d\n",++reg_count);
+					fprintf(out,"MOV R%d,SP\n",++reg_count);
+					fprintf(out,"MOV R%d,%d\n",++reg_count,lTableEntry->type->size);
+					fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+					reg_count--;
+					fprintf(out,"MOV SP,R%d\n",reg_count);
 					reg_count--;
 					lTableEntry = lTableEntry->next;
 					}
@@ -425,25 +476,8 @@ switch(root->nodeType)
 				compile(oper1->var.index);
 	
 				//Resetting the stack for the caller function by popping the local variables
-				if(lTable)
-					{
-					lTableEntry = lTable;
-					//moving past the arglist variables
-					argListEntry = sTableEntry->args;
-					while(argListEntry!=NULL)
-					{
-					argListEntry = argListEntry->next;
-					lTableEntry=lTableEntry->next;
-					}
+				fprintf(out,"MOV SP,BP\n");
 
-					//popping the local variables
-					while(lTableEntry!=NULL)
-						{
-						fprintf(out,"POP R%d\n",++reg_count);
-						reg_count--;
-						lTableEntry = lTableEntry->next;
-						}
-					}
 				//setting BP back
 				fprintf(out,"POP BP\n");
 				fprintf(out,"RET\n");
@@ -473,7 +507,7 @@ switch(root->nodeType)
 					//if ref variable find the address and push
 					if(argListEntry->ref)
 					{
-					setVariableValue(argListEntry->value->var.name,NULL);		//gets the address of the variable
+					setVariableValue(argListEntry->value,NULL);		//gets the address of the variable
 					fprintf(out,"PUSH R%d\n",reg_count);
 					reg_count--;
 					}

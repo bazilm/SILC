@@ -109,21 +109,23 @@ void freeNode(Node *);
 
 void initializeTypeTable();
 void typeTableInstall();
+TypeTable *TLookUp(char *,TypeTable *);
+int getBinding(char *,TypeTable *);
 
 void makeSTable(IdList *,TypeTable *);
 STable * GInstall(char *,TypeTable *,int,ArgList *, int);
 STable * LookUp(char *);
 
 void makeLTable(IdList *,TypeTable *);
-LTable * LInstall(char *,TypeTable *,int);
+LTable * LInstall(char *,TypeTable *);
 LTable * LLookUp(char *,LTable *);
 
 ArgList * makeCallList(ArgList *,Node *);
 
 IdList * makeIdList(IdList *,char *,TypeTable *,int,ArgList *,int);
 
-void setVariableValue(char * name,Node * index);
-void getVariableValue(char * name,Node * index);
+void setVariableValue(Node * ,Node * );
+void getVariableValue(Node * ,Node * );
 
 void showContents(STable *);
 void LshowContents(LTable *);

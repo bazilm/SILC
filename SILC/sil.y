@@ -40,7 +40,7 @@ struct IdList * idval;
 
 program: 	TypeDefBlock Gdeclblock Fdeflist Main 			{
 								if(typeTableBeg)
-									showTypeTable();
+									//showTypeTable();
 								if($3)
 									$$ = makeOperNode('S',2,$3,$4);
 								else
@@ -68,7 +68,7 @@ TypeDefBlock:	TypeDefBlock TYPEDEF VAR '{' Fdecllist '}'	{typeTableInstall($3);}
 		|						{}
 		;
 
-Gdeclblock:	DECL Gdecllist ENDDECL				{}
+Gdeclblock:	DECL Gdecllist ENDDECL				{showContents(sTableBeg);}
 		|						{}
 		;
 
@@ -132,14 +132,12 @@ stmt_list: stmt_list stmt					{$$ = makeOperNode('S',2,$1,$2);	}
 	   |stmt						{$$ = $1;				}
     	  
 
-stmt: 	READ '(' VAR ')' ';'	        			{$$ = makeOperNode(READ,1,makeVarNode($3,NULL,NULL,0));			}
-	|READ '(' VAR '['expr']'')' ';'				{$$ = makeOperNode(READ,1,makeVarNode($3,$5,NULL,0));			}
- 	|WRITE '(' expr ')' ';'					{$$ = makeOperNode(WRITE,1,$3);						}
+stmt: 	READ '(' Id ')' ';'	        			{$$ = makeOperNode(READ,1,$3);			}
+	|WRITE '(' expr ')' ';'					{$$ = makeOperNode(WRITE,1,$3);						}
 	|IF '('expr')' THEN stmt_list ELSE stmt_list ENDIF ';'	{$$ = makeOperNode(IF,3,$3,$6,$8);					}
 	|IF '('expr')' THEN stmt_list ENDIF ';'			{$$ = makeOperNode(IF,2,$3,$6);						}
 	|WHILE '(' expr ')' DO stmt_list ENDWHILE ';'		{$$ = makeOperNode(WHILE,2,$3,$6);					}
-	|VAR '=' expr ';'					{$$ = makeOperNode('=',2,makeVarNode($1,NULL,NULL,0),$3);		}
-	|VAR'['expr']' '=' expr ';'				{$$ = makeOperNode('=',2,makeVarNode($1,$3,NULL,0),$6);			}
+	|Id '=' expr ';'					{$$ = makeOperNode('=',2,$1,$3);		}
 	|RET expr ';'						{$$ = makeOperNode('R',1,$2);						}
 	;
 

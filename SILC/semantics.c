@@ -3,6 +3,34 @@
 LTable * lTable =NULL;
 STable * sTable = NULL;
 bool hasReturn = false,funcArg = false;
+
+//checks whether the inner ids are valid
+int checkInnerNode(Node * root)
+{
+Node * innerNode = root->var.innerId;
+Node * node = root;
+int binding = 0;
+TypeTable * innerType;
+if(innerNode)
+{
+	while(innerNode)
+	{
+		innerType = TLookUp(innerNode->var.name,node->type);
+		if(!innerType)
+		{
+		printf("Error in %d: No member %s for %s\n",root->lineNo,innerNode->var.name,node->var.name);
+		has_error = true;
+		return 0;
+		}
+		
+		innerNode->type = innerType;
+		node = innerNode;
+		innerNode = innerNode->var.innerId;
+	}
+root->type = innerType;	
+}
+}
+
 void semanticAnalyzer(Node * root)
 {
 
@@ -39,11 +67,15 @@ switch(root->nodeType)
 				}
 			else
 				{
-				//printf("%s found from global Table in memory address %d\n",root->var.name,sTableEntry->binding);
 				root->type = sTableEntry->type;
+				//printf("%s found from global Table in memory address %d\n",root->var.name,sTableEntry->binding+getInnerBinding(root));
+				//if complex variable, setting the type and checking for validity
+				checkInnerNode(root);
+				
+			
 				if(root->var.index)
 					{
-				
+					
 					semanticAnalyzer(root->var.index);
 
 					if(root->var.index->type!=INT)
@@ -59,10 +91,13 @@ switch(root->nodeType)
 		}
 		else
 			{
-			//printf("%s found from local Table in memory address %d\n",root->var.name,lTableEntry->binding);
 			root->type = lTableEntry->type;
+			//printf("%s found from local Table in memory address %d\n",root->var.name,lTableEntry->binding+getInnerBinding(root));
+			//checks inner node if it is a complex variable
+			checkInnerNode(root);
+			
+			
 			}
-		
 		break;
 		}
 
@@ -174,7 +209,7 @@ switch(root->nodeType)
 		case READ:
 			{
 			semanticAnalyzer(oper1);
-			if(oper1->type==BOOLEAN)
+			if(oper1->type!=INT)
 				{
 				printf("Error in %d: Type Error in READ\n",root->lineNo);
 				has_error=true;
@@ -185,7 +220,7 @@ switch(root->nodeType)
 		case WRITE:
 			{
 			semanticAnalyzer(oper1);
-			if(oper1->type==BOOLEAN)
+			if(oper1->type!=INT)
 				{
 				printf("Error in %d: Type Error in READ\n",root->lineNo);
 				has_error=true;
