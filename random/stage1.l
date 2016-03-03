@@ -1,0 +1,30 @@
+%option noyywrap
+%{
+	#include <stdlib.h>
+	#include <stdio.h>
+	
+%}
+	
+number [0-9]+
+ 
+%%
+ 
+{number} {printf("Found : %d\n",atoi(yytext));}
+[ \t\n]	
+.	{yyerror("Invalid character");
+	 printf("%s\n",yytext);}
+ 
+%%
+ 
+int main()
+{	
+	FILE * file = fopen("number","r");
+	yyin = file;
+	yylex();
+	return 1;
+}
+
+void yyerror(char * s)
+{
+printf("yyerror %s",s);
+}

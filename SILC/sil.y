@@ -68,7 +68,7 @@ TypeDefBlock:	TypeDefBlock TYPEDEF VAR '{' Fdecllist '}'	{typeTableInstall($3);}
 		|						{}
 		;
 
-Gdeclblock:	DECL Gdecllist ENDDECL				{showContents(sTableBeg);}
+Gdeclblock:	DECL Gdecllist ENDDECL				{}
 		|						{}
 		;
 
@@ -76,13 +76,18 @@ Gdecllist:	Gdecllist TYPE Gvarlist ';'			{makeSTable($3,$2);}
 		|						{}
 		;
 
-Gvarlist:	Gvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0);	}
-		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeIdList($1,$3,NULL,$5,NULL,0);	}
-		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeIdList($1,$3,NULL,1,$5,1);	}
-		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0);	}
-		|VAR '[' CONST ']'				{$$=makeIdList(NULL,$1,NULL,$3,NULL,0);	}
-		|VAR '(' Farglist ')'				{$$=makeIdList(NULL,$1,NULL,1,$3,1);	}
+Gvarlist:	Gvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0,0);	}
+		|Gvarlist ',' '^' VAR				{$$=makeIdList($1,$4,NULL,1,NULL,0,1);	}
+		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeIdList($1,$3,NULL,$5,NULL,0,0);	}
+		|Gvarlist ',' '^' VAR '[' CONST ']'		{$$=makeIdList($1,$4,NULL,$6,NULL,0,1);	}
+		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeIdList($1,$3,NULL,1,$5,1,0);	}
+		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0,0);	}
+		|'^' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,0,1);	}
+		|VAR '[' CONST ']'				{$$=makeIdList(NULL,$1,NULL,$3,NULL,0,0);	}
+		|'^' VAR '[' CONST ']'				{$$=makeIdList(NULL,$2,NULL,$4,NULL,0,1);	}
+		|VAR '(' Farglist ')'				{$$=makeIdList(NULL,$1,NULL,1,$3,1,0);	}
 		;
+
 
 Farglist:	Farglist ';' Fargtypelist 			{$$ = joinArgList($1,$3);		}
 		|Fargtypelist					{$$ = $1;				}
@@ -92,10 +97,10 @@ Fargtypelist:	TYPE Fargvarlist 				{$$ = makeArgList(NULL,$2,$1);		}
 		|						{$$ = NULL; 				}
 		;
 
-Fargvarlist:	Fargvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0);}
-		|Fargvarlist ',' '&' VAR			{$$=makeIdList($1,$4,NULL,1,NULL,1);}
-		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0);}
-		|'&' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,1);}
+Fargvarlist:	Fargvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0,0);}
+		|Fargvarlist ',' '&' VAR			{$$=makeIdList($1,$4,NULL,1,NULL,1,0);}
+		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0,0);}
+		|'&' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,1,0);}
 		;
 
 Fdeflist:	Fdeflist Fdef 					{if($$)
@@ -118,8 +123,10 @@ Fdecllist:	Fdecllist TYPE Fvarlist ';'			{makeLTable($3,$2);}
 		|						{}
 		;
 
-Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0);}
-		|VAR						{$$ =makeIdList(NULL,$1,NULL,1,NULL,0);}
+Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0,0);}
+		|Fvarlist ',' '^' VAR				{$$ =makeIdList($1,$4,NULL,1,NULL,0,1);}
+		|VAR						{$$ =makeIdList(NULL,$1,NULL,1,NULL,0,0);}
+		|'^' VAR					{$$ =makeIdList(NULL,$2,NULL,1,NULL,0,1);}
 		;
 
 Fbody:		BEG stmt_list END				{$$ = $2;}
@@ -187,6 +194,7 @@ yyin = fopen(argv[1],"r");
 
 lineNo=1;
 initializeTypeTable();
+initializeSymbolTable();
 yyparse();
 return 0;
 }

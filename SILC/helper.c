@@ -1,5 +1,43 @@
 #include "y.tab.h"
 
+//initializes symbol Table
+void initializeSymbolTable()
+{
+//putting main
+STable * sTable = malloc(sizeof(STable));
+sTable->name = malloc(sizeof("main"));
+strcpy(sTable->name,"main");
+sTable->type = INT;
+sTable->size = 0;			//size set to 0 to denote not defined functions
+sTable->binding = -1;			//binding set to -1 for functions
+sTable->next= NULL;
+sTableBeg = sTable;
+sTableEnd = sTable;
+
+//putting new
+sTable = malloc(sizeof(STable));
+sTable->name = malloc(sizeof("new"));
+strcpy(sTable->name,"new");
+sTable->type = INT;
+sTable->size = 1;
+sTable->binding = -1;
+sTable->next = NULL;
+sTableEnd->next = sTable;
+sTableEnd = sTable;
+
+//putting free
+sTable = malloc(sizeof(STable));
+sTable->name = malloc(sizeof("free"));
+strcpy(sTable->name,"free");
+sTable->type = INT;
+sTable->size = 1;
+sTable->binding = -1;
+sTable->next = NULL;
+sTableEnd->next = sTable;
+sTableEnd = sTable;
+}
+
+
 //initializes type table with int and boolean
 void initializeTypeTable()
 {
@@ -152,7 +190,7 @@ while(idListEntry!=NULL)
 			has_error=true;
 			}
 		else
-			{GInstall(idListEntry->name,type,idListEntry->size,idListEntry->argList,idListEntry->ref);
+			{GInstall(idListEntry->name,type,idListEntry->size,idListEntry->argList,idListEntry->ref,idListEntry->pointer);
 			idListEntry = idListEntry->next;
 			}
 		
@@ -170,7 +208,7 @@ while(idListEntry!=NULL)
 
 
 
-STable *GInstall(char *name,TypeTable *type,int size,ArgList * argList,int func)
+STable *GInstall(char *name,TypeTable *type,int size,ArgList * argList,int func,int pointer)
 {
 STable *sTable = malloc(sizeof(STable));
 sTable->name = name;
@@ -183,7 +221,7 @@ sTable->args = argList;
 sTable->size = 0;
 sTable->binding = -1;					//func have binding -1
 LTable *end,*LTableEntry;
-int bind=-3;
+int bind=-(type->size+1);				//binding of args depends on the return type
 while(argList!=NULL)
 	{
 	LTableEntry = malloc(sizeof(LTable));
@@ -196,6 +234,7 @@ while(argList!=NULL)
 	strcpy(LTableEntry->name,argList->name);
 	LTableEntry->type = argList->type;
 	LTableEntry->size = 1;
+	bind-=argList->type->size;
 	LTableEntry->binding = bind;
 	LTableEntry->ref = argList->ref;
 	LTableEntry->next = NULL;
@@ -211,7 +250,7 @@ while(argList!=NULL)
 		end = end->next;
 		}
 
-	bind--;
+	
 	argList = argList->next;
 	}
 
@@ -221,6 +260,9 @@ while(argList!=NULL)
 if(!func)
 {
 sTable->size = type->size * size;
+if(pointer)
+sTable->binding = -2;					//binding of pointer variables set to -2 initially
+else
 sTable->binding = mem;
 mem+=(type->size * size);
 }
@@ -330,7 +372,7 @@ return NULL;
 }
 
 //makes idlist of a certain type
-IdList * makeIdList(IdList * idListLeft,char * name,TypeTable *type,int size,ArgList * arglist,int ref)
+IdList * makeIdList(IdList * idListLeft,char * name,TypeTable *type,int size,ArgList * arglist,int ref,int pointer)
 {
 IdList * idList = malloc(sizeof(IdList));
 idList->name = name;
@@ -338,6 +380,7 @@ idList->type = type;
 idList->size = size;
 idList->argList=arglist;
 idList->ref=ref;
+idList->pointer = pointer;
 if(idListLeft)
 	{IdList * idListEntry = idListLeft;
 	while(idListEntry->next !=NULL)
@@ -434,44 +477,13 @@ return argListEntry;
 Node * makeFuncNode(TypeTable *type,char * name,ArgList * argList,Node * func_body)
 {
 
-
 if(LookUp(name)==NULL)
-{
-//TODO: Move this out of here
-//Putting main to symbol Table
-if(strcmp(name,"main")==0)
-{
-has_main =true;
-STable *sTable = malloc(sizeof(STable));
-sTable->name = malloc(sizeof(name));
-strcpy(sTable->name,name);
-sTable->type = type;
-sTable->size = 1;
-sTable->binding = -1;
-sTable->symbolTable = malloc(sizeof(LTable));
-sTable->symbolTable = lTableBeg;
-if(sTableEnd)
-	{
-	sTableEnd->next = sTable;
-	sTableEnd=sTableEnd->next;
-	sTableEnd->next = NULL;
-	}
-else
-{
-	sTableBeg = sTable;
-	sTableEnd = sTable;
-	sTableEnd->next = NULL;
-}
-
-
-}
-else
 {
 printf("Error in %d: Function %s not declared\n",lineNo,name);
 has_error=true;
 return NULL;
 }
-}
+
 else
 {
 STable *sTable = LookUp(name);

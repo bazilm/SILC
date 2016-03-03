@@ -37,8 +37,6 @@ if(!lTableEntry)
 	{
 	reg_count++;
 	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
-	printf("%s - sTable - %d\n",root->var.name,sTableEntry->binding);
-	printf("%s - inner - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	}
 	//get the value of the index
 	else
@@ -46,8 +44,6 @@ if(!lTableEntry)
 	compile(index);
 	reg_count++;
 	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
-	printf("%s - sTable - %d\n",root->var.name,sTableEntry->binding);
-	printf("%s - inner - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	}
@@ -61,7 +57,6 @@ else
 	fprintf(out,"MOV R%d,BP\n",reg_count);
 	reg_count++;
 	fprintf(out,"MOV R%d,%d\n",reg_count,lTableEntry->binding+innerBinding);
-	printf("%s - inner - %d\n",root->var.name,lTableEntry->binding+innerBinding);
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	//if it is a reference variable,get the address it is storing
@@ -78,7 +73,7 @@ int innerBinding;
 if(!lTableEntry)
 	{
 	STable *sTableEntry = LookUp(root->var.name);
-	
+	//resetting the type which was set in semantic analysis phase
 	root->type = sTableEntry->type;
 	innerBinding = getInnerBinding(root);
 
@@ -86,7 +81,6 @@ if(!lTableEntry)
 	{
 	reg_count++;
 	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
-	printf("%s - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	}
 	else
@@ -97,11 +91,11 @@ if(!lTableEntry)
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
-	printf("%s - %d\n",root->var.name,sTableEntry->binding+innerBinding);
 	}
 	}
 else
 	{
+	//resetting the type which was set in semantic analysis phase
 	root->type = lTableEntry->type;
 	innerBinding = getInnerBinding(root);
 
@@ -112,7 +106,6 @@ else
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
-	printf("%s - %d\n",root->var.name,lTableEntry->binding+innerBinding);
 	
 	if(lTableEntry->ref ==1)
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
@@ -151,7 +144,6 @@ for(count=count-1;count>=0;count--)
 
 return revArgList;
 }
-
 
 
 void compile(Node * root)
@@ -268,12 +260,41 @@ switch(root->nodeType)
 
 			case '=':
 				{
-								
+				int i=0;
+				//if a complex variable copy the contents from one to the other				
+				if((oper1->type!=INT)&&(oper1->type!=BOOLEAN))
+				{
+				reg_count++;
+				fprintf(out,"MOV R%d,%d\n",reg_count,oper1->type->size);
 				setVariableValue(oper1,oper1->var.index);
+				//checking whether oper2 is a variable or a function call
+				if(oper2->nodeType == VARIABLE)
+					setVariableValue(oper2,oper2->var.index);
+				else
+					compile(oper2);
+
+				reg_count++;
 				
+				fprintf(out,"WHILEBEG%d:\n",++while_count);
+				fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count-1);
+				fprintf(out,"MOV [R%d],R%d\n",reg_count-2,reg_count);
+				fprintf(out,"INR R%d\n",reg_count-1);
+				fprintf(out,"INR R%d\n",reg_count-2);
+				fprintf(out,"DCR R%d\n",reg_count-3);
+				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-3,while_count);
+				fprintf(out,"JMP WHILEBEG%d\n",while_count);
+				fprintf(out,"WHILEEND%d:\n",while_count);
+				
+				reg_count-=4;
+				}
+				//else set the value
+				else
+				{
+				setVariableValue(oper1,oper1->var.index);
 				compile(oper2);
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
 				reg_count-=2;
+				}
 
 				break;
 				}	
@@ -502,7 +523,52 @@ switch(root->nodeType)
 
 					while(argListEntry!=NULL)
 					{
+					//if a complex variable push the address of all the fields				
+					if((argListEntry->type!=INT)&&(argListEntry->type!=BOOLEAN))
+					{
+					//if ref variable find the address and push
+						if(argListEntry->ref)
+						{
+						
+						reg_count++;
+						fprintf(out,"MOV R%d,%d\n",reg_count,argListEntry->type->size);
+						setVariableValue(argListEntry->value,NULL);
+								
+						fprintf(out,"WHILEBEG%d:\n",++while_count);
+						fprintf(out,"PUSH R%d\n",reg_count);
+						fprintf(out,"INR R%d\n",reg_count);
+						fprintf(out,"DCR R%d\n",reg_count-1);
+						fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-1,while_count);
+						fprintf(out,"JMP WHILEBEG%d\n",while_count);
+						fprintf(out,"WHILEEND%d:\n",while_count);
+				
+						reg_count-=2;
+						}
 
+						else
+						{
+						reg_count++;
+						fprintf(out,"MOV R%d,%d\n",reg_count,argListEntry->type->size);
+						setVariableValue(argListEntry->value,NULL);
+								
+						fprintf(out,"WHILEBEG%d:\n",++while_count);
+						fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+						fprintf(out,"PUSH R%d\n",reg_count);
+						fprintf(out,"INR R%d\n",reg_count);
+						fprintf(out,"DCR R%d\n",reg_count-1);
+						fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-1,while_count);
+						fprintf(out,"JMP WHILEBEG%d\n",while_count);
+						fprintf(out,"WHILEEND%d:\n",while_count);
+				
+						reg_count-=2;
+						}
+					
+						
+					}
+					
+
+					else
+					{
 					//if ref variable find the address and push
 					if(argListEntry->ref)
 					{
@@ -518,29 +584,57 @@ switch(root->nodeType)
 					fprintf(out,"PUSH R%d\n",reg_count);
 					reg_count--;
 					}
-					
+					}
 					argListEntry = argListEntry->next;
 					}
 					}
 				
-				//pushing space for the return value (pushing the value 0)
-				fprintf(out,"MOV R%d,0\n",0);
-				fprintf(out,"PUSH R%d\n",0);
+				//pushing space for the return value (moving SP by the size of the return type)
+				reg_count++;
+				fprintf(out,"MOV R%d,SP\n",reg_count);
+				reg_count++;
+				fprintf(out,"MOV R%d,%d\n",reg_count,root->type->size);
+				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
+				fprintf(out,"MOV SP,R%d\n",reg_count);
+				reg_count--;
+				
 
 				//calling the function
 				fprintf(out,"CALL %s\n",oper1->var.name);
 				
-				//popping the return value
+				
+				//moving SP to the beginning of the return value(for complex types,each field is copied starting from this address
 				reg_count++;
-				fprintf(out,"POP R%d\n",reg_count);
-
+				fprintf(out,"MOV R%d,SP\n",reg_count);
+				reg_count++;
+				fprintf(out,"MOV R%d,%d\n",reg_count,root->type->size-1);
+				fprintf(out,"SUB R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
+				fprintf(out,"MOV SP,R%d\n",reg_count);
+				//if simple type get the return value
+				if((root->type==INT)||(root->type==BOOLEAN))
+				{
+				fprintf(out,"MOV R%d,[R%d]\n",reg_count);
+				}
+				
+				//correcting off by one for SP
+				fprintf(out,"POP R%d\n",reg_count-1);
 				//pop back the arglist
 				if(oper1->var.argList)
 					{
 					argListEntry = oper1->var.argList;
 					while(argListEntry!=NULL)
 						{
-						fprintf(out,"POP R%d\n",0);
+						reg_count++;
+						fprintf(out,"MOV R%d,SP\n",reg_count);
+						reg_count++;
+						fprintf(out,"MOV R%d,%d\n",reg_count,argListEntry->type->size);
+						fprintf(out,"SUB R%d,R%d\n",reg_count-1,reg_count);
+						reg_count--;
+						
+						fprintf(out,"MOV SP R%d\n",reg_count);
+						reg_count--;
 						argListEntry=argListEntry->next;
 						}
 					}
@@ -557,17 +651,42 @@ switch(root->nodeType)
 
 				//getting the address to store the return value i.e BP-2
 				fprintf(out,"MOV R%d,BP\n",++reg_count);
-				fprintf(out,"MOV R%d,-2\n",++reg_count);
+				fprintf(out,"MOV R%d,-%d\n",++reg_count,oper1->type->size+1);
 				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 
+				//if complex return type copy the values to return value space
+				if((oper1->type!=INT)&&(oper1->type!=BOOLEAN))
+				{
+				reg_count++;
+				fprintf(out,"MOV R%d,%d\n",reg_count,oper1->type->size);
+				setVariableValue(oper1,NULL);
+				
+				fprintf(out,"WHILEBEG%d:\n",++while_count);
+				
+				reg_count++;	
+				fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count-1);
+				fprintf(out,"MOV [R%d],R%d\n",reg_count-3,reg_count);
+				fprintf(out,"INR R%d\n",reg_count-1);
+				fprintf(out,"INR R%d\n",reg_count-3);
+				fprintf(out,"DCR R%d\n",reg_count-2);
+				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-2,while_count);
+				fprintf(out,"JMP WHILEBEG%d\n",while_count);
+				fprintf(out,"WHILEEND%d:\n",while_count);
+				
+				reg_count-=4;
+				}
+				
+				else
+				{
 				//compiling the expression for return value
 				compile(oper1);
 	
 				//putting the value in the address
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
+				reg_count-=2;
+				}	
 				
-
 				break;
 				}
 				

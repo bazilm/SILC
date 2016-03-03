@@ -93,6 +93,7 @@ TypeTable *type;
 int size;
 ArgList * argList;
 int ref;
+int pointer;
 struct IDList * next;
 }IdList;
 
@@ -112,8 +113,9 @@ void typeTableInstall();
 TypeTable *TLookUp(char *,TypeTable *);
 int getBinding(char *,TypeTable *);
 
+void initializeSymbolTable();
 void makeSTable(IdList *,TypeTable *);
-STable * GInstall(char *,TypeTable *,int,ArgList *, int);
+STable * GInstall(char *,TypeTable *,int,ArgList *, int,int);
 STable * LookUp(char *);
 
 void makeLTable(IdList *,TypeTable *);
@@ -122,7 +124,7 @@ LTable * LLookUp(char *,LTable *);
 
 ArgList * makeCallList(ArgList *,Node *);
 
-IdList * makeIdList(IdList *,char *,TypeTable *,int,ArgList *,int);
+IdList * makeIdList(IdList *,char *,TypeTable *,int,ArgList *,int,int);
 
 void setVariableValue(Node * ,Node * );
 void getVariableValue(Node * ,Node * );

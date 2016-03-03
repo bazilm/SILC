@@ -150,8 +150,7 @@ switch(root->nodeType)
 				printf("Error in %d: Type Error in =\n",root->lineNo);
 				has_error = true;
 				}
-
-				
+			
 			break;
 			}	
 			
@@ -222,7 +221,7 @@ switch(root->nodeType)
 			semanticAnalyzer(oper1);
 			if(oper1->type!=INT)
 				{
-				printf("Error in %d: Type Error in READ\n",root->lineNo);
+				printf("Error in %d: Type Error in WRITE\n",root->lineNo);
 				has_error=true;
 				}
 			
@@ -369,6 +368,7 @@ switch(root->nodeType)
 				printf("Error in %d: %s is not defined\n",root->lineNo,oper1->var.name);
 				has_error = true;
 				}
+				//setting the return type
 				root->type = sTableEntry->type;
 				
 				if(sTableEntry->args)
@@ -380,7 +380,8 @@ switch(root->nodeType)
 				{	
 					//checking whether variables in arglist are declared 
 					semanticAnalyzer(funcArgList->value);
-										
+					//setting the type of arg list
+					funcArgList->type = funcArgList->value->type;					
 					//checking whether type matches
 					if(symArgList->type!=funcArgList->value->type)
 					{
@@ -388,7 +389,7 @@ switch(root->nodeType)
 					printf("Error in %d: Type mismatch in arguments of function %s\n",root->lineNo,oper1->var.name);
 					has_error =true;
 					}
-
+					
 					//setting whether ref or not
 					funcArgList->ref = symArgList->ref;
 

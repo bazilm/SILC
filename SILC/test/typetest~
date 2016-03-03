@@ -1,44 +1,63 @@
-typedef car
+typedef Car
 {
 int a,b,c;
 boolean e;
 }
 
-typedef swift
+typedef Swift
 {
-
+Car car;
 int price,mileage;
-car a;
+
 }
 
 decl
 int a;
-swift d[10];
+Swift swift;
 int f;
-swift get();
+int swap(Swift &a;Swift &b);
+Swift retu(Swift a);
 enddecl
 
-swift get()
+int swap(Swift &a,&b)
+{
+decl
+Swift c;
+enddecl
+begin
+c = a;
+a = b;
+b = c;
+return 0;
+end
+}
+
+Swift retu(Swift a)
 {
 begin
-return d;
+return a;
 end
 }
 
 int main()
 {
 decl
-
-swift c,e;
-boolean b;
+int r;
+Swift a,b;
+Swift ^e;
+Car c;
+boolean d;
 enddecl
 
 begin
-read(d[0].a.c);
-write(d[0].a.c);
-e.a= 10;
-write(e.a.c);
+a.car.a = 23;
+b.car.a = 34;
+r = swap(a,b);
+write(a.car.a);
+write(b.car.a);
 return 0;
 end
 }
+
+
 
