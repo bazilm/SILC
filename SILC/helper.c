@@ -61,8 +61,13 @@ while(lTable)
 	strcpy(id->name,lTable->name);
 	id->type = lTable->type;
 	id->binding = binding;
+	id->pointer = lTable->pointer;
 	id->next = NULL;
-	binding += lTable->type->size;
+	if(lTable->pointer)
+		binding+=1;
+	else
+		binding += lTable->type->size;
+	
 	if(!idBeg)
 	{
 	idBeg = id;
@@ -241,10 +246,10 @@ while(argList!=NULL)
 if(!func)
 {
 sTable->size = type->size * size;
-if(pointer)
-sTable->binding = -2;					//binding of pointer variables set to -2 initially
-else
 sTable->binding = mem;
+if(sTable->pointer)
+mem+=1;
+else
 mem+=(type->size * size);
 }
 
@@ -321,6 +326,9 @@ lTable->type = type;
 lTable->pointer = pointer;
 lTable->size = type->size;
 lTable->binding = fmem;
+if(pointer)
+fmem+=1;
+else
 fmem+=type->size;
 
 lTable->next = NULL;

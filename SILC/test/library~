@@ -1,16 +1,17 @@
 decl
 int heap[1000];
 int heapend;
-int new(int size);
-int free(int beg);
+int newn(int size);
+int freen(int beg);
 enddecl
 
-int new(int size)
+int newn(int size)
 {
 decl
 int i,j,temp,curfit,bestfit,bestindex;
 enddecl
 begin
+
 i=1;
 j = heap[i];
 bestfit=1000;
@@ -32,7 +33,7 @@ return -1;
 end
 }
 
-int free(int binding)
+int freen(int binding)
 {
 begin
 heap[heapend] = binding-2;
@@ -42,6 +43,12 @@ return heapend;
 end
 }
 
+int main()
+{
+begin
+return 0;
+end
+}
 		
 		
 			

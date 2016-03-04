@@ -39,28 +39,14 @@ struct IdList * idval;
 %%
 
 program: 	TypeDefBlock Gdeclblock Fdeflist Main 			{
-								if(typeTableBeg)
-									//showTypeTable();
 								if($3)
 									$$ = makeOperNode('S',2,$3,$4);
 								else
 									$$ = $4;
-								semanticAnalyzer($$);
-								if(!has_error)
-								{
-								out = fopen("sil.out","w");
-								fprintf(out,"START\n");
-								fprintf(out,"MOV SP,1535\n");
-								fprintf(out,"MOV BP,1535\n");
-								fprintf(out,"PUSH R0\n");
-								fprintf(out,"CALL main\n");
-								fprintf(out,"HALT\n");
-								compile($$);
 								
+								root = $$;
+								}
 								
-								}
-								return 0;
-								}
 		|error						{return 0;}
 		;
 
@@ -122,9 +108,9 @@ Fdecllist:	Fdecllist TYPE Fvarlist ';'			{makeLTable($3,$2);}
 		;
 
 Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0,0,0);}
-		|Fvarlist ',' '^' VAR				{$$ =makeIdList($1,$4,NULL,1,NULL,0,1,0);}
+		|Fvarlist ',' '^' VAR				{$$ =makeIdList($1,$4,NULL,1,NULL,0,1,1);}
 		|VAR						{$$ =makeIdList(NULL,$1,NULL,1,NULL,0,0,0);}
-		|'^' VAR					{$$ =makeIdList(NULL,$2,NULL,1,NULL,0,1,0);}
+		|'^' VAR					{$$ =makeIdList(NULL,$2,NULL,1,NULL,0,1,1);}
 		;
 
 Fbody:		BEG stmt_list END				{$$ = $2;}
@@ -196,6 +182,19 @@ lineNo=1;
 initializeTypeTable();
 initializeSymbolTable();
 yyparse();
+
+semanticAnalyzer(root);
+if(!has_error)
+{
+out = fopen("sil.out","w");
+fprintf(out,"START\n");
+fprintf(out,"MOV SP,1535\n");
+fprintf(out,"MOV BP,1535\n");
+fprintf(out,"PUSH R0\n");
+fprintf(out,"CALL main\n");
+fprintf(out,"HALT\n");
+compile(root);
+}								
 return 0;
 }
 

@@ -21,6 +21,33 @@ return binding;
 return 0;
 }
 
+void getPointerValue(Node * root,Node * index)
+{
+LTable *lTableEntry = LLookUp(root->var.name,lTable);
+
+int innerBinding;
+innerBinding = getInnerBinding(root);
+if(!lTableEntry)
+	{
+        STable * sTableEntry = LookUp(root->var.name);
+	reg_count++;
+	fprintf(out,"MOV R%d,[%d]\n",reg_count,sTableEntry->binding);
+
+	}
+else
+	{
+	reg_count++;
+	fprintf(out,"MOV R%d,[%d]\n",reg_count,lTableEntry->binding);
+	}
+
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,innerBinding);
+fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+reg_count--;
+fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);		
+}	
+
+
 void setVariableValue(Node * root,Node *index)
 {
 LTable *lTableEntry = LLookUp(root->var.name,lTable);
@@ -70,13 +97,18 @@ void getVariableValue(Node * root,Node *index)
 {
 LTable *lTableEntry = LLookUp(root->var.name,lTable);
 int innerBinding;
+if(root->var.pointer)
+	getPointerValue(root,index);
+else
+{
 if(!lTableEntry)
 	{
 	STable *sTableEntry = LookUp(root->var.name);
 	//resetting the type which was set in semantic analysis phase
 	root->type = sTableEntry->type;
+	
 	innerBinding = getInnerBinding(root);
-
+	
 	if(!index)
 	{
 	reg_count++;
@@ -85,9 +117,9 @@ if(!lTableEntry)
 	}
 	else
 	{
-	compile(index);
 	reg_count++;
 	fprintf(out,"MOV R%d,%d\n",reg_count,sTableEntry->binding+innerBinding);
+	compile(index);
 	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 	reg_count--;
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
@@ -98,7 +130,7 @@ else
 	//resetting the type which was set in semantic analysis phase
 	root->type = lTableEntry->type;
 	innerBinding = getInnerBinding(root);
-
+	
 	reg_count++;
 	fprintf(out,"MOV R%d,BP\n",reg_count);
 	reg_count++;
@@ -110,6 +142,7 @@ else
 	if(lTableEntry->ref ==1)
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	}
+}
 }
 
 ArgList * reverseArgList(ArgList * argList)
@@ -454,6 +487,69 @@ switch(root->nodeType)
 
 				}
 
+			case NEW:
+				{
+
+				compile(oper2);
+				//getting the value to push(by multiplying with the types size)
+				reg_count++;
+				fprintf(out,"MOV R%d,%d\n",oper1->type->size);
+				fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
+				reg_count--;
+
+							
+				//pushing the used registers (this will also push the argument since it is in the topmost register)
+				for(i=0;i<=reg_count;i++)
+					fprintf(out,"PUSH R%d\n",i);
+
+				//pushing space for return value
+				fprintf(out,"PUSH R%d\n",reg_count);
+		
+				//calling new
+				fprintf(out,"CALL new\n");
+				
+				//getting the return value
+				reg_count++;
+				fprintf(out,"POP R%d\n",reg_count);
+				
+				//moving the value to the pointer
+				setVariableValue(oper1,NULL);
+				fprintf(out, "MOV [R%d],R%d\n",reg_count,reg_count-1);	
+				reg_count-=2;
+				
+				//popping the argument
+				fprintf(out,"POP R%d\n",reg_count);
+				
+				//popping back the registers
+				for(i=reg_count;i>=0;i--)
+					fprintf(out,"POP R%d\n",i);
+				
+				break;
+				}
+
+			case FREE:
+				{
+				//getting the value in the pointer
+				setVariableValue(oper1,NULL);
+				fprintf(out,"MOV R%d,[R%d]\n",reg_count);
+				
+				//pushing the used registers (this will also push the argument since it is in the topmost register)
+				for(i=0;i<=reg_count;i++)
+					fprintf(out,"PUSH R%d\n",i);
+
+				//calling free
+				fprintf(out,"CALL free\n");
+				
+				//popping the argument;
+				fprintf(out,"POP R%d\n",reg_count);
+				
+				//popping back the registers
+				for(i=reg_count;i>=0;i--)
+					fprintf(out,"POP R%d\n",i);
+				
+				break;
+				}
+
 			case 'F':
 				{
 				
@@ -615,7 +711,7 @@ switch(root->nodeType)
 				//if simple type get the return value
 				if((root->type==INT)||(root->type==BOOLEAN))
 				{
-				fprintf(out,"MOV R%d,[R%d]\n",reg_count);
+				fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 				}
 				
 				//correcting off by one for SP

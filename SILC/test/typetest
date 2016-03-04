@@ -16,6 +16,7 @@ int a;
 Swift swift;
 int f[100];
 int swap(Swift &a;Swift &b);
+int addn(int a,b);
 Swift retu(Swift a);
 enddecl
 
@@ -29,6 +30,13 @@ c = a;
 a = b;
 b = c;
 return 0;
+end
+}
+
+int addn(int a,b)
+{
+begin
+return a+b;
 end
 }
 
@@ -52,8 +60,7 @@ enddecl
 begin
 a.car.a = 23;
 b.car.a = 34;
-f[1] = r;
-r = swap(a,b);
+e = new(1);
 write(a.car.a);
 write(b.car.a);
 return 0;

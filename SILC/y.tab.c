@@ -505,14 +505,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    41,    41,    64,    67,    68,    71,    72,    75,    76,
-      79,    80,    81,    82,    83,    84,    85,    86,    90,    91,
-      94,    95,    98,    99,   100,   101,   104,   109,   113,   116,
-     117,   120,   121,   124,   125,   126,   127,   130,   133,   136,
-     137,   140,   141,   142,   143,   144,   145,   146,   147,   148,
-     153,   154,   155,   156,   157,   158,   159,   160,   161,   162,
-     163,   164,   165,   166,   167,   168,   169,   170,   171,   172,
-     173,   176,   177,   178,   181,   182,   183
+       0,    41,    41,    50,    53,    54,    57,    58,    61,    62,
+      65,    66,    67,    68,    69,    70,    71,    72,    76,    77,
+      80,    81,    84,    85,    86,    87,    90,    95,    99,   102,
+     103,   106,   107,   110,   111,   112,   113,   116,   119,   122,
+     123,   126,   127,   128,   129,   130,   131,   132,   133,   134,
+     139,   140,   141,   142,   143,   144,   145,   146,   147,   148,
+     149,   150,   151,   152,   153,   154,   155,   156,   157,   158,
+     159,   162,   163,   164,   167,   168,   169
 };
 #endif
 
@@ -1437,481 +1437,466 @@ yyreduce:
         case 2:
 #line 41 "sil.y" /* yacc.c:1646  */
     {
-								if(typeTableBeg)
-									//showTypeTable();
 								if((yyvsp[-1].nval))
 									(yyval.nval) = makeOperNode('S',2,(yyvsp[-1].nval),(yyvsp[0].nval));
 								else
 									(yyval.nval) = (yyvsp[0].nval);
-								semanticAnalyzer((yyval.nval));
-								if(!has_error)
-								{
-								out = fopen("sil.out","w");
-								fprintf(out,"START\n");
-								fprintf(out,"MOV SP,1535\n");
-								fprintf(out,"MOV BP,1535\n");
-								fprintf(out,"PUSH R0\n");
-								fprintf(out,"CALL main\n");
-								fprintf(out,"HALT\n");
-								compile((yyval.nval));
 								
-								
+								root = (yyval.nval);
 								}
-								return 0;
-								}
-#line 1463 "y.tab.c" /* yacc.c:1646  */
+#line 1448 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 64 "sil.y" /* yacc.c:1646  */
+#line 50 "sil.y" /* yacc.c:1646  */
     {return 0;}
-#line 1469 "y.tab.c" /* yacc.c:1646  */
+#line 1454 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 67 "sil.y" /* yacc.c:1646  */
+#line 53 "sil.y" /* yacc.c:1646  */
     {typeTableInstall((yyvsp[-3].sval));}
-#line 1475 "y.tab.c" /* yacc.c:1646  */
+#line 1460 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 68 "sil.y" /* yacc.c:1646  */
+#line 54 "sil.y" /* yacc.c:1646  */
     {}
-#line 1481 "y.tab.c" /* yacc.c:1646  */
+#line 1466 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 71 "sil.y" /* yacc.c:1646  */
+#line 57 "sil.y" /* yacc.c:1646  */
     {}
-#line 1487 "y.tab.c" /* yacc.c:1646  */
+#line 1472 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 72 "sil.y" /* yacc.c:1646  */
+#line 58 "sil.y" /* yacc.c:1646  */
     {}
-#line 1493 "y.tab.c" /* yacc.c:1646  */
+#line 1478 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 75 "sil.y" /* yacc.c:1646  */
+#line 61 "sil.y" /* yacc.c:1646  */
     {makeSTable((yyvsp[-1].idval),(yyvsp[-2].typeTable));}
-#line 1499 "y.tab.c" /* yacc.c:1646  */
+#line 1484 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 76 "sil.y" /* yacc.c:1646  */
+#line 62 "sil.y" /* yacc.c:1646  */
     {}
-#line 1505 "y.tab.c" /* yacc.c:1646  */
+#line 1490 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 79 "sil.y" /* yacc.c:1646  */
+#line 65 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList((yyvsp[-2].idval),(yyvsp[0].sval),NULL,1,NULL,0,0,0);	}
-#line 1511 "y.tab.c" /* yacc.c:1646  */
+#line 1496 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 80 "sil.y" /* yacc.c:1646  */
+#line 66 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList((yyvsp[-3].idval),(yyvsp[0].sval),NULL,1,NULL,0,1,0);	}
-#line 1517 "y.tab.c" /* yacc.c:1646  */
+#line 1502 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 81 "sil.y" /* yacc.c:1646  */
+#line 67 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList((yyvsp[-5].idval),(yyvsp[-3].sval),NULL,(yyvsp[-1].ival),NULL,0,0,1);	}
-#line 1523 "y.tab.c" /* yacc.c:1646  */
+#line 1508 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 82 "sil.y" /* yacc.c:1646  */
+#line 68 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList((yyvsp[-5].idval),(yyvsp[-3].sval),NULL,1,(yyvsp[-1].argval),1,0,0);	}
-#line 1529 "y.tab.c" /* yacc.c:1646  */
+#line 1514 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 83 "sil.y" /* yacc.c:1646  */
+#line 69 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList(NULL,(yyvsp[0].sval),NULL,1,NULL,0,0,0);	}
-#line 1535 "y.tab.c" /* yacc.c:1646  */
+#line 1520 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 84 "sil.y" /* yacc.c:1646  */
+#line 70 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList(NULL,(yyvsp[0].sval),NULL,1,NULL,0,1,0);	}
-#line 1541 "y.tab.c" /* yacc.c:1646  */
+#line 1526 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 85 "sil.y" /* yacc.c:1646  */
+#line 71 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList(NULL,(yyvsp[-3].sval),NULL,(yyvsp[-1].ival),NULL,0,0,1);	}
-#line 1547 "y.tab.c" /* yacc.c:1646  */
+#line 1532 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 86 "sil.y" /* yacc.c:1646  */
+#line 72 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList(NULL,(yyvsp[-3].sval),NULL,1,(yyvsp[-1].argval),1,0,0);	}
-#line 1553 "y.tab.c" /* yacc.c:1646  */
+#line 1538 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 90 "sil.y" /* yacc.c:1646  */
+#line 76 "sil.y" /* yacc.c:1646  */
     {(yyval.argval) = joinArgList((yyvsp[-2].argval),(yyvsp[0].argval));		}
-#line 1559 "y.tab.c" /* yacc.c:1646  */
+#line 1544 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 91 "sil.y" /* yacc.c:1646  */
+#line 77 "sil.y" /* yacc.c:1646  */
     {(yyval.argval) = (yyvsp[0].argval);				}
-#line 1565 "y.tab.c" /* yacc.c:1646  */
+#line 1550 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 94 "sil.y" /* yacc.c:1646  */
+#line 80 "sil.y" /* yacc.c:1646  */
     {(yyval.argval) = makeArgList(NULL,(yyvsp[0].idval),(yyvsp[-1].typeTable));		}
-#line 1571 "y.tab.c" /* yacc.c:1646  */
+#line 1556 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 95 "sil.y" /* yacc.c:1646  */
+#line 81 "sil.y" /* yacc.c:1646  */
     {(yyval.argval) = NULL; 				}
-#line 1577 "y.tab.c" /* yacc.c:1646  */
+#line 1562 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 98 "sil.y" /* yacc.c:1646  */
+#line 84 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList((yyvsp[-2].idval),(yyvsp[0].sval),NULL,1,NULL,0,0,0);}
-#line 1583 "y.tab.c" /* yacc.c:1646  */
+#line 1568 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 99 "sil.y" /* yacc.c:1646  */
+#line 85 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList((yyvsp[-3].idval),(yyvsp[0].sval),NULL,1,NULL,1,0,0);}
-#line 1589 "y.tab.c" /* yacc.c:1646  */
+#line 1574 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 100 "sil.y" /* yacc.c:1646  */
+#line 86 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList(NULL,(yyvsp[0].sval),NULL,1,NULL,0,0,0);}
-#line 1595 "y.tab.c" /* yacc.c:1646  */
+#line 1580 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 101 "sil.y" /* yacc.c:1646  */
+#line 87 "sil.y" /* yacc.c:1646  */
     {(yyval.idval)=makeIdList(NULL,(yyvsp[0].sval),NULL,1,NULL,1,0,0);}
-#line 1601 "y.tab.c" /* yacc.c:1646  */
+#line 1586 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 104 "sil.y" /* yacc.c:1646  */
+#line 90 "sil.y" /* yacc.c:1646  */
     {if((yyval.nval))
 									(yyval.nval) = makeOperNode('S',2,(yyvsp[-1].nval),(yyvsp[0].nval));
 								 else
 									(yyval.nval) = (yyvsp[0].nval);
 								}
-#line 1611 "y.tab.c" /* yacc.c:1646  */
+#line 1596 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 109 "sil.y" /* yacc.c:1646  */
+#line 95 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = NULL;}
-#line 1617 "y.tab.c" /* yacc.c:1646  */
+#line 1602 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 113 "sil.y" /* yacc.c:1646  */
+#line 99 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeFuncNode((yyvsp[-8].typeTable),(yyvsp[-7].sval),(yyvsp[-5].argval),(yyvsp[-1].nval));}
-#line 1623 "y.tab.c" /* yacc.c:1646  */
+#line 1608 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 116 "sil.y" /* yacc.c:1646  */
+#line 102 "sil.y" /* yacc.c:1646  */
     {}
-#line 1629 "y.tab.c" /* yacc.c:1646  */
+#line 1614 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 117 "sil.y" /* yacc.c:1646  */
+#line 103 "sil.y" /* yacc.c:1646  */
     {}
-#line 1635 "y.tab.c" /* yacc.c:1646  */
+#line 1620 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 120 "sil.y" /* yacc.c:1646  */
+#line 106 "sil.y" /* yacc.c:1646  */
     {makeLTable((yyvsp[-1].idval),(yyvsp[-2].typeTable));}
-#line 1641 "y.tab.c" /* yacc.c:1646  */
+#line 1626 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 121 "sil.y" /* yacc.c:1646  */
+#line 107 "sil.y" /* yacc.c:1646  */
     {}
-#line 1647 "y.tab.c" /* yacc.c:1646  */
+#line 1632 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 124 "sil.y" /* yacc.c:1646  */
+#line 110 "sil.y" /* yacc.c:1646  */
     {(yyval.idval) =makeIdList((yyvsp[-2].idval),(yyvsp[0].sval),NULL,1,NULL,0,0,0);}
-#line 1653 "y.tab.c" /* yacc.c:1646  */
+#line 1638 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 125 "sil.y" /* yacc.c:1646  */
-    {(yyval.idval) =makeIdList((yyvsp[-3].idval),(yyvsp[0].sval),NULL,1,NULL,0,1,0);}
-#line 1659 "y.tab.c" /* yacc.c:1646  */
+#line 111 "sil.y" /* yacc.c:1646  */
+    {(yyval.idval) =makeIdList((yyvsp[-3].idval),(yyvsp[0].sval),NULL,1,NULL,0,1,1);}
+#line 1644 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 126 "sil.y" /* yacc.c:1646  */
+#line 112 "sil.y" /* yacc.c:1646  */
     {(yyval.idval) =makeIdList(NULL,(yyvsp[0].sval),NULL,1,NULL,0,0,0);}
-#line 1665 "y.tab.c" /* yacc.c:1646  */
+#line 1650 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 127 "sil.y" /* yacc.c:1646  */
-    {(yyval.idval) =makeIdList(NULL,(yyvsp[0].sval),NULL,1,NULL,0,1,0);}
-#line 1671 "y.tab.c" /* yacc.c:1646  */
+#line 113 "sil.y" /* yacc.c:1646  */
+    {(yyval.idval) =makeIdList(NULL,(yyvsp[0].sval),NULL,1,NULL,0,1,1);}
+#line 1656 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 130 "sil.y" /* yacc.c:1646  */
+#line 116 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = (yyvsp[-1].nval);}
-#line 1677 "y.tab.c" /* yacc.c:1646  */
+#line 1662 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 133 "sil.y" /* yacc.c:1646  */
+#line 119 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeFuncNode((yyvsp[-7].typeTable),"main",NULL,(yyvsp[-1].nval));}
-#line 1683 "y.tab.c" /* yacc.c:1646  */
+#line 1668 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 136 "sil.y" /* yacc.c:1646  */
+#line 122 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('S',2,(yyvsp[-1].nval),(yyvsp[0].nval));	}
-#line 1689 "y.tab.c" /* yacc.c:1646  */
+#line 1674 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 137 "sil.y" /* yacc.c:1646  */
+#line 123 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = (yyvsp[0].nval);				}
-#line 1695 "y.tab.c" /* yacc.c:1646  */
+#line 1680 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 140 "sil.y" /* yacc.c:1646  */
+#line 126 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(READ,1,(yyvsp[-2].nval));			}
-#line 1701 "y.tab.c" /* yacc.c:1646  */
+#line 1686 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 141 "sil.y" /* yacc.c:1646  */
+#line 127 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(WRITE,1,(yyvsp[-2].nval));			}
-#line 1707 "y.tab.c" /* yacc.c:1646  */
+#line 1692 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 142 "sil.y" /* yacc.c:1646  */
+#line 128 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(IF,3,(yyvsp[-7].nval),(yyvsp[-4].nval),(yyvsp[-2].nval));		}
-#line 1713 "y.tab.c" /* yacc.c:1646  */
+#line 1698 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 143 "sil.y" /* yacc.c:1646  */
+#line 129 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(IF,2,(yyvsp[-5].nval),(yyvsp[-2].nval));			}
-#line 1719 "y.tab.c" /* yacc.c:1646  */
+#line 1704 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 144 "sil.y" /* yacc.c:1646  */
+#line 130 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(WHILE,2,(yyvsp[-5].nval),(yyvsp[-2].nval));		}
-#line 1725 "y.tab.c" /* yacc.c:1646  */
+#line 1710 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 145 "sil.y" /* yacc.c:1646  */
+#line 131 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('=',2,(yyvsp[-3].nval),(yyvsp[-1].nval));		}
-#line 1731 "y.tab.c" /* yacc.c:1646  */
+#line 1716 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 146 "sil.y" /* yacc.c:1646  */
+#line 132 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NEW,2,(yyvsp[-6].nval),(yyvsp[-2].nval));		}
-#line 1737 "y.tab.c" /* yacc.c:1646  */
+#line 1722 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 147 "sil.y" /* yacc.c:1646  */
+#line 133 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(FREE,1,(yyvsp[-2].nval));			}
-#line 1743 "y.tab.c" /* yacc.c:1646  */
+#line 1728 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 148 "sil.y" /* yacc.c:1646  */
+#line 134 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('R',1,(yyvsp[-1].nval));			}
-#line 1749 "y.tab.c" /* yacc.c:1646  */
+#line 1734 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 153 "sil.y" /* yacc.c:1646  */
+#line 139 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('+',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1755 "y.tab.c" /* yacc.c:1646  */
+#line 1740 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 154 "sil.y" /* yacc.c:1646  */
+#line 140 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('-',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1761 "y.tab.c" /* yacc.c:1646  */
+#line 1746 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 155 "sil.y" /* yacc.c:1646  */
+#line 141 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('*',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1767 "y.tab.c" /* yacc.c:1646  */
+#line 1752 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 156 "sil.y" /* yacc.c:1646  */
+#line 142 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('/',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1773 "y.tab.c" /* yacc.c:1646  */
+#line 1758 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 157 "sil.y" /* yacc.c:1646  */
+#line 143 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('%',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1779 "y.tab.c" /* yacc.c:1646  */
+#line 1764 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 158 "sil.y" /* yacc.c:1646  */
+#line 144 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(EQ,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1785 "y.tab.c" /* yacc.c:1646  */
+#line 1770 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 159 "sil.y" /* yacc.c:1646  */
+#line 145 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('<',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1791 "y.tab.c" /* yacc.c:1646  */
+#line 1776 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 160 "sil.y" /* yacc.c:1646  */
+#line 146 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('>',2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1797 "y.tab.c" /* yacc.c:1646  */
+#line 1782 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 161 "sil.y" /* yacc.c:1646  */
+#line 147 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(LE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1803 "y.tab.c" /* yacc.c:1646  */
+#line 1788 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 162 "sil.y" /* yacc.c:1646  */
+#line 148 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(GE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1809 "y.tab.c" /* yacc.c:1646  */
+#line 1794 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 163 "sil.y" /* yacc.c:1646  */
+#line 149 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NE,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1815 "y.tab.c" /* yacc.c:1646  */
+#line 1800 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 164 "sil.y" /* yacc.c:1646  */
+#line 150 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(AND,2,(yyvsp[-2].nval),(yyvsp[0].nval));	}
-#line 1821 "y.tab.c" /* yacc.c:1646  */
+#line 1806 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 165 "sil.y" /* yacc.c:1646  */
+#line 151 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(OR,2,(yyvsp[-2].nval),(yyvsp[0].nval));		}
-#line 1827 "y.tab.c" /* yacc.c:1646  */
+#line 1812 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 166 "sil.y" /* yacc.c:1646  */
+#line 152 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode(NOT,1,(yyvsp[0].nval));		}
-#line 1833 "y.tab.c" /* yacc.c:1646  */
+#line 1818 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 167 "sil.y" /* yacc.c:1646  */
+#line 153 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('-',1,(yyvsp[0].nval));		}
-#line 1839 "y.tab.c" /* yacc.c:1646  */
+#line 1824 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 168 "sil.y" /* yacc.c:1646  */
+#line 154 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = (yyvsp[-1].nval);				}
-#line 1845 "y.tab.c" /* yacc.c:1646  */
+#line 1830 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 169 "sil.y" /* yacc.c:1646  */
+#line 155 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeConNode(INT,(yyvsp[0].ival));		}
-#line 1851 "y.tab.c" /* yacc.c:1646  */
+#line 1836 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 170 "sil.y" /* yacc.c:1646  */
+#line 156 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeConNode(BOOLEAN,1);		}
-#line 1857 "y.tab.c" /* yacc.c:1646  */
+#line 1842 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 171 "sil.y" /* yacc.c:1646  */
+#line 157 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeConNode(BOOLEAN,0);		}
-#line 1863 "y.tab.c" /* yacc.c:1646  */
+#line 1848 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 172 "sil.y" /* yacc.c:1646  */
+#line 158 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = (yyvsp[0].nval);				}
-#line 1869 "y.tab.c" /* yacc.c:1646  */
+#line 1854 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 173 "sil.y" /* yacc.c:1646  */
+#line 159 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeOperNode('f',1,makeVarNode((yyvsp[-3].sval),NULL,(yyvsp[-1].argval),0));		}
-#line 1875 "y.tab.c" /* yacc.c:1646  */
+#line 1860 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 176 "sil.y" /* yacc.c:1646  */
+#line 162 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = addInnerId((yyvsp[-2].nval),(yyvsp[0].sval));					}
-#line 1881 "y.tab.c" /* yacc.c:1646  */
+#line 1866 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 177 "sil.y" /* yacc.c:1646  */
+#line 163 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeVarNode((yyvsp[0].sval),NULL,NULL,0);				}
-#line 1887 "y.tab.c" /* yacc.c:1646  */
+#line 1872 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 178 "sil.y" /* yacc.c:1646  */
+#line 164 "sil.y" /* yacc.c:1646  */
     {(yyval.nval) = makeVarNode((yyvsp[-3].sval),(yyvsp[-1].nval),NULL,0);				}
-#line 1893 "y.tab.c" /* yacc.c:1646  */
+#line 1878 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 181 "sil.y" /* yacc.c:1646  */
+#line 167 "sil.y" /* yacc.c:1646  */
     {(yyval.argval) = makeCallList((yyvsp[-2].argval),(yyvsp[0].nval));}
-#line 1899 "y.tab.c" /* yacc.c:1646  */
+#line 1884 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 182 "sil.y" /* yacc.c:1646  */
+#line 168 "sil.y" /* yacc.c:1646  */
     {(yyval.argval) = makeCallList(NULL,(yyvsp[0].nval));}
-#line 1905 "y.tab.c" /* yacc.c:1646  */
+#line 1890 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 183 "sil.y" /* yacc.c:1646  */
+#line 169 "sil.y" /* yacc.c:1646  */
     {(yyval.argval) = NULL;		}
-#line 1911 "y.tab.c" /* yacc.c:1646  */
+#line 1896 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1915 "y.tab.c" /* yacc.c:1646  */
+#line 1900 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2139,7 +2124,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 185 "sil.y" /* yacc.c:1906  */
+#line 171 "sil.y" /* yacc.c:1906  */
 
 
 int main(int argc, char *argv[])
@@ -2154,6 +2139,19 @@ lineNo=1;
 initializeTypeTable();
 initializeSymbolTable();
 yyparse();
+
+semanticAnalyzer(root);
+if(!has_error)
+{
+out = fopen("sil.out","w");
+fprintf(out,"START\n");
+fprintf(out,"MOV SP,1535\n");
+fprintf(out,"MOV BP,1535\n");
+fprintf(out,"PUSH R0\n");
+fprintf(out,"CALL main\n");
+fprintf(out,"HALT\n");
+compile(root);
+}								
 return 0;
 }
 

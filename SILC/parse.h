@@ -9,6 +9,7 @@ typedef struct  typetableid
 char * name;
 TypeTable * type;
 int binding;
+int pointer;
 struct typetableid * next;
 }TypeTableId;
 
@@ -145,6 +146,7 @@ LTable *lTableBeg=NULL,*lTableEnd;
 IdList * idListBeg=NULL, *idListEnd;
 TypeTable *typeTableBeg=NULL,*typeTableEnd;
 TypeTable *INT,*BOOLEAN;
+Node * root;
 int lineNo;
 bool has_error = false,has_main=false;
 FILE * out;

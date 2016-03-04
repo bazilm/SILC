@@ -120,7 +120,7 @@ int getBinding(char *,TypeTable *);
 
 void initializeSymbolTable();
 void makeSTable(IdList *,TypeTable *);
-STable * GInstall(char *,TypeTable *,int,ArgList *, int,int);
+STable * GInstall(char *,TypeTable *,int,ArgList *, int,int,int);
 STable * LookUp(char *);
 
 void makeLTable(IdList *,TypeTable *);
@@ -145,6 +145,7 @@ LTable *lTableBeg=NULL,*lTableEnd;
 IdList * idListBeg=NULL, *idListEnd;
 TypeTable *typeTableBeg=NULL,*typeTableEnd;
 TypeTable *INT,*BOOLEAN;
+Node * root;
 int lineNo;
 bool has_error = false,has_main=false;
 FILE * out;

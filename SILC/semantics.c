@@ -2,8 +2,7 @@
 
 LTable * lTable =NULL;
 STable * sTable = NULL;
-STable *sTableEntry;
-LTable *lTableEntry;
+
 bool hasReturn = false,funcArg = false;
 
 //checks whether the inner ids are valid
@@ -35,7 +34,8 @@ root->type = innerType;
 
 void semanticAnalyzer(Node * root)
 {
-
+STable *sTableEntry;
+LTable *lTableEntry;
 Node * oper1,*oper2,*oper3;
 int nops;
 

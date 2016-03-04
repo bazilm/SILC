@@ -104,6 +104,12 @@ switch(root->nodeType)
 			{
 			root->type = lTableEntry->type;
 			root->var.pointer = lTableEntry->pointer;
+
+			if(root->var.index)
+			{
+			printf("Error in %d: %s is not an array\n",root->lineNo,root->var.name);
+			has_error = true;
+			}
 			//printf("%s found from local Table in memory address %d\n",root->var.name,lTableEntry->binding+getInnerBinding(root));
 			//checks inner node if it is a complex variable
 			checkInnerNode(root);
