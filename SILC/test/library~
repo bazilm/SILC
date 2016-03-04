@@ -1,0 +1,49 @@
+decl
+int heap[1000];
+int heapend;
+int new(int size);
+int free(int beg);
+enddecl
+
+int new(int size)
+{
+decl
+int i,j,temp,curfit,bestfit,bestindex;
+enddecl
+begin
+i=1;
+j = heap[i];
+bestfit=1000;
+curfit=0;
+bestindex=0;
+while(j!=0) do
+	if(heap[j+1]>=size) then
+		heap[i] = j+size+1;
+		heap[j+size+1] = heap[j];
+		heap[j+size+2] = heap[j+1]-size-2;
+		heap[j+1] = size;
+		return j+2;
+	else
+	 	i = j;
+		j = heap[j];
+	endif;
+endwhile;
+return -1;
+end
+}
+
+int free(int binding)
+{
+begin
+heap[heapend] = binding-2;
+heap[binding-2]= 0;
+heapend = binding-2;
+return heapend;
+end
+}
+
+		
+		
+			
+	
+

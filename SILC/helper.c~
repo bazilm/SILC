@@ -14,27 +14,6 @@ sTable->next= NULL;
 sTableBeg = sTable;
 sTableEnd = sTable;
 
-//putting new
-*sTable = malloc(sizeof(STable));
-sTable->name = malloc(sizeof("new"));
-strcpy(sTable->name,"new");
-sTable->type = INT;
-sTable->size = 1;
-sTable->binding = -1;
-sTable->next = NULL;
-sTableEnd->next = sTable;
-sTableEnd = sTable;
-
-//putting free
-*sTable = malloc(sizeof(STable));
-sTable->name = malloc(sizeof("free"));
-strcpy(sTable->name,"free");
-sTable->type = INT;
-sTable->size = 1;
-sTable->binding = -1;
-sTable->next = NULL;
-sTableEnd->next = sTable;
-sTableEnd = sTable;
 }
 
 
@@ -144,6 +123,7 @@ members = members->next;
 return NULL;
 }
 
+//gets relative binding of a variable in a type
 int getBinding(char * name,TypeTable * typeTable)
 {
 TypeTableId * members = typeTable->members;
@@ -170,7 +150,7 @@ while(beg)
 return NULL;
 }
 
-
+//adds a list of variables to symbol Table
 void makeSTable(IdList * root,TypeTable * type)
 {
 STable * sTableEntry;
@@ -190,7 +170,7 @@ while(idListEntry!=NULL)
 			has_error=true;
 			}
 		else
-			{GInstall(idListEntry->name,type,idListEntry->size,idListEntry->argList,idListEntry->ref,idListEntry->pointer);
+			{GInstall(idListEntry->name,type,idListEntry->size,idListEntry->argList,idListEntry->ref,idListEntry->pointer,idListEntry->array);
 			idListEntry = idListEntry->next;
 			}
 		
@@ -208,12 +188,12 @@ while(idListEntry!=NULL)
 
 
 
-STable *GInstall(char *name,TypeTable *type,int size,ArgList * argList,int func,int pointer)
+STable *GInstall(char *name,TypeTable *type,int size,ArgList * argList,int func,int pointer,int array)
 {
 STable *sTable = malloc(sizeof(STable));
 sTable->name = name;
 sTable->type = type;
-
+sTable->pointer = pointer;
 //Putting the arguments to local symbol table
 if(func)
 {
@@ -315,7 +295,7 @@ while(idListEntry!=NULL)
 			has_error=true;
 			}
 		else
-			{LInstall(idListEntry->name,type);
+			{LInstall(idListEntry->name,idListEntry->pointer,type);
 			idListEntry = idListEntry->next;
 			}
 		
@@ -332,12 +312,12 @@ while(idListEntry!=NULL)
 }
 
 //installs in the local symbol table
-LTable *LInstall(char *name,TypeTable *type)
+LTable *LInstall(char *name,int pointer,TypeTable *type)
 {
 LTable *lTable = malloc(sizeof(LTable));
 lTable->name = name;
 lTable->type = type;
-
+lTable->pointer = pointer;
 lTable->size = type->size;
 lTable->binding = fmem;
 fmem+=type->size;
@@ -372,7 +352,7 @@ return NULL;
 }
 
 //makes idlist of a certain type
-IdList * makeIdList(IdList * idListLeft,char * name,TypeTable *type,int size,ArgList * arglist,int ref,int pointer)
+IdList * makeIdList(IdList * idListLeft,char * name,TypeTable *type,int size,ArgList * arglist,int ref,int pointer,int array)
 {
 IdList * idList = malloc(sizeof(IdList));
 idList->name = name;
@@ -381,6 +361,7 @@ idList->size = size;
 idList->argList=arglist;
 idList->ref=ref;
 idList->pointer = pointer;
+idList->array = array;
 if(idListLeft)
 	{IdList * idListEntry = idListLeft;
 	while(idListEntry->next !=NULL)

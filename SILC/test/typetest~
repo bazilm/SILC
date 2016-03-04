@@ -14,7 +14,7 @@ int price,mileage;
 decl
 int a;
 Swift swift;
-int f;
+int f[100];
 int swap(Swift &a;Swift &b);
 Swift retu(Swift a);
 enddecl
@@ -44,7 +44,7 @@ int main()
 decl
 int r;
 Swift a,b;
-Swift ^e;
+Car ^e;
 Car c;
 boolean d;
 enddecl
@@ -52,6 +52,7 @@ enddecl
 begin
 a.car.a = 23;
 b.car.a = 34;
+f = r;
 r = swap(a,b);
 write(a.car.a);
 write(b.car.a);

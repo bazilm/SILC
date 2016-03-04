@@ -21,7 +21,7 @@ struct typetable * typeTable;
 struct IdList * idval;
 }
 
-%token TYPEDEF BEG DECL ENDDECL TYPE END READ WRITE TRUE FALSE EQ NE LE GE AND OR NOT IF THEN ELSE MAIN ENDIF WHILE DO ENDWHILE RET
+%token TYPEDEF BEG DECL ENDDECL TYPE END READ WRITE TRUE FALSE EQ NE LE GE AND OR NOT IF THEN ELSE MAIN ENDIF WHILE DO ENDWHILE RET NEW FREE
 %token <ival> CONST
 %token <nval> STRCONST
 %token <sval> VAR
@@ -76,16 +76,14 @@ Gdecllist:	Gdecllist TYPE Gvarlist ';'			{makeSTable($3,$2);}
 		|						{}
 		;
 
-Gvarlist:	Gvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0,0);	}
-		|Gvarlist ',' '^' VAR				{$$=makeIdList($1,$4,NULL,1,NULL,0,1);	}
-		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeIdList($1,$3,NULL,$5,NULL,0,0);	}
-		|Gvarlist ',' '^' VAR '[' CONST ']'		{$$=makeIdList($1,$4,NULL,$6,NULL,0,1);	}
-		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeIdList($1,$3,NULL,1,$5,1,0);	}
-		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0,0);	}
-		|'^' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,0,1);	}
-		|VAR '[' CONST ']'				{$$=makeIdList(NULL,$1,NULL,$3,NULL,0,0);	}
-		|'^' VAR '[' CONST ']'				{$$=makeIdList(NULL,$2,NULL,$4,NULL,0,1);	}
-		|VAR '(' Farglist ')'				{$$=makeIdList(NULL,$1,NULL,1,$3,1,0);	}
+Gvarlist:	Gvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0,0,0);	}
+		|Gvarlist ',' '^' VAR				{$$=makeIdList($1,$4,NULL,1,NULL,0,1,0);	}
+		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeIdList($1,$3,NULL,$5,NULL,0,0,1);	}
+		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeIdList($1,$3,NULL,1,$5,1,0,0);	}
+		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0,0,0);	}
+		|'^' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,0,1,0);	}
+		|VAR '[' CONST ']'				{$$=makeIdList(NULL,$1,NULL,$3,NULL,0,0,1);	}
+		|VAR '(' Farglist ')'				{$$=makeIdList(NULL,$1,NULL,1,$3,1,0,0);	}
 		;
 
 
@@ -97,10 +95,10 @@ Fargtypelist:	TYPE Fargvarlist 				{$$ = makeArgList(NULL,$2,$1);		}
 		|						{$$ = NULL; 				}
 		;
 
-Fargvarlist:	Fargvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0,0);}
-		|Fargvarlist ',' '&' VAR			{$$=makeIdList($1,$4,NULL,1,NULL,1,0);}
-		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0,0);}
-		|'&' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,1,0);}
+Fargvarlist:	Fargvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0,0,0);}
+		|Fargvarlist ',' '&' VAR			{$$=makeIdList($1,$4,NULL,1,NULL,1,0,0);}
+		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0,0,0);}
+		|'&' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,1,0,0);}
 		;
 
 Fdeflist:	Fdeflist Fdef 					{if($$)
@@ -123,10 +121,10 @@ Fdecllist:	Fdecllist TYPE Fvarlist ';'			{makeLTable($3,$2);}
 		|						{}
 		;
 
-Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0,0);}
-		|Fvarlist ',' '^' VAR				{$$ =makeIdList($1,$4,NULL,1,NULL,0,1);}
-		|VAR						{$$ =makeIdList(NULL,$1,NULL,1,NULL,0,0);}
-		|'^' VAR					{$$ =makeIdList(NULL,$2,NULL,1,NULL,0,1);}
+Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0,0,0);}
+		|Fvarlist ',' '^' VAR				{$$ =makeIdList($1,$4,NULL,1,NULL,0,1,0);}
+		|VAR						{$$ =makeIdList(NULL,$1,NULL,1,NULL,0,0,0);}
+		|'^' VAR					{$$ =makeIdList(NULL,$2,NULL,1,NULL,0,1,0);}
 		;
 
 Fbody:		BEG stmt_list END				{$$ = $2;}
@@ -140,12 +138,14 @@ stmt_list: stmt_list stmt					{$$ = makeOperNode('S',2,$1,$2);	}
     	  
 
 stmt: 	READ '(' Id ')' ';'	        			{$$ = makeOperNode(READ,1,$3);			}
-	|WRITE '(' expr ')' ';'					{$$ = makeOperNode(WRITE,1,$3);						}
-	|IF '('expr')' THEN stmt_list ELSE stmt_list ENDIF ';'	{$$ = makeOperNode(IF,3,$3,$6,$8);					}
-	|IF '('expr')' THEN stmt_list ENDIF ';'			{$$ = makeOperNode(IF,2,$3,$6);						}
-	|WHILE '(' expr ')' DO stmt_list ENDWHILE ';'		{$$ = makeOperNode(WHILE,2,$3,$6);					}
+	|WRITE '(' expr ')' ';'					{$$ = makeOperNode(WRITE,1,$3);			}
+	|IF '('expr')' THEN stmt_list ELSE stmt_list ENDIF ';'	{$$ = makeOperNode(IF,3,$3,$6,$8);		}
+	|IF '('expr')' THEN stmt_list ENDIF ';'			{$$ = makeOperNode(IF,2,$3,$6);			}
+	|WHILE '(' expr ')' DO stmt_list ENDWHILE ';'		{$$ = makeOperNode(WHILE,2,$3,$6);		}
 	|Id '=' expr ';'					{$$ = makeOperNode('=',2,$1,$3);		}
-	|RET expr ';'						{$$ = makeOperNode('R',1,$2);						}
+	|Id '=' NEW '('expr')' ';'				{$$ = makeOperNode(NEW,2,$1,$5);		}
+	|FREE '(' Id ')' ';'					{$$ = makeOperNode(FREE,1,$3);			}
+	|RET expr ';'						{$$ = makeOperNode('R',1,$2);			}
 	;
 
 

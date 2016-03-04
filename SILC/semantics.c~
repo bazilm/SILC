@@ -2,6 +2,8 @@
 
 LTable * lTable =NULL;
 STable * sTable = NULL;
+STable *sTableEntry;
+LTable *lTableEntry;
 bool hasReturn = false,funcArg = false;
 
 //checks whether the inner ids are valid
@@ -34,12 +36,8 @@ root->type = innerType;
 void semanticAnalyzer(Node * root)
 {
 
-STable *sTableEntry;
-LTable *lTableEntry;
 Node * oper1,*oper2,*oper3;
 int nops;
-
-
 
 if(!root)
 	{
@@ -68,6 +66,7 @@ switch(root->nodeType)
 			else
 				{
 				root->type = sTableEntry->type;
+				root->var.pointer = sTableEntry->pointer;
 				//printf("%s found from global Table in memory address %d\n",root->var.name,sTableEntry->binding+getInnerBinding(root));
 				//if complex variable, setting the type and checking for validity
 				checkInnerNode(root);
@@ -76,6 +75,11 @@ switch(root->nodeType)
 				if(root->var.index)
 					{
 					
+					if(sTableEntry->array==0)
+					{
+					printf("Error in %d: %s is not an array\n",root->lineNo,root->var.name);					
+					has_error = true;
+					}
 					semanticAnalyzer(root->var.index);
 
 					if(root->var.index->type!=INT)
@@ -85,13 +89,21 @@ switch(root->nodeType)
 						}
 					
 					}
-
+				else
+					{
+					if(sTableEntry->array==1)
+					{
+					printf("Error in %d: %s is an array\n",root->lineNo,root->var.name);
+					has_error = true;
+					}
+					}
 				
 				}
 		}
 		else
 			{
 			root->type = lTableEntry->type;
+			root->var.pointer = lTableEntry->pointer;
 			//printf("%s found from local Table in memory address %d\n",root->var.name,lTableEntry->binding+getInnerBinding(root));
 			//checks inner node if it is a complex variable
 			checkInnerNode(root);
@@ -150,6 +162,7 @@ switch(root->nodeType)
 				printf("Error in %d: Type Error in =\n",root->lineNo);
 				has_error = true;
 				}
+			
 			
 			break;
 			}	
@@ -250,18 +263,50 @@ switch(root->nodeType)
 			semanticAnalyzer(oper2);
 			break;
 			}
+	
+		case NEW:
+			{
+			
+			semanticAnalyzer(oper2);
+			semanticAnalyzer(oper1);
+			
+			
+			//argument must be integer
+			if(oper2->type!=INT)
+			{
+				printf("Error in %d: Argument to new must be integer\n",root->lineNo);
+				has_error = true;
+			}
+			
+			//oper1 must be pointer
+			if(oper1->var.pointer == 0)
+			{
+				printf("Error in %d: %s is not a pointer\n",root->lineNo,oper1->var.name);
+				has_error = true;
+			}
+			break;
+			}
+
+		case FREE:
+			{
+			semanticAnalyzer(oper1);
+			
+			//checking whether the variable is a pointer
+			if(oper1->var.pointer==0)
+			{
+				printf("Error in %d: %s is not a pointer\n",root->lineNo,oper1->var.name);
+				has_error = true;
+			}
+			
+			break;
+			}
+			
+
+
 		case 'F':
 			{
 			sTableEntry = LookUp(oper1->var.name);
-
-			//if main checking the return type
-			if(strcmp(sTableEntry->name,"main")==0&&sTableEntry->type!=INT)
-				{
-				printf("Error: Return type of main must be int\n");
-				has_error = true;
-				}
-			
-			
+	
 			//no sTableEntry, so function not declared
 			if(!sTableEntry)
 			{
@@ -291,11 +336,13 @@ switch(root->nodeType)
 				//setting lTable to be used by the function body
 				lTable = sTable->symbolTable;
 				
+				ArgList * funcArgList = oper1->var.argList;
+				ArgList * symArgList = sTableEntry->args;
+
 				//function has args, checking whether declaration and definition args match
 				if(sTableEntry->args)
 				{
-				ArgList * funcArgList = oper1->var.argList;
-				ArgList * symArgList = sTableEntry->args;
+				
 				
 				while(symArgList!=NULL&&funcArgList!=NULL)
 				{	
@@ -317,12 +364,13 @@ switch(root->nodeType)
 				symArgList = symArgList->next;
 				funcArgList = funcArgList->next;
 				}
-				//checking whether no. of arguments match
-				if(symArgList!=NULL||funcArgList!=NULL)
-				{
-				printf("Error in %d: No of arguments doesnt match in function %s\n",root->lineNo,oper1->var.name);
-				has_error = true;
+				
 				}
+			//checking whether no. of arguments match
+			if(symArgList!=NULL||funcArgList!=NULL)
+			{
+			printf("Error in %d: No of arguments doesnt match in function %s\n",root->lineNo,oper1->var.name);
+			has_error = true;
 			}
 				
 			}
@@ -368,13 +416,14 @@ switch(root->nodeType)
 				printf("Error in %d: %s is not defined\n",root->lineNo,oper1->var.name);
 				has_error = true;
 				}
+				//setting the return type
 				root->type = sTableEntry->type;
 				
-				if(sTableEntry->args)
-				{
 				ArgList * funcArgList = oper1->var.argList;
 				ArgList * symArgList = sTableEntry->args;
-				
+			
+				if(sTableEntry->args)
+				{
 				while(symArgList!=NULL&&funcArgList!=NULL)
 				{	
 					//checking whether variables in arglist are declared 
@@ -395,13 +444,14 @@ switch(root->nodeType)
 				symArgList = symArgList->next;
 				funcArgList = funcArgList->next;
 				}
+				}
 				//checking whether no. of arguments match
 				if(symArgList!=NULL||funcArgList!=NULL)
 				{
 				printf("Error in %d: No of arguments doesnt match in function %s\n",root->lineNo,oper1->var.name);
 				has_error = true;
 				}
-				}
+				
 			}
 			break;
 			
