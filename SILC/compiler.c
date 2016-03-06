@@ -97,7 +97,7 @@ else
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 
 	}
-printf("%d\n",innerBinding);
+
 if(innerBinding!=0)
 {
 reg_count++;
@@ -614,7 +614,7 @@ switch(root->nodeType)
 				fprintf(out,"PUSH R%d\n",reg_count);
 		
 				//calling new
-				fprintf(out,"CALL newn\n");
+				fprintf(out,"CALL new\n");
 				
 				//getting the return value
 				reg_count++;
@@ -645,7 +645,7 @@ switch(root->nodeType)
 				//for return value
 				fprintf(out,"PUSH R%d\n",reg_count);
 				//calling free
-				fprintf(out,"CALL freen\n");
+				fprintf(out,"CALL free\n");
 				
 				//popping the return value;
 				fprintf(out,"POP R%d\n",reg_count);

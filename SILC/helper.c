@@ -27,7 +27,7 @@ while (c != EOF)
 fputc(c, out);
 c = fgetc(lib);
 }
-printf("File Initialized\n");
+
 }
 //initializes symbol Table
 void initializeSymbolTable()

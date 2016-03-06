@@ -1,11 +1,17 @@
+
 typedef pair
 {
 int a,b;
 }
+typedef triplet
+{
+pair a;
+int b;
+}
+
 
 decl
-int a[3];
-int b[5];
+pair pairs[20];
 
 enddecl
 
@@ -13,22 +19,19 @@ int main()
 {
 decl
 int ^p,n,i;
-pair pa,pb;
+pair ^pa,pb;
+triplet ^tr;
 pair abc;
 enddecl
 begin
-
-pa.a = 1;
-pa.b = 2;
-pb.a = 3;
-pb.b = 4;
-a[0]=2;
-a[1]=3;
-b[0]=3;
-b[2]=5;
-a=b;
-write(a[2]);
-
+i=0;
+while(i<100) do
+tr = new(10);
+free(tr);
+i=i+1;
+endwhile;
+tr = new(1);
+write(tr[0].a.a);
 return 0;
 end
 }

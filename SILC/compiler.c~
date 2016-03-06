@@ -405,7 +405,7 @@ switch(root->nodeType)
 				else
 				{			
 				//if a complex variable copy the contents from one to the other				
-				if(oper1->size>1)
+				if(oper1->var.size>1)
 				{
 				reg_count++;
 				fprintf(out,"MOV R%d,%d\n",reg_count,oper1->type->size);
@@ -614,7 +614,7 @@ switch(root->nodeType)
 				fprintf(out,"PUSH R%d\n",reg_count);
 		
 				//calling new
-				fprintf(out,"CALL newn\n");
+				fprintf(out,"CALL new\n");
 				
 				//getting the return value
 				reg_count++;
@@ -645,7 +645,7 @@ switch(root->nodeType)
 				//for return value
 				fprintf(out,"PUSH R%d\n",reg_count);
 				//calling free
-				fprintf(out,"CALL freen\n");
+				fprintf(out,"CALL free\n");
 				
 				//popping the return value;
 				fprintf(out,"POP R%d\n",reg_count);

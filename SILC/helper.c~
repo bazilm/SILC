@@ -10,6 +10,7 @@ fprintf(out,"MOV [0],996\n");
 fprintf(out,"MOV [1],2\n");
 fprintf(out,"MOV [2],0\n");
 fprintf(out,"MOV [3],996\n");
+fprintf(out,"MOV [1000],2\n");
 fprintf(out,"CALL main\n");
 fprintf(out,"HALT\n");
 
