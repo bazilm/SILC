@@ -21,12 +21,12 @@ struct typetable * typeTable;
 struct IdList * idval;
 }
 
-%token TYPEDEF BEG DECL ENDDECL TYPE END READ WRITE TRUE FALSE EQ NE LE GE AND OR NOT IF THEN ELSE MAIN ENDIF WHILE DO ENDWHILE RET NEW FREE
+%token TYPEDEF BEG DECL ENDDECL TYPE END READ WRITE TRUE FALSE EQ NE LE GE AND OR NOT IF THEN ELSE ENDIF WHILE DO ENDWHILE RET NEW FREE
 %token <ival> CONST
 %token <nval> STRCONST
 %token <sval> VAR
 %type <typeTable> TYPE
-%type <nval> expr stmt stmt_list Main program Fdeflist Fdef Fbody Id
+%type <nval> expr stmt stmt_list program Fdeflist Fdef Fbody Id
 %type <argval> Farglist Fcalllist Fargtypelist
 %type <idval> Fvarlist Gvarlist Fargvarlist
 %left AND OR
@@ -38,11 +38,8 @@ struct IdList * idval;
 
 %%
 
-program: 	TypeDefBlock Gdeclblock Fdeflist Main 			{
-								if($3)
-									$$ = makeOperNode('S',2,$3,$4);
-								else
-									$$ = $4;
+program: 	TypeDefBlock Gdeclblock Fdeflist 		{
+								$$ = $3;
 								
 								root = $$;
 								}
@@ -63,11 +60,11 @@ Gdecllist:	Gdecllist TYPE Gvarlist ';'			{makeSTable($3,$2);}
 		;
 
 Gvarlist:	Gvarlist ',' VAR				{$$=makeIdList($1,$3,NULL,1,NULL,0,0,0);	}
-		|Gvarlist ',' '^' VAR				{$$=makeIdList($1,$4,NULL,1,NULL,0,1,0);	}
+		|Gvarlist ',' '^' VAR				{$$=makeIdList($1,$4,NULL,1,NULL,0,1,1);	}
 		|Gvarlist ',' VAR '[' CONST ']'			{$$=makeIdList($1,$3,NULL,$5,NULL,0,0,1);	}
 		|Gvarlist ',' VAR '(' Farglist ')'		{$$=makeIdList($1,$3,NULL,1,$5,1,0,0);	}
 		|VAR						{$$=makeIdList(NULL,$1,NULL,1,NULL,0,0,0);	}
-		|'^' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,0,1,0);	}
+		|'^' VAR					{$$=makeIdList(NULL,$2,NULL,1,NULL,0,1,1);	}
 		|VAR '[' CONST ']'				{$$=makeIdList(NULL,$1,NULL,$3,NULL,0,0,1);	}
 		|VAR '(' Farglist ')'				{$$=makeIdList(NULL,$1,NULL,1,$3,1,0,0);	}
 		;
@@ -116,8 +113,6 @@ Fvarlist:	Fvarlist ',' VAR				{$$ =makeIdList($1,$3,NULL,1,NULL,0,0,0);}
 Fbody:		BEG stmt_list END				{$$ = $2;}
 		;
 
-Main:		TYPE MAIN '('')''{'Fdeclblock Fbody '}'		{$$ = makeFuncNode($1,"main",NULL,$7);}
-		;
 
 stmt_list: stmt_list stmt					{$$ = makeOperNode('S',2,$1,$2);	}
 	   |stmt						{$$ = $1;				}
@@ -172,10 +167,30 @@ Fcalllist:Fcalllist ',' expr			{$$ = makeCallList($1,$3);}
 
 int main(int argc, char *argv[])
 {
+char * output = "sil.out";
+bool libraryCode = false;
 if(argc>1)
 {
 extern FILE * yyin;
 yyin = fopen(argv[1],"r");
+}
+if(argc>2)
+{
+output = malloc(sizeof(argv[2]));
+strcpy(output,argv[2]);
+}
+
+if(argc>3)
+{
+	if(strcmp(argv[3],"-l")==0)
+	{
+	printf("Library Code\n");
+	has_main=true;
+	mem = 0;
+	while_count=500;
+	if_count=500;
+	libraryCode=true;
+	}
 }
 
 lineNo=1;
@@ -184,15 +199,11 @@ initializeSymbolTable();
 yyparse();
 
 semanticAnalyzer(root);
-if(!has_error)
+if(!has_error&&has_main)
 {
-out = fopen("sil.out","w");
-fprintf(out,"START\n");
-fprintf(out,"MOV SP,1535\n");
-fprintf(out,"MOV BP,1535\n");
-fprintf(out,"PUSH R0\n");
-fprintf(out,"CALL main\n");
-fprintf(out,"HALT\n");
+out = fopen(output,"w");
+if(!libraryCode)
+	initializeOutputFile(out);
 compile(root);
 }								
 return 0;

@@ -139,6 +139,7 @@ void showContents(STable *);
 void LshowContents(LTable *);
 void showTypeTable();
 
+void initializeOuputFile(FILE *);
 
 //global variables
 STable *sTableBeg=NULL,*sTableEnd;
@@ -151,7 +152,7 @@ int lineNo;
 bool has_error = false,has_main=false;
 FILE * out;
 int reg_count=-1;
-int mem = 0,if_count=1,while_count=1,fmem=1;
+int mem = 1001,if_count=1,while_count=1,fmem=1;
 
 
 

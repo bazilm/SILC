@@ -37,7 +37,6 @@ while		return WHILE;
 do		return DO;
 endwhile 	return ENDWHILE;
 "return"	return RET;
-main		return MAIN;
 new		return NEW;
 free		return FREE;
 \".+\"		{

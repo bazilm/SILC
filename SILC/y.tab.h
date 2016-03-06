@@ -65,17 +65,16 @@ extern int yydebug;
     IF = 275,
     THEN = 276,
     ELSE = 277,
-    MAIN = 278,
-    ENDIF = 279,
-    WHILE = 280,
-    DO = 281,
-    ENDWHILE = 282,
-    RET = 283,
-    NEW = 284,
-    FREE = 285,
-    CONST = 286,
-    STRCONST = 287,
-    VAR = 288
+    ENDIF = 278,
+    WHILE = 279,
+    DO = 280,
+    ENDWHILE = 281,
+    RET = 282,
+    NEW = 283,
+    FREE = 284,
+    CONST = 285,
+    STRCONST = 286,
+    VAR = 287
   };
 #endif
 /* Tokens.  */
@@ -99,17 +98,16 @@ extern int yydebug;
 #define IF 275
 #define THEN 276
 #define ELSE 277
-#define MAIN 278
-#define ENDIF 279
-#define WHILE 280
-#define DO 281
-#define ENDWHILE 282
-#define RET 283
-#define NEW 284
-#define FREE 285
-#define CONST 286
-#define STRCONST 287
-#define VAR 288
+#define ENDIF 278
+#define WHILE 279
+#define DO 280
+#define ENDWHILE 281
+#define RET 282
+#define NEW 283
+#define FREE 284
+#define CONST 285
+#define STRCONST 286
+#define VAR 287
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -125,7 +123,7 @@ struct ArgList * argval;
 struct typetable * typeTable;
 struct IdList * idval;
 
-#line 129 "y.tab.h" /* yacc.c:1909  */
+#line 127 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

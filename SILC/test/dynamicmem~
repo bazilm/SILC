@@ -1,0 +1,34 @@
+typedef pair
+{
+int a,b;
+}
+
+decl
+int a[3];
+int b[5];
+
+enddecl
+
+int main()
+{
+decl
+int ^p,n,i;
+pair pa,pb;
+pair abc;
+enddecl
+begin
+
+pa.a = 1;
+pa.b = 2;
+pb.a = 3;
+pb.b = 4;
+a[0]=2;
+a[1]=3;
+b[0]=3;
+b[2]=5;
+a=b;
+write(a[2]);
+
+return 0;
+end
+}

@@ -1,0 +1,22 @@
+typedef pair
+{
+int a,b;
+}
+
+decl
+pair pairs[20];
+
+enddecl
+
+int main()
+{
+decl
+int ^p,n,i;
+pair pa,pb;
+pair abc;
+enddecl
+begin
+
+return 0;
+end
+}

@@ -38,6 +38,8 @@ do		return DO;
 endwhile 	return ENDWHILE;
 "return"	return RET;
 main		return MAIN;
+new		return NEW;
+free		return FREE;
 \".+\"		{
 		yylval.sval = malloc(sizeof(yytext));
 		strncpy(yylval.sval,yytext+1,strlen(yytext)-2);

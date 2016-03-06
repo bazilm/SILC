@@ -12,7 +12,7 @@ int price,mileage;
 }
 
 decl
-int a;
+int a,b[100];
 Swift swift;
 int f[100];
 int swap(Swift &a;Swift &b);
@@ -50,19 +50,20 @@ end
 int main()
 {
 decl
-int r;
-Swift a,b;
+int a;
+int ^r;
+Swift gg,f;
 Car ^e;
 Car c;
 boolean d;
 enddecl
 
 begin
-a.car.a = 23;
-b.car.a = 34;
-e = new(1);
-write(a.car.a);
-write(b.car.a);
+a = 5000;
+
+
+
+
 return 0;
 end
 }

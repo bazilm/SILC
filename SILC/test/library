@@ -18,11 +18,26 @@ bestfit=1000;
 curfit=0;
 bestindex=0;
 while(j!=0) do
+	
 	if(heap[j+1]>=size) then
-		heap[i] = j+size+1;
-		heap[j+size+1] = heap[j];
-		heap[j+size+2] = heap[j+1]-size-2;
-		heap[j+1] = size;
+		if(heap[j+1]>size+2) then
+			heap[i] = j+size+2;
+			heap[j+size+2] = heap[j];
+			heap[j+size+3] = heap[j+1]-size-2;
+			heap[j+1] = size;
+			if(j==heapend) then
+				heap[i] = j+size+2;
+				heapend = j + size+2;
+			endif;
+		else
+			if(j==heapend) then
+				heap[i] = 0;
+				heapend = i;
+			else
+				heap[i] = heap[j];
+			endif;
+		endif;
+			
 		return j+2;
 	else
 	 	i = j;
@@ -36,19 +51,19 @@ end
 int freen(int binding)
 {
 begin
+
+if(binding<=3) then
+	write(-1);
+	return -1;
+endif;
 heap[heapend] = binding-2;
 heap[binding-2]= 0;
 heapend = binding-2;
-return heapend;
+
+return -1;
 end
 }
 
-int main()
-{
-begin
-return 0;
-end
-}
 		
 		
 			

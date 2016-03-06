@@ -26,32 +26,101 @@ void getPointerValue(Node * root,Node * index)
 LTable *lTableEntry = LLookUp(root->var.name,lTable);
 
 int innerBinding;
-innerBinding = getInnerBinding(root);
+
+	
 if(!lTableEntry)
 	{
         STable * sTableEntry = LookUp(root->var.name);
+	root->type = sTableEntry->type;
+	innerBinding = getInnerBinding(root);
 	reg_count++;
 	fprintf(out,"MOV R%d,[%d]\n",reg_count,sTableEntry->binding);
 
 	}
 else
 	{
+	root->type = lTableEntry->type;
+	innerBinding = getInnerBinding(root);
 	reg_count++;
-	fprintf(out,"MOV R%d,[%d]\n",reg_count,lTableEntry->binding);
+	fprintf(out,"MOV R%d,BP\n",reg_count);
+	reg_count++;
+	fprintf(out,"MOV R%d,%d\n",reg_count,lTableEntry->binding);
+	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+	reg_count--;
+	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+
 	}
 
+if(innerBinding!=0)
+{
 reg_count++;
 fprintf(out,"MOV R%d,%d\n",reg_count,innerBinding);
 fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 reg_count--;
+}
+if(index)
+{
+	compile(index);
+	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+	reg_count--;
+}
 fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);		
-}	
+	
+}
+
+void getPointerAddress(Node * root,Node * index)
+{
+LTable *lTableEntry = LLookUp(root->var.name,lTable);
+
+int innerBinding;
+
+	
+if(!lTableEntry)
+	{
+        STable * sTableEntry = LookUp(root->var.name);
+	root->type = sTableEntry->type;
+	innerBinding = getInnerBinding(root);
+	reg_count++;
+	fprintf(out,"MOV R%d,[%d]\n",reg_count,sTableEntry->binding);
+
+	}
+else
+	{
+	root->type = lTableEntry->type;
+	innerBinding = getInnerBinding(root);
+	reg_count++;
+	fprintf(out,"MOV R%d,BP\n",reg_count);
+	reg_count++;
+	fprintf(out,"MOV R%d,%d\n",reg_count,lTableEntry->binding);
+	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+	reg_count--;
+	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
+
+	}
+printf("%d\n",innerBinding);
+if(innerBinding!=0)
+{
+reg_count++;
+fprintf(out,"MOV R%d,%d\n",reg_count,innerBinding);
+fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+reg_count--;
+}
+if(index)
+{
+	compile(index);
+	fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
+	reg_count--;
+}
+		
+	
+}
 
 
 void setVariableValue(Node * root,Node *index)
 {
 LTable *lTableEntry = LLookUp(root->var.name,lTable);
 int innerBinding;
+
 //if not in local table find in global table
 if(!lTableEntry)
 	{
@@ -59,7 +128,7 @@ if(!lTableEntry)
 	//resetting the type which was set in semantic analysis phase
 	root->type = sTableEntry->type;
 	innerBinding = getInnerBinding(root);
-		
+	
 	if(!index)
 	{
 	reg_count++;
@@ -91,19 +160,26 @@ else
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	
 	}
+
 }
 
 void getVariableValue(Node * root,Node *index)
 {
 LTable *lTableEntry = LLookUp(root->var.name,lTable);
 int innerBinding;
-if(root->var.pointer)
-	getPointerValue(root,index);
-else
-{
+
 if(!lTableEntry)
 	{
 	STable *sTableEntry = LookUp(root->var.name);
+
+	//if it is a pointer and there is no index get the address, pointer is pointing to
+	if(sTableEntry->pointer&&root->var.index)
+		getPointerAddress(root,index);
+	//else get the value in that address
+	else if(sTableEntry->pointer)
+		getPointerValue(root,index);
+	else
+	{
 	//resetting the type which was set in semantic analysis phase
 	root->type = sTableEntry->type;
 	
@@ -125,7 +201,17 @@ if(!lTableEntry)
 	fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	}
 	}
+	}
 else
+	{
+	//if is a pointer and there is no index get the address the pointer is pointing to
+	if(lTableEntry->pointer&&!root->var.index)
+		getPointerAddress(root,index);
+	//else get the value in that address
+	else if(lTableEntry->pointer)
+		getPointerValue(root,index);
+
+	else
 	{
 	//resetting the type which was set in semantic analysis phase
 	root->type = lTableEntry->type;
@@ -142,7 +228,8 @@ else
 	if(lTableEntry->ref ==1)
 		fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 	}
-}
+	}
+
 }
 
 ArgList * reverseArgList(ArgList * argList)
@@ -234,7 +321,8 @@ switch(root->nodeType)
 				if(nops==1)
 					{
 					compile(oper1);
-					fprintf(out,"MOV R%d,0\n",reg_count);
+					reg_count++;
+					fprintf(out,"MOV R%d,-1\n",reg_count);
 					fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
 					reg_count--;	
 					}
@@ -294,8 +382,30 @@ switch(root->nodeType)
 			case '=':
 				{
 				int i=0;
+
+				if(oper1->var.pointer)
+					{
+					if(!oper1->var.index)
+					{
+					setVariableValue(oper1,oper1->var.index);
+					setVariableValue(oper2,oper2->var.index);
+					reg_count++;
+					fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count-1);
+					fprintf(out,"MOV [R%d],R%d\n",reg_count-2,reg_count);
+					reg_count-=3;
+					}
+					else
+					{
+					getPointerAddress(oper1,oper1->var.index);
+					compile(oper2);
+					fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
+					reg_count-=2;
+					}
+					}	
+				else
+				{			
 				//if a complex variable copy the contents from one to the other				
-				if((oper1->type!=INT)&&(oper1->type!=BOOLEAN))
+				if(oper1->size>1)
 				{
 				reg_count++;
 				fprintf(out,"MOV R%d,%d\n",reg_count,oper1->type->size);
@@ -308,7 +418,7 @@ switch(root->nodeType)
 
 				reg_count++;
 				
-				fprintf(out,"WHILEBEG%d:\n",++while_count);
+				fprintf(out,"WHILEBEG%d:\n",while_count);
 				fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count-1);
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-2,reg_count);
 				fprintf(out,"INR R%d\n",reg_count-1);
@@ -317,7 +427,7 @@ switch(root->nodeType)
 				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-3,while_count);
 				fprintf(out,"JMP WHILEBEG%d\n",while_count);
 				fprintf(out,"WHILEEND%d:\n",while_count);
-				
+				while_count++;
 				reg_count-=4;
 				}
 				//else set the value
@@ -328,7 +438,7 @@ switch(root->nodeType)
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
 				reg_count-=2;
 				}
-
+				}	
 				break;
 				}	
 			
@@ -406,7 +516,7 @@ switch(root->nodeType)
 				fprintf(out,"MOV R%d,0\n",++reg_count);
 				fprintf(out,"GT R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
-				//return interpret(oper1)||interpret(oper2);
+				
 				break;
 				}
 
@@ -417,12 +527,16 @@ switch(root->nodeType)
 				fprintf(out,"ADD R%d,R%d\n",reg_count-1,reg_count);
 				fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
-				//return !interpret(oper1);
+				
 				break;
 				}
 			case READ:
 				{
-				setVariableValue(oper1,oper1->var.index);
+				//if a pointer gets the address it is pointing to
+				if(oper1->var.pointer)
+					getPointerAddress(oper1,oper1->var.index);
+				else
+					setVariableValue(oper1,oper1->var.index);
 				reg_count++;
 				fprintf(out,"IN R%d\n",reg_count);
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
@@ -432,7 +546,7 @@ switch(root->nodeType)
 
 			case WRITE:
 				{
-			
+				
 				compile(oper1);
 				fprintf(out,"OUT R%d\n",reg_count);
 				reg_count--;
@@ -454,11 +568,7 @@ switch(root->nodeType)
 				fprintf(out,"ENDIF%d:\n",cnt);
 				
 				
-				/*if(interpret(oper1))
-					interpret(oper2);
-				else if(root->oper.nops==3)
-					interpret(oper3);
-				*/			
+						
 				break;
 				}
 
@@ -474,8 +584,6 @@ switch(root->nodeType)
 				fprintf(out,"WHILEEND%d:\n",cnt);
 				
 				
-				//while(interpret(oper1))
-				//	interpret(oper2);
 				break;
 				}
 
@@ -493,7 +601,7 @@ switch(root->nodeType)
 				compile(oper2);
 				//getting the value to push(by multiplying with the types size)
 				reg_count++;
-				fprintf(out,"MOV R%d,%d\n",oper1->type->size);
+				fprintf(out,"MOV R%d,%d\n",reg_count,oper1->type->size);
 				fprintf(out,"MUL R%d,R%d\n",reg_count-1,reg_count);
 				reg_count--;
 
@@ -506,7 +614,7 @@ switch(root->nodeType)
 				fprintf(out,"PUSH R%d\n",reg_count);
 		
 				//calling new
-				fprintf(out,"CALL new\n");
+				fprintf(out,"CALL newn\n");
 				
 				//getting the return value
 				reg_count++;
@@ -517,9 +625,7 @@ switch(root->nodeType)
 				fprintf(out, "MOV [R%d],R%d\n",reg_count,reg_count-1);	
 				reg_count-=2;
 				
-				//popping the argument
-				fprintf(out,"POP R%d\n",reg_count);
-				
+								
 				//popping back the registers
 				for(i=reg_count;i>=0;i--)
 					fprintf(out,"POP R%d\n",i);
@@ -530,22 +636,29 @@ switch(root->nodeType)
 			case FREE:
 				{
 				//getting the value in the pointer
-				setVariableValue(oper1,NULL);
-				fprintf(out,"MOV R%d,[R%d]\n",reg_count);
+				compile(oper1);
 				
 				//pushing the used registers (this will also push the argument since it is in the topmost register)
 				for(i=0;i<=reg_count;i++)
 					fprintf(out,"PUSH R%d\n",i);
-
-				//calling free
-				fprintf(out,"CALL free\n");
 				
-				//popping the argument;
+				//for return value
+				fprintf(out,"PUSH R%d\n",reg_count);
+				//calling free
+				fprintf(out,"CALL freen\n");
+				
+				//popping the return value;
 				fprintf(out,"POP R%d\n",reg_count);
+				
+				//moving the value to the pointer
+				setVariableValue(oper1,NULL);
+				fprintf(out, "MOV [R%d],0\n",reg_count,reg_count-1);	
+				reg_count--;
 				
 				//popping back the registers
 				for(i=reg_count;i>=0;i--)
 					fprintf(out,"POP R%d\n",i);
+				reg_count--;
 				
 				break;
 				}
@@ -591,12 +704,7 @@ switch(root->nodeType)
 				//compiling func body
 				compile(oper1->var.index);
 	
-				//Resetting the stack for the caller function by popping the local variables
-				fprintf(out,"MOV SP,BP\n");
-
-				//setting BP back
-				fprintf(out,"POP BP\n");
-				fprintf(out,"RET\n");
+				
 				break;
 				}
 			case 'f':
@@ -630,14 +738,14 @@ switch(root->nodeType)
 						fprintf(out,"MOV R%d,%d\n",reg_count,argListEntry->type->size);
 						setVariableValue(argListEntry->value,NULL);
 								
-						fprintf(out,"WHILEBEG%d:\n",++while_count);
+						fprintf(out,"WHILEBEG%d:\n",while_count);
 						fprintf(out,"PUSH R%d\n",reg_count);
 						fprintf(out,"INR R%d\n",reg_count);
 						fprintf(out,"DCR R%d\n",reg_count-1);
 						fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-1,while_count);
 						fprintf(out,"JMP WHILEBEG%d\n",while_count);
 						fprintf(out,"WHILEEND%d:\n",while_count);
-				
+						while_count++;
 						reg_count-=2;
 						}
 
@@ -647,7 +755,7 @@ switch(root->nodeType)
 						fprintf(out,"MOV R%d,%d\n",reg_count,argListEntry->type->size);
 						setVariableValue(argListEntry->value,NULL);
 								
-						fprintf(out,"WHILEBEG%d:\n",++while_count);
+						fprintf(out,"WHILEBEG%d:\n",while_count);
 						fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count);
 						fprintf(out,"PUSH R%d\n",reg_count);
 						fprintf(out,"INR R%d\n",reg_count);
@@ -655,7 +763,7 @@ switch(root->nodeType)
 						fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-1,while_count);
 						fprintf(out,"JMP WHILEBEG%d\n",while_count);
 						fprintf(out,"WHILEEND%d:\n",while_count);
-				
+						while_count++;
 						reg_count-=2;
 						}
 					
@@ -758,7 +866,7 @@ switch(root->nodeType)
 				fprintf(out,"MOV R%d,%d\n",reg_count,oper1->type->size);
 				setVariableValue(oper1,NULL);
 				
-				fprintf(out,"WHILEBEG%d:\n",++while_count);
+				fprintf(out,"WHILEBEG%d:\n",while_count);
 				
 				reg_count++;	
 				fprintf(out,"MOV R%d,[R%d]\n",reg_count,reg_count-1);
@@ -769,7 +877,7 @@ switch(root->nodeType)
 				fprintf(out,"JZ R%d,WHILEEND%d\n",reg_count-2,while_count);
 				fprintf(out,"JMP WHILEBEG%d\n",while_count);
 				fprintf(out,"WHILEEND%d:\n",while_count);
-				
+				while_count++;
 				reg_count-=4;
 				}
 				
@@ -781,7 +889,14 @@ switch(root->nodeType)
 				//putting the value in the address
 				fprintf(out,"MOV [R%d],R%d\n",reg_count-1,reg_count);
 				reg_count-=2;
-				}	
+				}
+				
+				//Resetting the stack for the caller function by popping the local variables
+				fprintf(out,"MOV SP,BP\n");
+
+				//setting BP back
+				fprintf(out,"POP BP\n");
+				fprintf(out,"RET\n");	
 				
 				break;
 				}

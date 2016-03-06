@@ -29,6 +29,7 @@ if(innerNode)
 		innerNode = innerNode->var.innerId;
 	}
 root->type = innerType;	
+
 }
 }
 
@@ -67,7 +68,7 @@ switch(root->nodeType)
 				{
 				root->type = sTableEntry->type;
 				root->var.pointer = sTableEntry->pointer;
-				//printf("%s found from global Table in memory address %d\n",root->var.name,sTableEntry->binding+getInnerBinding(root));
+				
 				//if complex variable, setting the type and checking for validity
 				checkInnerNode(root);
 				
@@ -89,14 +90,6 @@ switch(root->nodeType)
 						}
 					
 					}
-				else
-					{
-					if(sTableEntry->array==1)
-					{
-					printf("Error in %d: %s is an array\n",root->lineNo,root->var.name);
-					has_error = true;
-					}
-					}
 				
 				}
 		}
@@ -104,15 +97,19 @@ switch(root->nodeType)
 			{
 			root->type = lTableEntry->type;
 			root->var.pointer = lTableEntry->pointer;
+			
+			//checks inner node if it is a complex variable
+			checkInnerNode(root);
 
-			if(root->var.index)
+			//if it is not a pointer there shouldnt be any index
+			if(!root->var.pointer&&root->var.index)
 			{
 			printf("Error in %d: %s is not an array\n",root->lineNo,root->var.name);
 			has_error = true;
 			}
-			//printf("%s found from local Table in memory address %d\n",root->var.name,lTableEntry->binding+getInnerBinding(root));
-			//checks inner node if it is a complex variable
-			checkInnerNode(root);
+			
+			
+			
 			
 			
 			}
@@ -168,7 +165,14 @@ switch(root->nodeType)
 				printf("Error in %d: Type Error in =\n",root->lineNo);
 				has_error = true;
 				}
-			
+			if(oper1->var.pointer!=oper2->var.pointer)
+				{
+				if((oper1->var.pointer&&!oper1->var.index)||(oper2->var.pointer&&oper2->var.index))
+				{				
+				printf("Error in %d: Type Error in =\n",root->lineNo);
+				has_error = true;
+				}
+				}
 			
 			break;
 			}	
@@ -227,6 +231,13 @@ switch(root->nodeType)
 		case READ:
 			{
 			semanticAnalyzer(oper1);
+			//cant read a pointer
+			if(oper1->var.pointer&&!oper1->var.index)
+				{
+				printf("Error in %d: Type Error in READ\n",root->lineNo);
+				has_error=true;
+				}
+
 			if(oper1->type!=INT)
 				{
 				printf("Error in %d: Type Error in READ\n",root->lineNo);
@@ -243,7 +254,7 @@ switch(root->nodeType)
 				printf("Error in %d: Type Error in WRITE\n",root->lineNo);
 				has_error=true;
 				}
-			
+
 			break;
 			}
 

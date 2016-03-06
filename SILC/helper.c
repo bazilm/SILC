@@ -1,5 +1,34 @@
 #include "y.tab.h"
 
+//initializes the output file(adds library code and sets up stack)
+void initializeOutputFile(FILE * out)
+{
+fprintf(out,"START\n");
+fprintf(out,"MOV BP,1535\n");
+fprintf(out,"MOV SP,BP\n");
+fprintf(out,"MOV [0],996\n");
+fprintf(out,"MOV [1],2\n");
+fprintf(out,"MOV [2],0\n");
+fprintf(out,"MOV [3],996\n");
+fprintf(out,"MOV [1000],2\n");
+fprintf(out,"CALL main\n");
+fprintf(out,"HALT\n");
+
+FILE * lib = fopen("library.out","r");
+if(!lib)
+	{
+	printf("Library File Not FOund\n");
+	exit(0);
+	}
+char c = fgetc(lib);
+
+while (c != EOF)
+{
+fputc(c, out);
+c = fgetc(lib);
+}
+printf("File Initialized\n");
+}
 //initializes symbol Table
 void initializeSymbolTable()
 {
@@ -466,6 +495,8 @@ return argListEntry;
 
 Node * makeFuncNode(TypeTable *type,char * name,ArgList * argList,Node * func_body)
 {
+if(strcmp(name,"main")==0)
+	has_main=true;
 
 if(LookUp(name)==NULL)
 {
